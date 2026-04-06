@@ -1,0 +1,293 @@
+import { normalizeConfidence, normalizeScore, scoreToDirection } from "./score.js";
+
+const RAW_API_BASE = String(process.env.NEXT_PUBLIC_NEUTRALEYE_API_URL || "").trim();
+const IS_DEV = process.env.NODE_ENV !== "production";
+
+function resolveApiBase() {
+  const configured = RAW_API_BASE.replace(/\/$/, "");
+  if (!configured) return "";
+  if (typeof window === "undefined") return configured;
+
+  try {
+    const current = new URL(window.location.href);
+    const target = new URL(configured);
+    const localHosts = new Set(["localhost", "127.0.0.1"]);
+
+    if (
+      localHosts.has(current.hostname) &&
+      localHosts.has(target.hostname) &&
+      current.port === target.port &&
+      current.protocol === target.protocol
+    ) {
+      return `${current.protocol}//${current.host}`.replace(/\/$/, "");
+    }
+  } catch {
+    return configured;
+  }
+
+  return configured;
+}
+
+class ApiError extends Error {
+  constructor(message, { status, code, requestId, endpoint, details } = {}) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status || 0;
+    this.code = code || "API_ERROR";
+    this.requestId = requestId || "";
+    this.endpoint = endpoint || "";
+    this.details = details || "";
+  }
+}
+
+function devLog(message, meta) {
+  if (!IS_DEV) return;
+  if (meta !== undefined) {
+    console.info(`[neutraleye:web] ${message}`, meta);
+    return;
+  }
+  console.info(`[neutraleye:web] ${message}`);
+}
+
+function listFromBlock(text) {
+  return String(text || "")
+    .split(/\n+/)
+    .map((line) => line.replace(/^[-*]\s*/, "").trim())
+    .filter(Boolean);
+}
+
+function sectionValue(markdown, heading, fallbackHeading) {
+  const titles = [heading, fallbackHeading].filter(Boolean).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const pattern = new RegExp(`(?:^|\\n)\\*\\*(${titles.join("|")})\\*\\*\\s*\\n?([\\s\\S]*?)(?=\\n\\*\\*[^\\n]+\\*\\*|$)`, "i");
+  const match = String(markdown || "").match(pattern);
+  return match ? match[2].trim() : "";
+}
+
+function parseLegacyMarkdown(raw) {
+  const markdown = String(raw || "").trim();
+  if (!markdown) return {};
+
+  const direction = sectionValue(markdown, "Bias Level", "Direction");
+  const summary = sectionValue(markdown, "Summary of Bias", "Summary");
+  const examples = listFromBlock(sectionValue(markdown, "Examples of Bias", "Examples")).map((item) => ({
+    quote: item,
+    label: "Bias signal",
+    explanation: "Legacy response item."
+  }));
+  const sources = listFromBlock(sectionValue(markdown, "Suggested Unbiased Sources", "Suggested unbiased sources"));
+  const recommendations = listFromBlock(sectionValue(markdown, "Recommendations", "Recommendations to look up"));
+
+  const confidenceText = sectionValue(markdown, "Analysis Confidence", "Confidence level");
+  const match = confidenceText.match(/(\d+(?:\.\d+)?)\s*%?/);
+  const confidence = match ? normalizeConfidence(Number(match[1]) > 1 ? Number(match[1]) / 100 : Number(match[1])) : 0.5;
+
+  return {
+    directionLabel: direction || undefined,
+    confidence,
+    score: undefined,
+    summary: summary || "",
+    drivers: [],
+    examples,
+    sources,
+    recommendations
+  };
+}
+
+function toArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeSource(item) {
+  if (typeof item === "string") {
+    const value = item.trim();
+    return value ? value : null;
+  }
+
+  const name = String(item?.name || item?.title || item?.outlet || "").trim();
+  const url = String(item?.url || "").trim();
+  if (!name && !url) return null;
+
+  return {
+    name: name || url,
+    url
+  };
+}
+
+function normalizeExample(item) {
+  const quote = String(item?.quote || item || "").trim();
+  if (!quote) return null;
+
+  return {
+    quote,
+    label: String(item?.label || "Evidence").trim() || "Evidence",
+    explanation: String(item?.explanation || "Model-detected signal.").trim() || "Model-detected signal.",
+    highlights: toArray(item?.highlights).map((value) => String(value).trim()).filter(Boolean)
+  };
+}
+
+function firstTextBlock(markdown) {
+  return String(markdown || "")
+    .replace(/\r/g, "")
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .find((block) => block && !/^#{1,6}\s/.test(block) && !/^\*\*[^*]+\*\*$/.test(block))
+    || "";
+}
+
+function compactSummaryFromMixedResult(markdown) {
+  const text = String(markdown || "").trim();
+  if (!text) return "";
+  const fromSection = sectionValue(text, "Summary of Bias", "Summary");
+  if (fromSection) return fromSection;
+
+  return text
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line && !/^\*\*[^*]+\*\*$/.test(line) && !/^[-*]\s+/.test(line))
+    .slice(0, 3)
+    .join(" ")
+    .slice(0, 600);
+}
+
+function stringOrFallback(value, fallback) {
+  const next = String(value || "").trim();
+  return next || fallback;
+}
+
+function normalizeResponse(data, inputType, requestMeta = {}) {
+  const raw = data || {};
+  const legacy = parseLegacyMarkdown(raw.result);
+  const fallbackSummary = compactSummaryFromMixedResult(raw.result) || firstTextBlock(raw.result);
+
+  const score = normalizeScore(raw.score ?? raw.biasScore ?? legacy.score ?? 0);
+  const directionLabel = raw.directionLabel || raw.direction || raw.biasLevel || legacy.directionLabel || scoreToDirection(score);
+  const createdAt = new Date().toISOString();
+  const requestTimestamp = requestMeta.requestStartedAt || createdAt;
+  const normalizedExamples = toArray(raw.examples ?? legacy.examples).map(normalizeExample).filter(Boolean);
+  const normalizedSources = toArray(raw.sources ?? legacy.sources).map(normalizeSource).filter(Boolean);
+  const normalizedRecommendations = toArray(raw.recommendations ?? legacy.recommendations)
+    .map((item) => String(item).trim())
+    .filter(Boolean);
+  const normalizedDrivers = toArray(raw.drivers).map((item) => String(item).trim()).filter(Boolean).slice(0, 6);
+
+  const normalized = {
+    id: crypto.randomUUID(),
+    createdAt,
+    inputType,
+    url: requestMeta.url,
+    title: raw.title || requestMeta.title || requestMeta.url,
+    direction: String(directionLabel || "Neutral"),
+    directionLabel: String(directionLabel || "Neutral"),
+    confidence: normalizeConfidence(raw.confidence ?? raw.confidenceValue ?? legacy.confidence ?? 0.5),
+    score,
+    summary: stringOrFallback(raw.summary || legacy.summary || fallbackSummary, "No summary returned."),
+    drivers: normalizedDrivers,
+    examples: normalizedExamples,
+    sources: normalizedSources,
+    recommendations: normalizedRecommendations,
+    extractedText: String(raw.extractedText || raw.extracted || ""),
+    requestMeta: {
+      requestId: String(requestMeta.requestId || ""),
+      requestStartedAt: requestTimestamp,
+      requestCompletedAt: createdAt,
+      status: Number(requestMeta.status || 200),
+      endpoint: String(requestMeta.endpoint || "")
+    }
+  };
+
+  if (!normalized.drivers.length) {
+    normalized.drivers = normalized.examples.length
+      ? [...new Set(normalized.examples.map((item) => item.label))].slice(0, 6)
+      : ["Loaded wording", "Framing", "Source imbalance", "Attribution gaps"];
+  }
+
+  return normalized;
+}
+
+function ensureApiBaseConfigured() {
+  if (resolveApiBase()) return;
+  throw new ApiError("Backend URL is not configured. Set NEXT_PUBLIC_NEUTRALEYE_API_URL.", {
+    status: 0,
+    code: "CONFIG_ERROR",
+    endpoint: ""
+  });
+}
+
+async function request(endpoint, payload, inputType, requestMeta) {
+  ensureApiBaseConfigured();
+  const requestId = crypto.randomUUID();
+  const requestStartedAt = new Date().toISOString();
+  const target = `${resolveApiBase()}${endpoint}`;
+  devLog(`request start ${endpoint}`, { requestId, payload });
+
+  let response;
+  const timeoutMs = Number(requestMeta?.timeoutMs || 30000);
+  const controller = new AbortController();
+  const timeoutId = globalThis.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    response = await fetch(target, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-client": "web", "x-request-id": requestId },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+  } catch (error) {
+    globalThis.clearTimeout(timeoutId);
+    if (error?.name === "AbortError") {
+      devLog(`request timeout ${endpoint}`, { requestId, timeoutMs });
+      throw new ApiError("Request timed out while contacting the analysis service.", {
+        status: 0,
+        code: "TIMEOUT",
+        requestId,
+        endpoint
+      });
+    }
+    devLog(`request network error ${endpoint}`, { requestId, error: String(error?.message || error) });
+    throw new ApiError("Network error: could not reach analysis service.", {
+      status: 0,
+      code: "NETWORK_ERROR",
+      requestId,
+      endpoint
+    });
+  } finally {
+    globalThis.clearTimeout(timeoutId);
+  }
+
+  let data = {};
+  let rawText = "";
+  const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+  try {
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      rawText = String(await response.text() || "").trim();
+    }
+  } catch {
+    data = {};
+  }
+  devLog(`request complete ${endpoint}`, { requestId, status: response.status, ok: response.ok, body: data });
+
+  if (!response.ok) {
+    const message = String(data?.error || data?.message || rawText || "Analysis request failed.");
+    const details = String(data?.details || rawText || "");
+    throw new ApiError(message, {
+      status: response.status,
+      code: String(data?.code || `HTTP_${response.status}`),
+      requestId,
+      endpoint,
+      details
+    });
+  }
+
+  return normalizeResponse(data, inputType, { ...requestMeta, requestId, requestStartedAt, status: response.status, endpoint });
+}
+
+export async function analyzeText(text) {
+  return request("/analyze-text", { text }, "text", { timeoutMs: 30000 });
+}
+
+export async function analyzeUrl(url) {
+  return request("/analyze-url", { url }, "url", { url, timeoutMs: 45000 });
+}
+
+export { ApiError, normalizeResponse, resolveApiBase };

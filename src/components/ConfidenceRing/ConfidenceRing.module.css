@@ -1,0 +1,23 @@
+.wrap {
+  display: inline-flex;
+}
+
+.ring {
+  --size: 64px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, #fff 56%, transparent 58%),
+    conic-gradient(#333 calc(var(--progress) * 1%), #ddd 0);
+  border: 1px solid var(--border);
+}
+
+.ring strong {
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  color: var(--text);
+}

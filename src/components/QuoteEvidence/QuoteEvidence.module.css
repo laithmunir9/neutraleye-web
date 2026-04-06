@@ -1,0 +1,51 @@
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.chip {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #f0f0f0;
+  padding: 5px 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.quote {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+}
+
+.mark {
+  color: #999;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.quote mark {
+  background: #e7e7e7;
+  color: inherit;
+  border-radius: 5px;
+  padding: 1px 3px;
+}
+
+.explanation {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--secondary-text);
+  line-height: 1.55;
+}
