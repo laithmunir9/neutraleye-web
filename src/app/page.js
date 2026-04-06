@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import BiasDetectionFlowGraphic from "@/components/BiasDetectionFlowGraphic/BiasDetectionFlowGraphic";
 import styles from "./page.module.css";
 
 const EXTENSION_URL =
@@ -117,12 +118,18 @@ const BLOG_PREVIEW = [
   }
 ];
 
+const HERO_TRUST_PILLS = [
+  "AI-powered",
+  "Privacy-safe",
+  "No data storage"
+];
+
 function ResultPanel({ data }) {
   if (data.status === "loading") {
     return (
       <div className={styles.resultBox} aria-live="polite">
         <p className={styles.resultLead}>
-          Reading
+          Reading...
           <span className={styles.loadingDots} aria-hidden="true">
             <span>.</span>
             <span>.</span>
@@ -241,25 +248,19 @@ export default function Home() {
               NeutralEye analyzes tone, framing, and omission so readers can understand how a story is being shaped,
               not just where it was published.
             </p>
+            <div className={styles.heroPills} aria-label="Product trust signals">
+              {HERO_TRUST_PILLS.map((item) => (
+                <span key={item} className={styles.heroPill}>
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className={styles.heroSummary}>
-            <p className={styles.heroSummaryLabel}>What you can do right away</p>
-            <ul className={styles.heroChecklist}>
-              <li>Paste a URL or article text</li>
-              <li>See where wording and framing start to lean</li>
-              <li>Compare with suggested alternative coverage</li>
-            </ul>
+          <div className={styles.heroGraphicColumn}>
+            <p className={styles.heroSummaryLabel}>How NeutralEye works</p>
+            <BiasDetectionFlowGraphic />
           </div>
-        </div>
-
-        <div className={styles.heroTrustRail}>
-          {TRUST_ITEMS.map((item) => (
-            <article key={item.title} className={styles.trustCard}>
-              <h3>{item.title}</h3>
-              <p>{item.copy}</p>
-            </article>
-          ))}
         </div>
 
         <div className={styles.productStage}>
@@ -274,7 +275,7 @@ export default function Home() {
                   Install Extension
                 </a>
                 <a href="#demo" className={styles.secondaryButton}>
-                  Jump To Demo
+                  Try Demo
                 </a>
               </div>
             </div>
@@ -292,8 +293,8 @@ export default function Home() {
                     readOnly
                     aria-readonly="true"
                   />
-                  <a href="#demo" className={styles.primaryButton}>
-                    Analyze
+                  <a href="#demo" className={styles.secondaryButton}>
+                    Try Demo
                   </a>
                 </div>
                 <p className={styles.inputHint}>Works best with public article URLs or a full article body.</p>
@@ -344,13 +345,28 @@ export default function Home() {
                 value="Paste any public news article URL or article text here to inspect framing, tone, and omission."
               />
               <div className={styles.demoActions}>
-                <button type="button" className={styles.primaryButton} onClick={() => triggerDemo("bias")}>
-                  Analyze
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={() => triggerDemo("bias")}
+                  disabled={isDemoLoading}
+                >
+                  {isDemoLoading ? "Reading..." : "Try Demo"}
                 </button>
-                <button type="button" className={styles.secondaryButton} onClick={() => triggerDemo("nobias")}>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => triggerDemo("nobias")}
+                  disabled={isDemoLoading}
+                >
                   No Bias Example
                 </button>
-                <button type="button" className={styles.secondaryButton} onClick={() => triggerDemo("error")}>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => triggerDemo("error")}
+                  disabled={isDemoLoading}
+                >
                   Error Example
                 </button>
               </div>
@@ -370,7 +386,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.section} id="how-it-works">
+      <section className={`${styles.section} ${styles.deferredSection}`} id="how-it-works">
         <div className={styles.sectionIntro}>
           <p className={styles.eyebrow}>How It Works</p>
           <h2>Three steps, no editorial labels.</h2>
@@ -396,7 +412,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.section}>
+      <section className={`${styles.section} ${styles.deferredSection}`}>
         <div className={styles.sectionIntro}>
           <p className={styles.eyebrow}>Output Preview</p>
           <h2>The result stays identical in structure to the extension.</h2>
@@ -407,7 +423,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.section}>
+      <section className={`${styles.section} ${styles.deferredSection}`}>
         <div className={styles.sectionHeading}>
           <div className={styles.sectionIntro}>
             <p className={styles.eyebrow}>Trust</p>
@@ -426,6 +442,9 @@ export default function Home() {
             <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.primaryButton}>
               Install Extension
             </a>
+            <a href="#demo" className={styles.secondaryButton}>
+              Try Demo
+            </a>
           </div>
 
           <div className={styles.trustGrid}>
@@ -439,7 +458,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.section} id="about">
+      <section className={`${styles.section} ${styles.deferredSection}`} id="about">
         <div className={styles.sectionIntro}>
           <p className={styles.eyebrow}>Use Cases</p>
           <h2>Useful anywhere media literacy matters.</h2>
@@ -461,16 +480,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.section}>
+      <section className={`${styles.section} ${styles.deferredSection}`}>
         <div className={styles.sectionHeading}>
           <div className={styles.sectionIntro}>
             <p className={styles.eyebrow}>From The Blog</p>
             <h2>Bias literacy content makes the product feel like a platform.</h2>
             <p>Use the blog to bring readers in from search, then move them toward the demo and extension install.</p>
           </div>
-          <Link href="/blog" className={styles.secondaryButton}>
-            Browse Blog
-          </Link>
+          <div className={styles.heroActions}>
+            <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.primaryButton}>
+              Install Extension
+            </a>
+            <a href="#demo" className={styles.secondaryButton}>
+              Try Demo
+            </a>
+          </div>
         </div>
 
         <div className={styles.blogGrid}>

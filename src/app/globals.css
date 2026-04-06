@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --bg: #fafafa;
   --surface: #ffffff;
@@ -23,6 +25,23 @@
   --warning-bg: #faf3d7;
   --error-bg: #f9e8e8;
   --error-text: #8a3d3d;
+  --background: #fafafa;
+  --foreground: #333333;
+  --card: #ffffff;
+  --card-foreground: #333333;
+  --popover: #ffffff;
+  --popover-foreground: #333333;
+  --primary: #333333;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f0f0;
+  --secondary-foreground: #333333;
+  --muted-foreground: #666666;
+  --accent: #f0f0f0;
+  --accent-foreground: #333333;
+  --destructive: #8a3d3d;
+  --destructive-foreground: #ffffff;
+  --input: #dddddd;
+  --ring: rgba(51, 51, 51, 0.2);
   --font-sans: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, monospace;
 }
