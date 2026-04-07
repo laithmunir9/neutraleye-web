@@ -290,4 +290,13 @@ export async function analyzeUrl(url) {
   return request("/analyze-url", { url }, "url", { url, timeoutMs: 45000 });
 }
 
+export async function analyzeInput({ text, url }) {
+  const hasText = typeof text === "string" && text.trim().length > 0;
+  const hasUrl = typeof url === "string" && url.trim().length > 0;
+  const payload = hasText ? { text: text.trim() } : { url: String(url || "").trim() };
+  const inputType = hasText ? "text" : "url";
+  const requestMeta = hasUrl ? { url: String(url || "").trim(), timeoutMs: 45000 } : { timeoutMs: 30000 };
+  return request("/check-bias", payload, inputType, requestMeta);
+}
+
 export { ApiError, normalizeResponse, resolveApiBase };

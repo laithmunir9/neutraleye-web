@@ -25,20 +25,34 @@ const NODES = [
   }
 ];
 
-export default function BiasDetectionFlowGraphic() {
+export default function BiasDetectionFlowGraphic({ activeStage = 0, flowing = false }) {
   return (
     <div className={styles.wrapper} aria-hidden="true">
       <div className={styles.backdrop} />
       <svg className={styles.connections} viewBox="0 0 320 500" preserveAspectRatio="none">
-        <path className={styles.path} d="M60 52 C110 76, 132 92, 142 132" />
-        <path className={styles.path} d="M150 174 C166 212, 186 238, 212 276" />
-        <path className={styles.path} d="M214 318 C198 352, 178 382, 168 414" />
-        <path className={styles.path} d="M164 454 C154 470, 154 480, 160 492" />
+        <path className={`${styles.path} ${flowing ? styles.pathActive : ""}`} d="M60 52 C110 76, 132 92, 142 132" />
+        <path
+          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
+          d="M150 174 C166 212, 186 238, 212 276"
+        />
+        <path
+          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
+          d="M214 318 C198 352, 178 382, 168 414"
+        />
+        <path
+          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
+          d="M164 454 C154 470, 154 480, 160 492"
+        />
       </svg>
 
       <div className={styles.graphic}>
         {NODES.map((node, index) => (
-          <div key={node.title} className={`${styles.node} ${styles[`node${index + 1}`]}`}>
+          <div
+            key={node.title}
+            className={`${styles.node} ${styles[`node${index + 1}`]} ${
+              activeStage === index + 1 ? styles.nodeActive : ""
+            }`}
+          >
             <div className={styles.nodeMarker}>
               <span className={styles.nodeCore} />
             </div>

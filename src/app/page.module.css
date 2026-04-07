@@ -1,7 +1,7 @@
 .page {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 28px 24px 104px;
+  padding: 24px 24px 104px;
 }
 
 .topbar {
@@ -36,7 +36,7 @@
 }
 
 .hero {
-  padding: 40px 0 56px;
+  padding: 32px 0 40px;
 }
 
 .heroHeader {
@@ -93,6 +93,15 @@
   font-size: 18px;
 }
 
+.conversionLine {
+  margin: 18px 0 0;
+  max-width: 64ch;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
 .heroPills {
   display: flex;
   flex-wrap: wrap;
@@ -124,6 +133,134 @@
   display: grid;
   gap: 12px;
   align-self: stretch;
+}
+
+.heroActionShell {
+  margin-top: 28px;
+  border: 1px solid #cfcfcf;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #f7f7f7);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.heroActionShell:hover {
+  transform: scale(1.01);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.06);
+}
+
+.heroActionLabel {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.heroPrimaryRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.heroPrimaryInput,
+.productActionInput {
+  min-height: 54px;
+  border-color: #c8c8c8;
+  background: #fafafa;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.02);
+  font-size: 16px;
+}
+
+.inputReady {
+  border-color: #8f8f8f;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(0, 0, 0, 0.02);
+}
+
+.heroPrimaryInput:focus,
+.productActionInput:focus,
+.textarea:focus,
+.input:focus {
+  outline: none;
+  border-color: #8b8b8b;
+  box-shadow:
+    0 0 0 2px rgba(51, 51, 51, 0.08),
+    inset 0 1px 1px rgba(0, 0, 0, 0.02);
+}
+
+.heroActionSubtext {
+  margin: 10px 0 0;
+  color: var(--secondary-text);
+  font-size: 14px;
+}
+
+.inputMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.detectedTag {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f5f5f5;
+  color: var(--secondary-text);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.resultPreviewHint,
+.microTrustLine {
+  margin: 10px 0 0;
+  color: var(--secondary-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.microTrustLine {
+  margin-top: 6px;
+}
+
+.zeroFrictionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-top: 12px;
+}
+
+.zeroFrictionRow span,
+.demoZeroFriction {
+  color: var(--secondary-text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.zeroFrictionRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f6f6f6;
+  padding: 7px 11px;
+}
+
+.heroQuickActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .heroChecklist {
@@ -238,6 +375,10 @@
   color: var(--text);
   padding: 14px 16px;
   font-size: 16px;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
 }
 
 .textarea {
@@ -256,6 +397,28 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.tertiaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-height: 42px;
+  color: var(--secondary-text);
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.tertiaryButton:hover {
+  background: #f1f1f1;
+  color: var(--text);
+  transform: scale(1.01);
 }
 
 .primaryButton,
@@ -279,16 +442,29 @@
     opacity 180ms ease;
 }
 
+.analyzeButton {
+  min-height: 48px;
+  padding: 12px 20px;
+  font-size: 15px;
+}
+
 .primaryButton {
   background: #333;
   color: #fff;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 .primaryButton:hover {
   background: #4a4a4a;
   border-color: #4a4a4a;
-  transform: scale(1.01);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.primaryButtonReady {
+  background: #2f2f2f;
+  border-color: #2f2f2f;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
 }
 
 .secondaryButton {
@@ -320,7 +496,7 @@
 }
 
 .section {
-  padding: 104px 0;
+  padding: 112px 0;
 }
 
 .sectionHeading {
@@ -372,6 +548,21 @@
   background: #fcfcfc;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
   padding: 24px;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.demoHighlighted {
+  border-color: #b9b9b9;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
+}
+
+.demoOutputFocused {
+  border-color: #c2c2c2;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
 }
 
 .demoGrid {
@@ -401,6 +592,44 @@
   margin-top: 16px;
 }
 
+.demoZeroFriction {
+  margin: 12px 0 0;
+}
+
+.resetButton,
+.clearButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.resetButton {
+  margin-top: 14px;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.clearButton {
+  min-height: 34px;
+  padding: 7px 10px;
+}
+
+.resetButton:hover,
+.clearButton:hover {
+  background: #f5f5f5;
+  transform: scale(1.01);
+}
+
 .threeUp,
 .trustGrid,
 .blogGrid {
@@ -426,6 +655,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
+  min-height: 420px;
 }
 
 .resultLead,
@@ -440,12 +670,28 @@
 }
 
 .resultSection + .resultSection {
-  margin-top: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(221, 221, 221, 0.9);
+}
+
+.revealBlock,
+.revealListItem {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.revealVisible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .resultSection strong {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-size: 14px;
   color: #333;
 }
@@ -453,6 +699,26 @@
 .resultSection ul {
   margin: 0;
   padding-left: 18px;
+}
+
+.resultSection p,
+.resultSection li {
+  line-height: 1.65;
+}
+
+.resultConfidenceNote {
+  margin: 12px 0 0;
+  color: var(--secondary-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.inlineInstallCta {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .outputFrame {
@@ -504,6 +770,31 @@
   color: var(--text);
 }
 
+.blogDemoCta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.blogDemoCta p,
+.demoNudge {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.demoNudge {
+  margin-top: 14px;
+}
+
 .finalCta {
   display: flex;
   align-items: center;
@@ -547,6 +838,32 @@
 
 .loadingDots span:nth-child(3) {
   animation-delay: 0.3s;
+}
+
+.trustStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 8px;
+}
+
+.trustStripItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f5f5f5;
+  color: var(--secondary-text);
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.trustCheck {
+  color: var(--text);
+  font-weight: 700;
 }
 
 .successMessage {
@@ -607,6 +924,10 @@
     max-width: 12ch;
   }
 
+  .heroPrimaryRow {
+    grid-template-columns: 1fr;
+  }
+
   .heroGraphicColumn {
     display: none;
   }
@@ -618,6 +939,26 @@
   }
 
   .heroInputRow {
+    flex-direction: column;
+  }
+
+  .heroQuickActions,
+  .heroActions,
+  .demoActions,
+  .zeroFrictionRow,
+  .trustStrip,
+  .blogDemoCta,
+  .inputMetaRow {
+    width: 100%;
+  }
+
+  .blogDemoCta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .inputMetaRow {
+    align-items: flex-start;
     flex-direction: column;
   }
 
