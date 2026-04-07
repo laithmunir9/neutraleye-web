@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import type { Variants } from "framer-motion";
 import {
   ArrowRight,
   Bot,
@@ -21,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { cn } from "@/lib/utils";
 
-const transitionVariants = {
+const transitionVariants: { item: Variants } = {
   item: {
     hidden: {
       opacity: 0,
@@ -33,7 +34,7 @@ const transitionVariants = {
       filter: "blur(0px)",
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         bounce: 0.3,
         duration: 1.5
       }
@@ -94,13 +95,13 @@ export function HeroSection() {
                     opacity: 1,
                     y: 0,
                     transition: {
-                      type: "spring",
+                      type: "spring" as const,
                       bounce: 0.3,
                       duration: 2
                     }
                   }
                 }
-              }}
+              } satisfies { container?: Variants; item?: Variants }}
               className="absolute inset-0 -z-20"
             >
               <img
