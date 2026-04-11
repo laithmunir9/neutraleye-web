@@ -4,7 +4,6 @@ import React from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Facebook,
   Frame,
   Instagram,
   Linkedin,
@@ -53,7 +52,6 @@ const footerLinks: FooterSection[] = [
   {
     label: 'Social Links',
     links: [
-      { title: 'Facebook', href: '#', icon: Facebook },
       { title: 'Instagram', href: '#', icon: Instagram },
       { title: 'Youtube', href: '#', icon: Youtube },
       { title: 'LinkedIn', href: '#', icon: Linkedin }
