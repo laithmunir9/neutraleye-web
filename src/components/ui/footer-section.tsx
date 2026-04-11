@@ -4,11 +4,11 @@ import React from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
-  FacebookIcon,
-  FrameIcon,
-  InstagramIcon,
-  LinkedinIcon,
-  YoutubeIcon
+  Facebook,
+  Frame,
+  Instagram,
+  Linkedin,
+  Youtube
 } from 'lucide-react';
 
 interface FooterLink {
@@ -53,10 +53,10 @@ const footerLinks: FooterSection[] = [
   {
     label: 'Social Links',
     links: [
-      { title: 'Facebook', href: '#', icon: FacebookIcon },
-      { title: 'Instagram', href: '#', icon: InstagramIcon },
-      { title: 'Youtube', href: '#', icon: YoutubeIcon },
-      { title: 'LinkedIn', href: '#', icon: LinkedinIcon }
+      { title: 'Facebook', href: '#', icon: Facebook },
+      { title: 'Instagram', href: '#', icon: Instagram },
+      { title: 'Youtube', href: '#', icon: Youtube },
+      { title: 'LinkedIn', href: '#', icon: Linkedin }
     ]
   }
 ];
