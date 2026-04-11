@@ -3,12 +3,8 @@
 import React from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import {
-  Frame,
-  Instagram,
-  Linkedin,
-  Youtube
-} from 'lucide-react';
+import { Frame } from 'lucide-react';
+import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 
 interface FooterLink {
   title: string;
@@ -52,9 +48,10 @@ const footerLinks: FooterSection[] = [
   {
     label: 'Social Links',
     links: [
-      { title: 'Instagram', href: '#', icon: Instagram },
-      { title: 'Youtube', href: '#', icon: Youtube },
-      { title: 'LinkedIn', href: '#', icon: Linkedin }
+      { title: 'Facebook', href: '#', icon: FaFacebook },
+      { title: 'Instagram', href: '#', icon: FaInstagram },
+      { title: 'Youtube', href: '#', icon: FaYoutube },
+      { title: 'LinkedIn', href: '#', icon: FaLinkedin }
     ]
   }
 ];
@@ -66,7 +63,7 @@ export function Footer() {
 
       <div className="grid w-full gap-8 xl:grid-cols-3 xl:gap-8">
         <AnimatedContainer className="space-y-4">
-          <FrameIcon className="size-8" />
+          <Frame className="size-8" />
           <p className="text-muted-foreground mt-8 text-sm md:mt-0">
             © {new Date().getFullYear()} Asme. All rights reserved.
           </p>
