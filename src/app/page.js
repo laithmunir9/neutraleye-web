@@ -2,49 +2,41 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import BiasDetectionFlowGraphic from "@/components/BiasDetectionFlowGraphic/BiasDetectionFlowGraphic";
+import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { analyzeInput, ApiError } from "@/lib/api";
 import { saveAnalysis } from "@/lib/storage";
+import { BLOG_POSTS, EXTENSION_URL } from "@/lib/content";
 import styles from "./page.module.css";
 
-const EXTENSION_URL =
-  "https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe";
-
-const HERO_TRUST_PILLS = ["AI-powered", "Privacy-safe", "No data storage"];
-
-const TRUST_STRIP_ITEMS = [
-  "No data stored",
-  "Runs only when you click",
-  "Article-level analysis, not source bias",
-  "No tracking or accounts required"
+const TRUST_NOTES = [
+  "No account required",
+  "Website and extension share the same output structure",
+  "Analysis focuses on article writing, not publisher labels"
 ];
 
-const BLOG_PREVIEW = [
+const PRODUCT_NOTES = [
   {
-    href: "/blog/what-is-media-bias",
-    category: "Media bias",
-    title: "What is media bias?",
-    copy: "A practical explanation of wording, framing, sourcing, and omission."
+    eyebrow: "Product-first",
+    title: "The website is a usable analysis surface",
+    body: "Paste article text or a URL and get the same structured result format the extension returns while you browse."
   },
   {
-    href: "/blog/how-to-detect-bias-in-news",
-    category: "Critical thinking",
-    title: "How to detect bias in news",
-    copy: "A repeatable reading checklist for comparing articles and narratives."
+    eyebrow: "Bias signals",
+    title: "Tone, framing, omission, and attribution",
+    body: "NeutralEye surfaces the writing patterns that shape interpretation instead of collapsing everything into source reputation."
   },
   {
-    href: "/blog",
-    category: "Media literacy",
-    title: "More guides from the NeutralEye blog",
-    copy: "Explore explainers on framing, propaganda, and responsible source comparison."
+    eyebrow: "Designed output",
+    title: "Results stay aligned with the extension",
+    body: "Bias level, summary, examples, suggested sources, recommendations, and confidence remain in the familiar order."
   }
 ];
 
+const JOURNAL_PREVIEW = BLOG_POSTS.slice(0, 3);
 const EXAMPLE_INPUT =
   "The article frames one side as reckless and dangerous, quotes only sympathetic experts, and leaves out the strongest objections that would challenge its main thesis.";
-
-const LOADING_STEPS = ["Reading...", "Extracting article text...", "Analyzing tone and framing..."];
+const LOADING_STEPS = ["Reading article...", "Isolating readable text...", "Reviewing tone and framing..."];
 const REVEAL_SEQUENCE = ["biasLevel", "summary", "examples", "sources", "recommendations", "confidence"];
 const LANDING_STORAGE_KEY = "neutraleye.landing.v1";
 
@@ -108,7 +100,7 @@ function clearLandingState() {
 function EmptyResult() {
   return (
     <div className={styles.resultBox}>
-      <p className={styles.resultLead}>Paste an article or URL to analyze.</p>
+      <p className={styles.resultLead}>Paste article text or a direct article URL to analyze.</p>
     </div>
   );
 }
@@ -188,8 +180,6 @@ export default function Home() {
   const [analysisState, setAnalysisState] = useState({ status: "idle" });
   const [loadingStep, setLoadingStep] = useState(0);
   const [revealedSections, setRevealedSections] = useState(0);
-  const [hoveredAnalyze, setHoveredAnalyze] = useState("");
-  const [showDemoNudge, setShowDemoNudge] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const inputKind = useMemo(() => detectInputKind(inputValue), [inputValue]);
@@ -246,17 +236,6 @@ export default function Home() {
     };
   }, [hasResult, analysisState]);
 
-  useEffect(() => {
-    function handleScroll() {
-      if (!hasInteracted && window.scrollY > 900) {
-        setShowDemoNudge(true);
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasInteracted]);
-
   async function animateInputFill(nextValue) {
     typingTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     typingTimersRef.current = [];
@@ -282,7 +261,6 @@ export default function Home() {
   async function runAnalysis(nextInput = inputValue) {
     const detected = detectInputKind(nextInput);
     setHasInteracted(true);
-    setShowDemoNudge(false);
 
     if (detected.kind === "empty") {
       setAnalysisState({ status: "error", message: "Paste an article or URL to analyze." });
@@ -341,140 +319,102 @@ export default function Home() {
     }
   }
 
-  function getAnalyzeLabel(key) {
-    if (isLoading) return LOADING_STEPS[loadingStep];
-    return hoveredAnalyze === key ? "Analyze \u2192 see bias" : "Analyze";
-  }
-
   return (
-    <main className={styles.page}>
-      <header className={styles.topbar}>
-        <Link href="/" className={styles.wordmark} aria-label="NeutralEye home">
-          <Image src="/neutraleye-logo-48.png" alt="" width={32} height={32} />
-          <span>NeutralEye</span>
-        </Link>
+    <MarketingShell>
+      <main className={styles.page}>
+        <section className={styles.hero} id="product">
+          <div className={styles.heroGrid}>
+            <div className={styles.heroCopy}>
+              <p className={styles.eyebrow}>Website analyzer</p>
+              <h1>Paste a news article. Get a structured bias read in seconds.</h1>
+              <p className={styles.heroLead}>
+                NeutralEye’s website is a working product surface, not just a landing page. Drop in article text or a
+                direct article URL and get the same extension-style output order for tone, framing, omission, and
+                confidence.
+              </p>
 
-        <nav className={styles.nav} aria-label="Primary">
-          <a href="#product">Product</a>
-          <a href="#demo">Live analysis</a>
-          <Link href="/blog">Blog</Link>
-          <a href="#about">About</a>
-        </nav>
+              <div className={styles.heroAnalyzer}>
+                <div className={styles.inputHeader}>
+                  <div>
+                    <p className={styles.panelEyebrow}>Article input</p>
+                    <h2>Analyze directly on the page</h2>
+                  </div>
+                  {inputKind.label ? <span className={styles.detectedTag}>{inputKind.label}</span> : null}
+                </div>
 
-        <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.primaryButton}>
-          Install Extension
-        </a>
-      </header>
+                <div className={styles.heroPrimaryRow}>
+                  <input
+                    ref={heroInputRef}
+                    id="hero-analyze-input"
+                    className={`${styles.input} ${inputKind.kind !== "empty" ? styles.inputReady : ""}`}
+                    value={inputValue}
+                    onChange={(event) => {
+                      setHasInteracted(true);
+                      setInputValue(event.target.value);
+                    }}
+                    onKeyDown={handleInputKeyDown}
+                    placeholder="Paste article URL or article text"
+                    aria-label="Paste article URL or text"
+                  />
+                  <button type="button" className={styles.primaryButton} onClick={() => runAnalysis()} disabled={!canAnalyze}>
+                    {isLoading ? LOADING_STEPS[loadingStep] : "Analyze article"}
+                  </button>
+                </div>
 
-      <section className={styles.hero} id="product">
-        <div className={styles.heroHeader}>
-          <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>AI-powered news bias analysis</p>
-            <h1>Detect bias in any news article — instantly.</h1>
-            <p className={styles.subheadline}>
-              NeutralEye analyzes tone, framing, and omission so readers can understand how a story is being shaped,
-              not just where it was published.
-            </p>
-            <p className={styles.conversionLine}>
-              Most tools label sources. NeutralEye analyzes how the article is written.
-            </p>
-            <div className={styles.heroActionShell}>
-              <p className={styles.heroActionLabel}>Paste a news article or URL to analyze</p>
-              <div className={styles.heroPrimaryRow}>
-                <input
-                  ref={heroInputRef}
-                  id="hero-analyze-input"
-                  className={`${styles.input} ${styles.heroPrimaryInput} ${inputKind.kind !== "empty" ? styles.inputReady : ""}`}
-                  value={inputValue}
-                  onChange={(event) => {
-                    setHasInteracted(true);
-                    setInputValue(event.target.value);
-                  }}
-                  onKeyDown={handleInputKeyDown}
-                  placeholder="Paste article URL or text"
-                  aria-label="Paste article URL or text"
-                />
-                <button
-                  type="button"
-                  className={`${styles.primaryButton} ${styles.analyzeButton} ${inputKind.kind !== "empty" ? styles.primaryButtonReady : ""}`}
-                  onClick={() => runAnalysis()}
-                  disabled={!canAnalyze}
-                  onMouseEnter={() => setHoveredAnalyze("hero")}
-                  onMouseLeave={() => setHoveredAnalyze("")}
-                >
-                  {getAnalyzeLabel("hero")}
-                </button>
+                <div className={styles.metaRow}>
+                  <p>Free to use. No login. Best for real article pages and full article body text.</p>
+                  <button type="button" className={styles.inlineAction} onClick={handleExample} disabled={isLoading}>
+                    Load example
+                  </button>
+                </div>
               </div>
-              <div className={styles.inputMetaRow}>
-                <p className={styles.heroActionSubtext}>No signup required. Works instantly.</p>
+
+              <div className={styles.noteRow}>
+                {TRUST_NOTES.map((item) => (
+                  <span key={item} className={styles.notePill}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.heroVisual}>
+              <div className={styles.visualSummary}>
+                <p className={styles.panelEyebrow}>Active system view</p>
+                <p>
+                  NeutralEye validates the article first, then moves through extraction, tone review, framing checks,
+                  and structured output.
+                </p>
+              </div>
+              <BiasDetectionFlowGraphic activeStage={activeFlowStage} flowing={isLoading || hasResult} />
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section} id="demo" ref={demoSectionRef}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.eyebrow}>Live analysis</p>
+              <h2>Use the product first. Install later if it fits your reading flow.</h2>
+            </div>
+            <p className={styles.sectionLead}>
+              The website mirrors the extension’s structured response format so users can understand the product before
+              deciding whether they want it in-browser.
+            </p>
+          </div>
+
+          <div className={styles.demoShell}>
+            <div className={styles.demoPanel}>
+              <div className={styles.inputHeader}>
+                <div>
+                  <p className={styles.panelEyebrow}>Input panel</p>
+                  <h3>Paste URL or article text</h3>
+                </div>
                 {inputKind.label ? <span className={styles.detectedTag}>{inputKind.label}</span> : null}
               </div>
-              <p className={styles.resultPreviewHint}>Outputs: Bias level, explanation, examples, and sources</p>
-              <p className={styles.microTrustLine}>Used to evaluate real-world news articles in seconds</p>
-              <div className={styles.zeroFrictionRow}>
-                <span>No login required</span>
-                <span>Free to use</span>
-                <span>Takes ~5 seconds</span>
-              </div>
-              <div className={styles.heroQuickActions}>
-                <button type="button" className={styles.secondaryButton} onClick={handleExample} disabled={isLoading}>
-                  Try Example
-                </button>
-              </div>
-            </div>
-            <div className={styles.heroPills} aria-label="Product trust signals">
-              {HERO_TRUST_PILLS.map((item) => (
-                <span key={item} className={styles.heroPill}>
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
 
-          <div className={styles.heroGraphicColumn}>
-            <p className={styles.heroSummaryLabel}>How NeutralEye works</p>
-            <BiasDetectionFlowGraphic activeStage={activeFlowStage} flowing={isLoading || hasResult} />
-          </div>
-        </div>
-
-        <div className={styles.trustStrip} aria-label="Trust strip">
-          {TRUST_STRIP_ITEMS.map((item) => (
-            <span key={item} className={styles.trustStripItem}>
-              <span className={styles.trustCheck}>✓</span>
-              {item}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.section} id="demo" ref={demoSectionRef}>
-        <div className={styles.sectionHeading}>
-          <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>Live Demo</p>
-            <h2>Use the product directly on the page.</h2>
-            <p>
-              The live tool accepts either a full article URL or pasted article text, then returns a structured result
-              using the same extension-style output order.
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.demoShell}>
-          <div className={styles.demoGrid}>
-            <div className={styles.demoPanel}>
-              <div className={styles.demoPanelHeader}>
-                <div>
-                  <p className={styles.productStageLabel}>Input</p>
-                  <h3>Paste URL or text</h3>
-                </div>
-                {inputKind.label ? <span className={styles.demoBadge}>{inputKind.label}</span> : null}
-              </div>
-              <label className={styles.inputLabel} htmlFor="demo-text">
-                Article input
-              </label>
               <textarea
                 ref={demoInputRef}
-                id="demo-text"
                 className={`${styles.textarea} ${inputKind.kind !== "empty" ? styles.inputReady : ""}`}
                 value={inputValue}
                 onChange={(event) => {
@@ -482,131 +422,112 @@ export default function Home() {
                   setInputValue(event.target.value);
                 }}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Paste an article URL or article text"
+                placeholder="Paste a direct article URL or the article body"
               />
-              <p className={styles.demoZeroFriction}>No login required. Free to use. Takes ~5 seconds.</p>
-              <p className={styles.resultPreviewHint}>Outputs: Bias level, explanation, examples, and sources</p>
-              <p className={styles.microTrustLine}>Used to evaluate real-world news articles in seconds</p>
-              <div className={styles.demoActions}>
-                <button
-                  type="button"
-                  className={`${styles.primaryButton} ${styles.analyzeButton} ${inputKind.kind !== "empty" ? styles.primaryButtonReady : ""}`}
-                  onClick={() => runAnalysis()}
-                  disabled={!canAnalyze}
-                  onMouseEnter={() => setHoveredAnalyze("demo")}
-                  onMouseLeave={() => setHoveredAnalyze("")}
-                >
-                  {getAnalyzeLabel("demo")}
-                </button>
-                <button type="button" className={styles.secondaryButton} onClick={handleExample} disabled={isLoading}>
-                  Try Example
+
+              <div className={styles.demoMeta}>
+                <p>Outputs: bias level, summary, examples, suggested sources, recommendations, and confidence.</p>
+                <button type="button" className={styles.inlineAction} onClick={handleExample} disabled={isLoading}>
+                  Use sample article
                 </button>
               </div>
-              {hasResult ? (
-                <button type="button" className={styles.resetButton} onClick={handleReset}>
-                  Analyze another article
-                </button>
-              ) : null}
-            </div>
 
-            <div className={`${styles.demoOutputPanel} ${isLoading || hasResult ? styles.demoOutputFocused : ""}`}>
-              <div className={styles.demoPanelHeader}>
-                <div>
-                  <p className={styles.productStageLabel}>Live analysis result</p>
-                  <h3>Structured output</h3>
-                </div>
-                {inputValue ? (
-                  <button type="button" className={styles.clearButton} onClick={handleReset}>
+              <div className={styles.demoActions}>
+                <button type="button" className={styles.primaryButton} onClick={() => runAnalysis()} disabled={!canAnalyze}>
+                  {isLoading ? LOADING_STEPS[loadingStep] : "Run live analysis"}
+                </button>
+                {hasInteracted || hasResult ? (
+                  <button type="button" className={styles.tertiaryButton} onClick={handleReset}>
                     Clear
                   </button>
                 ) : null}
               </div>
+            </div>
+
+            <div className={styles.outputPanel}>
+              <div className={styles.inputHeader}>
+                <div>
+                  <p className={styles.panelEyebrow}>Extension parity</p>
+                  <h3>Structured output</h3>
+                </div>
+                <span className={styles.resultMeta}>Same order as extension</span>
+              </div>
 
               {analysisState.status === "idle" ? <EmptyResult /> : null}
-              {analysisState.status === "loading" ? <LoadingResult label={analysisState.label} /> : null}
+              {analysisState.status === "loading" ? <LoadingResult label={LOADING_STEPS[loadingStep]} /> : null}
               {analysisState.status === "error" ? <ErrorResult message={analysisState.message} /> : null}
               {analysisState.status === "result" ? (
                 <>
                   <ResultSections data={analysisState.data} revealStep={revealedSections} />
-                  <p className={styles.resultConfidenceNote}>Based on writing patterns, not publisher identity</p>
-                  <a
-                    href={EXTENSION_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.inlineInstallCta}
-                  >
-                    Analyze articles directly while browsing → Install Extension
+                  <p className={styles.resultConfidenceNote}>Based on writing patterns rather than publisher identity.</p>
+                  <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.textLink}>
+                    Use NeutralEye while browsing
                   </a>
                 </>
               ) : null}
             </div>
           </div>
-        </div>
+        </section>
 
-        {showDemoNudge && !hasInteracted ? (
-          <p className={styles.demoNudge}>Paste any article above to test how it works.</p>
-        ) : null}
-      </section>
-
-      <section className={`${styles.section} ${styles.deferredSection}`} id="about">
-        <div className={styles.sectionHeading}>
-          <div className={styles.sectionIntro}>
-            <p className={styles.eyebrow}>From The Blog</p>
-            <h2>Bias literacy content supports the product experience.</h2>
-            <p>Use the blog to understand bias patterns, then run your own article through the tool.</p>
+        <section className={styles.section} id="system">
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.eyebrow}>How it works</p>
+              <h2>A calmer, clearer product story.</h2>
+            </div>
+            <Link href="/methodology" className={styles.textLink}>
+              Read the methodology
+            </Link>
           </div>
-          <div className={styles.heroActions}>
-            <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.primaryButton}>
-              Install Extension
-            </a>
-          </div>
-        </div>
 
-        <div className={styles.blogGrid}>
-          {BLOG_PREVIEW.map((post) => (
-            <article key={post.title} className={styles.blogCard}>
-              <p className={styles.blogCategory}>{post.category}</p>
-              <h3>{post.title}</h3>
-              <p>{post.copy}</p>
-              <Link href={post.href} className={styles.textLink}>
-                Read article
-              </Link>
+          <div className={styles.productGrid}>
+            <article className={styles.featureLead}>
+              <p className={styles.panelEyebrow}>Website before marketing</p>
+              <h3>The homepage now behaves like a product workspace, with explanation and conversion sitting behind that core utility.</h3>
+              <p>
+                NeutralEye should earn trust by being usable immediately. The extension remains valuable, but it is now
+                framed as a faster companion surface rather than the only real product.
+              </p>
             </article>
-          ))}
-        </div>
-        <div className={styles.blogDemoCta}>
-          <p>Try analyzing an article yourself.</p>
-          <a
-            href="#demo"
-            className={styles.secondaryButton}
-            onClick={() => {
-              setHasInteracted(true);
-              setInputValue(EXAMPLE_INPUT);
-            }}
-          >
-            Try Demo
-          </a>
-        </div>
-      </section>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerBrand}>
-          <Link href="/" className={styles.wordmark}>
-            <Image src="/neutraleye-logo-48.png" alt="" width={28} height={28} />
-            <span>NeutralEye</span>
-          </Link>
-          <p className={styles.footerCopy}>Transparent AI analysis for tone, framing, and omission in news articles.</p>
-        </div>
+            <div className={styles.noteGrid}>
+              {PRODUCT_NOTES.map((item) => (
+                <article key={item.title} className={styles.noteCard}>
+                  <p className={styles.panelEyebrow}>{item.eyebrow}</p>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
 
-        <nav className={styles.footerNav} aria-label="Footer">
-          <a href="#privacy">Privacy Policy</a>
-          <Link href="/blog">Blog</Link>
-          <a href="#about">About</a>
-          <a href={EXTENSION_URL} target="_blank" rel="noreferrer">
-            Install Extension
-          </a>
-        </nav>
-      </footer>
-    </main>
+        <section className={styles.section} id="journal">
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.eyebrow}>Journal</p>
+              <h2>Bias literacy content stays inside the product flow.</h2>
+            </div>
+            <Link href="/blog" className={styles.textLink}>
+              Browse the archive
+            </Link>
+          </div>
+
+          <div className={styles.journalGrid}>
+            {JOURNAL_PREVIEW.map((post) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.journalCard}>
+                <div className={styles.journalMeta}>
+                  <span>{post.category}</span>
+                  <span>{post.readTime}</span>
+                </div>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+                <span className={styles.cardLink}>Read article</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </main>
+    </MarketingShell>
   );
 }

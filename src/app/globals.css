@@ -1,56 +1,82 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fafafa;
-  --surface: #ffffff;
-  --panel: #f0f0f0;
-  --text: #333333;
-  --secondary-text: #666666;
-  --muted: #666666;
-  --border: #dddddd;
-  --border-strong: #c8c8c8;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --radius-lg: 8px;
-  --radius-md: 8px;
-  --radius-sm: 8px;
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 40px;
-  --space-6: 48px;
-  --space-7: 64px;
-  --success-bg: #eef7ef;
-  --success-text: #2f6b35;
-  --warning-bg: #faf3d7;
-  --error-bg: #f9e8e8;
-  --error-text: #8a3d3d;
-  --background: #fafafa;
-  --foreground: #333333;
-  --card: #ffffff;
-  --card-foreground: #333333;
-  --popover: #ffffff;
-  --popover-foreground: #333333;
-  --primary: #333333;
-  --primary-foreground: #ffffff;
-  --secondary: #f0f0f0;
-  --secondary-foreground: #333333;
-  --muted-foreground: #666666;
-  --accent: #f0f0f0;
-  --accent-foreground: #333333;
-  --destructive: #8a3d3d;
-  --destructive-foreground: #ffffff;
-  --input: #dddddd;
-  --ring: rgba(51, 51, 51, 0.2);
-  --brand: 27 96% 61%;
-  --brand-foreground: 31 97% 72%;
-  --font-sans: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, monospace;
+  --bg: #f7f4ef;
+  --surface: rgba(255, 252, 247, 0.92);
+  --surface-strong: #fffcf7;
+  --surface-muted: #efe7dc;
+  --panel: rgba(243, 237, 229, 0.86);
+  --panel-strong: #e8dfd3;
+  --text: #201b16;
+  --secondary-text: #65584b;
+  --muted: #7b6a58;
+  --border: rgba(93, 75, 53, 0.12);
+  --border-strong: rgba(93, 75, 53, 0.24);
+  --shadow: 0 1.1rem 2.4rem rgba(40, 29, 19, 0.06);
+  --shadow-strong: 0 1.8rem 4rem rgba(40, 29, 19, 0.12);
+  --radius-xl: 2rem;
+  --radius-lg: 1.4rem;
+  --radius-md: 1rem;
+  --radius-sm: 0.8rem;
+  --space-1: 0.4rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4rem;
+  --space-8: 6rem;
+  --success-bg: #ecf4ec;
+  --success-text: #31593a;
+  --warning-bg: #f9eed6;
+  --error-bg: #f8e5e0;
+  --error-text: #8c4b40;
+  --background: #f7f4ef;
+  --foreground: #201b16;
+  --card: #fffcf7;
+  --card-foreground: #201b16;
+  --popover: #fffcf7;
+  --popover-foreground: #201b16;
+  --primary: #27211d;
+  --primary-foreground: #f8f4ee;
+  --secondary: #efe7dc;
+  --secondary-foreground: #201b16;
+  --muted-foreground: #65584b;
+  --accent: #efe3cf;
+  --accent-strong: #8b6741;
+  --accent-foreground: #201b16;
+  --destructive: #8c4b40;
+  --destructive-foreground: #fff7f4;
+  --input: rgba(93, 75, 53, 0.14);
+  --ring: rgba(139, 103, 65, 0.2);
+  --brand: 34 37% 39%;
+  --brand-foreground: 38 42% 76%;
+  --font-sans:
+    "Inter",
+    "Segoe UI",
+    "Helvetica Neue",
+    "SF Pro Text",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  --font-display:
+    "Iowan Old Style",
+    "Palatino Linotype",
+    "Book Antiqua",
+    "Georgia",
+    serif;
+  --font-mono:
+    "SFMono-Regular",
+    "SF Mono",
+    "IBM Plex Mono",
+    "Consolas",
+    monospace;
 }
 
 .dark {
-  --brand: 31 97% 72%;
-  --brand-foreground: 27 96% 61%;
+  --brand: 38 42% 76%;
+  --brand-foreground: 34 37% 39%;
 }
 
 * {
@@ -58,7 +84,7 @@
 }
 
 *::selection {
-  background: #e6e6e6;
+  background: rgba(205, 188, 163, 0.55);
 }
 
 html,
@@ -66,6 +92,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -89,22 +119,27 @@ textarea,
 select,
 summary {
   transition:
-    border-color 140ms ease,
-    background-color 140ms ease,
-    color 140ms ease,
-    box-shadow 140ms ease,
-    transform 140ms ease,
-    opacity 140ms ease;
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
 }
 
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.12);
+  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.12);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
 }
 
 .max-w-container {
@@ -120,7 +155,7 @@ a {
   position: absolute;
   inset: auto 0 0 0;
   height: 8rem;
-  background: linear-gradient(to bottom, rgba(250, 250, 250, 0), rgba(250, 250, 250, 1));
+  background: linear-gradient(to bottom, rgba(247, 244, 239, 0), rgba(247, 244, 239, 1));
   pointer-events: none;
 }
 
@@ -163,11 +198,17 @@ a {
 @keyframes appear-zoom {
   0% {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes border-beam {
+  100% {
+    offset-distance: 100%;
   }
 }

@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeutralEye Redesign Preview</title>
+    <style>
+      :root {
+        --bg: #f7f4ef;
+        --surface: rgba(255, 252, 247, 0.92);
+        --text: #201b16;
+        --secondary: #65584b;
+        --accent: #8b6741;
+        --border: rgba(93, 75, 53, 0.12);
+        --shadow: 0 1.3rem 2.8rem rgba(40, 29, 19, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(191, 161, 112, 0.16), transparent 28%),
+          linear-gradient(180deg, #f8f4ee 0%, #f4f0e9 32%, #f7f4ef 100%);
+        color: var(--text);
+      }
+      .page {
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 28px 28px 80px;
+      }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0 30px;
+      }
+      .brand { font-size: 34px; font-weight: 700; letter-spacing: -0.04em; display: flex; gap: 12px; align-items: center; }
+      .brand i {
+        width: 28px; height: 28px; border-radius: 50%;
+        border: 2px solid var(--text); display: inline-block;
+      }
+      .pillnav { display: flex; gap: 12px; }
+      .pill {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.5);
+        border-radius: 999px;
+        padding: 12px 18px;
+        color: var(--secondary);
+        font-weight: 600;
+      }
+      .cta {
+        padding: 14px 20px;
+        border-radius: 16px;
+        background: #2d2823;
+        color: #f8f4ee;
+        font-weight: 700;
+      }
+      .eyebrow {
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      h1, h2, h3, h4, p { margin: 0; }
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 0.94fr;
+        gap: 32px;
+        align-items: start;
+      }
+      .hero h1, .section h2, .footer h2, .article h1 {
+        font-family: "Iowan Old Style", Georgia, serif;
+        letter-spacing: -0.06em;
+        line-height: 0.92;
+      }
+      .hero h1 { font-size: 94px; max-width: 8.5ch; margin-top: 12px; }
+      .hero p.lead { font-size: 20px; line-height: 1.75; color: var(--secondary); max-width: 44rem; margin-top: 22px; }
+      .card, .feature, .journal-card, .footer-panel, .article-card {
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+      .analyzer { margin-top: 30px; padding: 24px; }
+      .headrow, .meta, .sectionhead { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+      .headrow h3, .section h3 { font-size: 34px; letter-spacing: -0.04em; margin-top: 8px; }
+      .inputrow { display: grid; grid-template-columns: 1fr auto; gap: 14px; margin-top: 18px; }
+      input, textarea {
+        width: 100%;
+        border: 1px solid rgba(93,75,53,0.14);
+        border-radius: 18px;
+        padding: 18px 20px;
+        background: rgba(246,240,232,0.72);
+        font: inherit;
+        color: var(--text);
+      }
+      textarea { min-height: 250px; resize: none; }
+      .primary {
+        border: 0;
+        border-radius: 18px;
+        background: #2d2823;
+        color: #f8f4ee;
+        padding: 18px 22px;
+        font-weight: 700;
+      }
+      .meta { margin-top: 16px; align-items: center; }
+      .meta p { color: var(--secondary); line-height: 1.6; }
+      .textlink { color: var(--accent); font-weight: 700; }
+      .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+      .tag {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 10px 14px;
+        color: var(--secondary);
+        background: rgba(255,252,247,0.7);
+        font-size: 14px;
+      }
+      .system {
+        min-height: 540px;
+        padding: 22px;
+        position: relative;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(255,253,249,0.95), rgba(245,238,229,0.96)),
+          radial-gradient(circle at top right, rgba(215,196,171,0.22), transparent 35%);
+      }
+      .system::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 1px 1px, rgba(90,72,52,0.16) 1px, transparent 0);
+        background-size: 20px 20px;
+        mask-image: radial-gradient(circle at 58% 44%, rgba(0,0,0,1), rgba(0,0,0,.2) 60%, transparent 88%);
+      }
+      .line {
+        position: absolute; inset: 140px 68px auto 68px; height: 180px;
+        border-bottom: 2px dashed rgba(52,44,37,0.55);
+        border-right: 2px dashed rgba(52,44,37,0.55);
+        border-radius: 0 120px 120px 0;
+        transform: rotate(-10deg);
+      }
+      .node {
+        position: absolute;
+        width: 240px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+      }
+      .node span.dot {
+        width: 14px; height: 14px; border-radius: 50%; background: #342d27; margin-top: 18px;
+        box-shadow: 0 0 0 10px rgba(52,45,39,0.08);
+      }
+      .node .box {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(255,253,249,0.92);
+        box-shadow: 0 12px 22px rgba(39,29,21,0.08);
+      }
+      .node .k { color: var(--accent); font-size: 11px; letter-spacing: 0.18em; font-weight: 700; }
+      .node strong { display:block; margin-top: 8px; font-size: 17px; }
+      .node p { margin-top: 8px; font-size: 14px; color: var(--secondary); line-height: 1.55; }
+      .n1 { top: 54px; left: 26px; }
+      .n2 { top: 152px; left: 180px; }
+      .n3 { top: 240px; left: 360px; }
+      .n4 { top: 214px; right: 36px; }
+      .n5 { bottom: 34px; left: 280px; }
+      .signal {
+        position: absolute;
+        padding: 9px 14px;
+        border-radius: 999px;
+        background: rgba(255,250,243,0.95);
+        border: 1px solid rgba(93,75,53,0.1);
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 18px rgba(39,29,21,0.08);
+      }
+      .s1 { top: 114px; left: 280px; }
+      .s2 { top: 206px; left: 488px; }
+      .s3 { top: 314px; right: 68px; }
+      .section { margin-top: 80px; }
+      .section h2 { font-size: 68px; max-width: 11ch; margin-top: 12px; }
+      .sectionhead p.lead { max-width: 420px; color: var(--secondary); line-height: 1.7; }
+      .demo {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 18px;
+        margin-top: 24px;
+      }
+      .panel { padding: 22px; }
+      .result {
+        min-height: 420px;
+        border-radius: 22px;
+        padding: 18px;
+        border: 1px solid rgba(93,75,53,0.1);
+        background: rgba(242,235,226,0.62);
+      }
+      .result .block + .block { border-top: 1px solid rgba(93,75,53,0.09); margin-top: 14px; padding-top: 14px; }
+      .result strong { display: block; margin-bottom: 8px; font-size: 15px; }
+      .result p, .result li { color: var(--secondary); line-height: 1.65; font-size: 15px; }
+      .feature-grid {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 18px;
+        margin-top: 24px;
+      }
+      .feature { padding: 24px; }
+      .feature h3 { margin-top: 12px; font-size: 54px; max-width: 12ch; font-family: "Iowan Old Style", Georgia, serif; letter-spacing: -0.06em; line-height: 0.96; }
+      .feature p { margin-top: 14px; color: var(--secondary); line-height: 1.7; font-size: 17px; }
+      .mini-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+      .journal { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 24px; }
+      .journal-card { padding: 22px; display: grid; gap: 14px; }
+      .journal-card .meta { margin-top: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); font-weight: 700; }
+      .journal-card h3 { font-size: 32px; line-height: 1.02; letter-spacing: -0.04em; }
+      .journal-card p { color: var(--secondary); line-height: 1.65; }
+      .footer { margin-top: 88px; }
+      .footer-panel {
+        padding: 34px;
+        display: grid;
+        grid-template-columns: 1.2fr auto;
+        align-items: center;
+        gap: 24px;
+        background: linear-gradient(135deg, rgba(82,68,52,0.96), rgba(41,35,31,0.98));
+        color: #f6f1e8;
+      }
+      .footer h2 { font-size: 64px; max-width: 12ch; }
+      .footer p { color: rgba(246,241,232,0.76); margin-top: 16px; line-height: 1.7; max-width: 40rem; }
+      .footer .textlink { color: #f6f1e8; margin-top: 14px; display: inline-flex; }
+      .archive, .article {
+        margin-top: 90px;
+      }
+      .archive .head, .article .head { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: end; }
+      .archive h2, .article h1 { font-size: 76px; max-width: 11ch; margin-top: 10px; }
+      .archive p.lead, .article p.lead { color: var(--secondary); font-size: 18px; line-height: 1.75; }
+      .article-card { padding: 24px; margin-top: 24px; }
+      .crumbs { color: var(--secondary); font-size: 14px; display: flex; gap: 10px; align-items: center; }
+      .returnband {
+        margin-top: 24px; padding: 22px; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,252,247,0.76);
+      }
+      .article .content { max-width: 760px; margin-top: 28px; }
+      .article .content section + section { margin-top: 24px; }
+      .article .content h3 { font-size: 34px; letter-spacing: -0.04em; margin-bottom: 10px; }
+      .article .content p { color: var(--secondary); line-height: 1.78; font-size: 18px; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="nav">
+        <div class="brand"><i></i> NeutralEye</div>
+        <div class="pillnav">
+          <div class="pill">Product</div>
+          <div class="pill">Resources</div>
+          <div class="pill">Workspace</div>
+        </div>
+        <div class="cta">Install Extension</div>
+      </div>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Website analyzer</div>
+          <h1>Paste a news article. Get a structured bias read in seconds.</h1>
+          <p class="lead">NeutralEye’s website is a working product surface, not just a landing page. Drop in article text or a direct article URL and get the same extension-style output order for tone, framing, omission, and confidence.</p>
+          <div class="card analyzer">
+            <div class="headrow">
+              <div>
+                <div class="eyebrow">Article input</div>
+                <h3>Analyze directly on the page</h3>
+              </div>
+              <div class="tag">URL detected</div>
+            </div>
+            <div class="inputrow">
+              <input value="https://news-site.example/article" />
+              <button class="primary">Analyze article</button>
+            </div>
+            <div class="meta">
+              <p>Free to use. No login. Best for real article pages and full article body text.</p>
+              <div class="textlink">Load example</div>
+            </div>
+          </div>
+          <div class="tags">
+            <div class="tag">No account required</div>
+            <div class="tag">Website and extension share the same output structure</div>
+            <div class="tag">Analysis focuses on article writing, not publisher labels</div>
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow">Active system view</div>
+          <p class="lead" style="font-size:16px;margin-top:10px;">NeutralEye validates the article first, then moves through extraction, tone review, framing checks, and structured output.</p>
+          <div class="card system" style="margin-top:14px;">
+            <div class="line"></div>
+            <div class="node n1"><span class="dot"></span><div class="box"><div class="k">01</div><strong>Article intake</strong><p>Paste text or submit a direct article URL.</p></div></div>
+            <div class="node n2"><span class="dot"></span><div class="box"><div class="k">02</div><strong>Readable text isolated</strong><p>NeutralEye confirms the content is a real article before analysis.</p></div></div>
+            <div class="node n3"><span class="dot"></span><div class="box"><div class="k">03</div><strong>Tone signals reviewed</strong><p>Loaded phrasing and asymmetry are scanned.</p></div></div>
+            <div class="node n4"><span class="dot"></span><div class="box"><div class="k">04</div><strong>Framing compared</strong><p>Narrative structure, omission, and source balance are checked.</p></div></div>
+            <div class="node n5"><span class="dot"></span><div class="box"><div class="k">05</div><strong>Structured result built</strong><p>Bias level, examples, sources, recommendations, and confidence are returned.</p></div></div>
+            <div class="signal s1">Article verified</div>
+            <div class="signal s2">Tone spike flagged</div>
+            <div class="signal s3">Missing context surfaced</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="sectionhead">
+          <div>
+            <div class="eyebrow">Live analysis</div>
+            <h2>Use the product first. Install later if it fits your reading flow.</h2>
+          </div>
+          <p class="lead">The website mirrors the extension’s structured response format so users can understand the product before deciding whether they want it in-browser.</p>
+        </div>
+        <div class="demo">
+          <div class="card panel">
+            <div class="headrow">
+              <div>
+                <div class="eyebrow">Input panel</div>
+                <h3>Paste URL or article text</h3>
+              </div>
+              <div class="tag">Text detected</div>
+            </div>
+            <textarea>The article frames one side as reckless and dangerous, quotes only sympathetic experts, and leaves out the strongest objections that would challenge its main thesis.</textarea>
+            <div class="meta">
+              <p>Outputs: bias level, summary, examples, suggested sources, recommendations, and confidence.</p>
+              <div class="textlink">Use sample article</div>
+            </div>
+            <div style="margin-top:18px;"><button class="primary">Run live analysis</button></div>
+          </div>
+          <div class="card panel">
+            <div class="headrow">
+              <div>
+                <div class="eyebrow">Extension parity</div>
+                <h3>Structured output</h3>
+              </div>
+              <div class="tag">Same order as extension</div>
+            </div>
+            <div class="result">
+              <div class="block"><strong>Bias Level</strong><p>Moderate framing bias</p></div>
+              <div class="block"><strong>Summary</strong><p>The article uses threat-heavy wording and one-sided sourcing that makes one viewpoint feel more reasonable before counterarguments arrive.</p></div>
+              <div class="block"><strong>Examples of Bias</strong><ul><li>“reckless and dangerous” loads the opening interpretation.</li><li>Only supportive experts are quoted directly.</li></ul></div>
+              <div class="block"><strong>Suggested Sources</strong><ul><li>Independent policy analysis</li><li>Primary documents or official records</li></ul></div>
+              <div class="block"><strong>Recommendations</strong><ul><li>Compare reporting from a source with different editorial framing.</li></ul></div>
+              <div class="block"><strong>Analysis Confidence</strong><p>83%</p></div>
+            </div>
+            <div class="meta"><p>Based on writing patterns rather than publisher identity.</p><div class="textlink">Use NeutralEye while browsing</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="sectionhead">
+          <div>
+            <div class="eyebrow">Journal</div>
+            <h2>Bias literacy content stays inside the product flow.</h2>
+          </div>
+          <div class="textlink">Browse the archive</div>
+        </div>
+        <div class="journal">
+          <div class="journal-card">
+            <div class="meta"><span>Media bias</span><span>5 min read</span></div>
+            <h3>What is media bias?</h3>
+            <p>A practical guide to wording, framing, sourcing, and omission that goes beyond source labels.</p>
+            <div class="textlink">Read article</div>
+          </div>
+          <div class="journal-card">
+            <div class="meta"><span>Critical thinking</span><span>6 min read</span></div>
+            <h3>How to detect bias in news</h3>
+            <p>A repeatable checklist for comparing language, attribution, and missing context.</p>
+            <div class="textlink">Read article</div>
+          </div>
+          <div class="journal-card">
+            <div class="meta"><span>Framing</span><span>4 min read</span></div>
+            <h3>How framing shapes the news</h3>
+            <p>Why overlapping facts can still push readers toward very different conclusions.</p>
+            <div class="textlink">Read article</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="footer">
+        <div class="footer-panel">
+          <div>
+            <div class="eyebrow" style="color: rgba(246,241,232,.72)">Use NeutralEye two ways</div>
+            <h2>Paste an article here or analyze it while browsing.</h2>
+            <p>The website is the product workspace. The extension is the faster in-context surface when you are already reading.</p>
+          </div>
+          <div>
+            <div class="cta">Analyze on the website</div>
+            <div class="textlink">Prefer the browser extension?</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="archive">
+        <div class="crumbs"><span>Home journal</span><span>/</span><span>Archive</span></div>
+        <div class="head" style="margin-top:24px;">
+          <div>
+            <div class="eyebrow">Journal archive</div>
+            <h2>Guides that stay connected to the product experience.</h2>
+          </div>
+          <p class="lead">Articles live inside the same NeutralEye system: read the guide, jump back to the homepage analyzer, or move into the full workspace without losing context.</p>
+        </div>
+      </section>
+
+      <section class="article">
+        <div class="crumbs"><span>Home journal</span><span>/</span><span>Archive</span><span>/</span><span>What is media bias?</span></div>
+        <div class="article-card">
+          <div class="eyebrow">Media bias · 5 min read</div>
+          <h1>What is media bias?</h1>
+          <p class="lead" style="max-width:44rem;margin-top:18px;">Media bias is not only about where a story appears. It also shows up in wording, emphasis, sourcing, and what gets left out.</p>
+          <div class="returnband">
+            <div class="eyebrow">Return paths</div>
+            <p class="lead" style="font-size:16px;margin-top:10px;">Stay inside the same system: go back to the homepage analyzer or jump into the full workspace.</p>
+            <div class="meta" style="margin-top:12px;"><div class="textlink">Open homepage analyzer</div><div class="textlink">Open workspace</div></div>
+          </div>
+          <div class="content">
+            <section><h3>Tone shapes interpretation</h3><p>Two articles can cover the same facts but lead readers in different directions through adjectives, verbs, and the order in which claims appear.</p></section>
+            <section><h3>Framing changes the center of gravity</h3><p>When one article treats an event as a policy success and another treats it as institutional failure, readers are not only learning facts. They are inheriting a narrative frame.</p></section>
+            <section><h3>Omission matters too</h3><p>Missing context can be just as influential as explicit persuasion. A reader may never see the tradeoffs, background, or alternate interpretation needed for a fair assessment.</p></section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

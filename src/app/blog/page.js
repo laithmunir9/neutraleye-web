@@ -1,58 +1,53 @@
 import Link from "next/link";
+import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import { BLOG_POSTS } from "@/lib/content";
 import styles from "./page.module.css";
-
-const POSTS = [
-  {
-    slug: "what-is-media-bias",
-    category: "Media bias",
-    title: "What is media bias?",
-    excerpt: "A practical guide to tone, framing, omission, and why source labels alone are not enough."
-  },
-  {
-    slug: "how-to-detect-bias-in-news",
-    category: "Critical thinking",
-    title: "How to detect bias in news",
-    excerpt: "A repeatable reading checklist for comparing articles, language, and missing context."
-  },
-  {
-    slug: "how-framing-shapes-the-news",
-    category: "Framing",
-    title: "How framing shapes the news",
-    excerpt: "Why two articles with similar facts can still leave readers with very different conclusions."
-  }
-];
 
 export default function BlogPage() {
   return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <p>Blog</p>
-        <h1>Guides for reading the news more carefully.</h1>
-        <p>
-          NeutralEye&apos;s content system is designed to bring readers from search to a useful explanation, then into
-          the demo.
-        </p>
-      </header>
+    <MarketingShell>
+      <main className={styles.page}>
+        <div className={styles.breadcrumbs}>
+          <Link href="/#journal">Home journal</Link>
+          <span>/</span>
+          <span>Archive</span>
+        </div>
 
-      <section className={styles.grid}>
-        {POSTS.map((post) => (
-          <article key={post.slug} className={styles.card}>
-            <p className={styles.category}>{post.category}</p>
-            <h2>{post.title}</h2>
-            <p>{post.excerpt}</p>
-            <Link href={`/blog/${post.slug}`} className={styles.link}>
-              Read article
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>Journal archive</p>
+            <h1>Guides that stay connected to the product experience.</h1>
+          </div>
+          <p className={styles.lead}>
+            Articles live inside the same NeutralEye system: read the guide, jump back to the homepage analyzer, or
+            move into the full workspace without losing context.
+          </p>
+        </header>
+
+        <section className={styles.grid}>
+          {BLOG_POSTS.map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
+              <div className={styles.metaRow}>
+                <span>{post.category}</span>
+                <span>{post.readTime}</span>
+              </div>
+              <h2>{post.title}</h2>
+              <p>{post.excerpt}</p>
+              <span className={styles.cardLink}>Read article</span>
             </Link>
-          </article>
-        ))}
-      </section>
+          ))}
+        </section>
 
-      <section className={styles.cta}>
-        <h2>Want to test an article while you read?</h2>
-        <Link href="/#demo" className={styles.button}>
-          Try Demo
-        </Link>
-      </section>
-    </main>
+        <section className={styles.inlineReturn}>
+          <div>
+            <p className={styles.eyebrow}>Return to the product</p>
+            <h2>Go back to the homepage analyzer whenever you want to test what you just read.</h2>
+          </div>
+          <Link href="/#demo" className={styles.returnLink}>
+            Open live analysis
+          </Link>
+        </section>
+      </main>
+    </MarketingShell>
   );
 }

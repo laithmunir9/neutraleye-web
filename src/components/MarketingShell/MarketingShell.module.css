@@ -1,0 +1,343 @@
+.shell {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(191, 161, 112, 0.16), transparent 34%),
+    radial-gradient(circle at top right, rgba(82, 70, 59, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8f4ee 0%, #f4f0e9 32%, #f7f4ef 100%);
+}
+
+.ambientTop {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 24rem;
+  background:
+    linear-gradient(180deg, rgba(24, 22, 19, 0.04), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.65), transparent 55%);
+  pointer-events: none;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 1.2rem 2rem;
+  backdrop-filter: blur(18px);
+  background: rgba(248, 244, 238, 0.72);
+  border-bottom: 1px solid rgba(68, 57, 43, 0.08);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.7rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(86, 72, 56, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.46);
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navTrigger::after {
+  content: "+";
+  font-size: 0.95rem;
+  color: var(--accent-strong);
+}
+
+.navItem:hover .navTrigger,
+.navItem:focus-within .navTrigger {
+  border-color: rgba(109, 87, 58, 0.16);
+  background: rgba(255, 252, 247, 0.88);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  left: 50%;
+  width: 19rem;
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid rgba(86, 72, 56, 0.12);
+  border-radius: 1.15rem;
+  background: rgba(253, 250, 245, 0.97);
+  box-shadow: 0 1.4rem 3rem rgba(39, 29, 21, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0.5rem);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.navItem:hover .popover,
+.navItem:focus-within .popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.popoverLink {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 0.9rem;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.popoverLink:hover,
+.popoverLink:focus-visible {
+  border-color: rgba(109, 87, 58, 0.14);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.popoverLink strong {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.popoverLink span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.headerCta,
+.footerPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.95rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.headerCta,
+.footerPrimary {
+  background: #2d2823;
+  color: #f8f4ee;
+  box-shadow: 0 0.9rem 2.2rem rgba(45, 40, 35, 0.16);
+}
+
+.headerCta:hover,
+.footerPrimary:hover {
+  background: #1f1b18;
+  transform: translateY(-1px);
+}
+
+.footer {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+
+.footerCta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) auto;
+  gap: 2rem;
+  padding: 2rem;
+  border: 1px solid rgba(123, 100, 70, 0.18);
+  border-radius: 2rem;
+  background:
+    linear-gradient(135deg, rgba(82, 68, 52, 0.96), rgba(41, 35, 31, 0.98)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+  color: #f6f1e8;
+  box-shadow: 0 1.6rem 3rem rgba(31, 27, 24, 0.18);
+}
+
+.footerEyebrow {
+  margin: 0;
+  color: rgba(246, 241, 232, 0.72);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footerCta h2 {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.footerLead {
+  max-width: 40rem;
+  margin: 1rem 0 0;
+  color: rgba(246, 241, 232, 0.76);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.footerActions {
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+  min-width: 15rem;
+}
+
+.footerTextLink {
+  display: inline-flex;
+  justify-content: center;
+  color: #f6f1e8;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.footerTextLink:hover {
+  color: rgba(246, 241, 232, 0.78);
+}
+
+.footerLower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(24rem, 36rem);
+  gap: 2rem;
+  margin-top: 1.3rem;
+  padding: 2rem 0 1rem;
+}
+
+.footerBrand {
+  display: grid;
+  gap: 1rem;
+}
+
+.footerBrand p {
+  max-width: 32rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.footerLinks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.footerColumn {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.footerColumn p {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footerColumn div {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.footerColumn a {
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.footerColumn a:hover {
+  color: var(--accent-strong);
+}
+
+@media (max-width: 980px) {
+  .header {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .footerCta,
+  .footerLower {
+    grid-template-columns: 1fr;
+  }
+
+  .footerLinks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    overflow-x: clip;
+  }
+
+  .header,
+  .footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .nav {
+    gap: 0.5rem;
+  }
+
+  .navTrigger {
+    padding: 0.6rem 0.9rem;
+  }
+
+  .popover {
+    left: 0;
+    width: min(18rem, calc(100vw - 2rem));
+    transform: translate(0, 0.5rem);
+  }
+
+  .navItem:hover .popover,
+  .navItem:focus-within .popover {
+    transform: translate(0, 0);
+  }
+
+  .footerLinks {
+    grid-template-columns: 1fr;
+  }
+
+  .footerCta {
+    padding: 1.4rem;
+    border-radius: 1.5rem;
+  }
+}

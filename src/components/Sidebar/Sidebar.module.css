@@ -1,137 +1,134 @@
 .sidebar {
   align-self: start;
   position: sticky;
-  top: var(--space-4);
+  top: 1.5rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(247, 241, 233, 0.9)),
+    radial-gradient(circle at top left, rgba(208, 190, 166, 0.16), transparent 32%);
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 1rem;
   color: var(--text);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 10px;
-  border-radius: 8px;
+  gap: var(--space-3);
+  padding: 0.9rem;
+  border-radius: 1.15rem;
   border: 1px solid var(--border);
-  background: #f5f5f5;
+  background: rgba(255, 252, 247, 0.72);
 }
 
 .brand:hover {
   border-color: var(--border-strong);
-  background: #f0f0f0;
+  background: rgba(255, 252, 247, 0.95);
 }
 
 .brand strong {
   display: block;
-  font-size: 15px;
-  letter-spacing: -0.01em;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
 }
 
 .brand span {
   display: block;
-  font-size: 12px;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
   color: var(--secondary-text);
 }
 
 .mission {
-  margin-top: var(--space-3);
-  padding: 12px;
-  border-radius: 8px;
+  margin-top: var(--space-4);
+  padding: 1rem;
+  border-radius: 1.2rem;
   border: 1px solid var(--border);
-  background: var(--panel);
+  background: rgba(239, 231, 220, 0.52);
   display: grid;
-  gap: 8px;
+  gap: 0.55rem;
 }
 
-.missionLabel {
-  font-size: 11px;
-  letter-spacing: 0.12em;
+.missionLabel,
+.groupTitle {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--secondary-text);
+  color: var(--accent-strong);
   font-weight: 700;
 }
 
 .mission strong {
-  font-size: 16px;
-  line-height: 1.25;
+  font-size: 1.05rem;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
 }
 
 .mission p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  line-height: 1.58;
   color: var(--secondary-text);
 }
 
 .group {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .groupTitle {
-  margin: 0 12px 8px;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--secondary-text);
-  text-transform: uppercase;
-  font-weight: 700;
+  margin: 0 0.75rem 0.55rem;
 }
 
 .nav {
   display: grid;
-  gap: 4px;
+  gap: 0.35rem;
 }
 
 .navItem {
   border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 1rem;
+  padding: 0.8rem 0.9rem;
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 14px;
+  gap: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text);
-  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 
 .icon {
-  min-width: 24px;
-  height: 24px;
-  border-radius: 8px;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 0.85rem;
   border: 1px solid var(--border);
-  background: #fafafa;
+  background: rgba(255, 252, 247, 0.82);
   color: var(--secondary-text);
   display: grid;
   place-items: center;
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
   font-weight: 700;
 }
 
 .navItem:hover {
   border-color: var(--border);
-  background: #f5f5f5;
-  transform: translateX(1px);
+  background: rgba(255, 252, 247, 0.84);
+  transform: translateX(2px);
 }
 
 .active {
-  border-color: #333;
-  background: #f0f0f0;
-  color: #333;
+  border-color: rgba(139, 103, 65, 0.18);
+  background: rgba(247, 238, 226, 0.84);
 }
 
 .navItem:focus-visible,
 .brand:focus-visible {
-  box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.12);
+  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.12);
 }
 
 .active .icon {
-  border-color: #333;
-  background: #fff;
-  color: #333;
+  border-color: rgba(139, 103, 65, 0.24);
+  color: var(--accent-strong);
 }
 
 @media (max-width: 980px) {

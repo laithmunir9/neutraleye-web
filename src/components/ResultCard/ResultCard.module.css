@@ -1,22 +1,22 @@
 .card {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 1.45rem;
   background: var(--surface);
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 1.2rem;
 }
 
 .title {
-  margin-bottom: 12px;
-  font-size: 13px;
+  margin-bottom: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--secondary-text);
+  color: var(--accent-strong);
 }
 
 .body {
   color: var(--text);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 0.95rem;
+  line-height: 1.65;
 }

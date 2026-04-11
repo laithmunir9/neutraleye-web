@@ -2,75 +2,116 @@ import styles from "./BiasDetectionFlowGraphic.module.css";
 
 const NODES = [
   {
-    title: "Article Input",
-    description: "Article URL or pasted text"
+    key: "input",
+    title: "Article intake",
+    description: "Paste text or submit a direct article URL.",
+    positionClass: "nodeInput",
+    pulseDelay: "0.2s"
   },
   {
-    title: "Text Extraction",
-    description: "Visible article content isolated"
+    key: "extract",
+    title: "Readable text isolated",
+    description: "NeutralEye confirms the content is a real article before analysis.",
+    positionClass: "nodeExtract",
+    pulseDelay: "1.1s"
   },
   {
-    title: "Tone Analysis",
-    description: "Language and emphasis reviewed",
-    tags: ["Emotional wording detected", "Selective emphasis"]
+    key: "tone",
+    title: "Tone signals reviewed",
+    description: "Loaded phrasing, emotional emphasis, and asymmetry are scanned.",
+    positionClass: "nodeTone",
+    pulseDelay: "2s"
   },
   {
-    title: "Framing Detection",
-    description: "Narrative structure compared",
-    tags: ["Missing counterargument", "Framing imbalance"]
+    key: "frame",
+    title: "Framing compared",
+    description: "Narrative structure, omitted context, and source balance are checked.",
+    positionClass: "nodeFrame",
+    pulseDelay: "2.9s"
   },
   {
-    title: "Structured Output",
-    description: "Bias, examples, sources, confidence"
+    key: "output",
+    title: "Structured result built",
+    description: "Bias level, examples, sources, recommendation, and confidence are returned.",
+    positionClass: "nodeOutput",
+    pulseDelay: "3.8s"
   }
 ];
 
+const SIGNALS = [
+  { label: "Article verified", positionClass: "signalOne", tone: "warm" },
+  { label: "Tone spike flagged", positionClass: "signalTwo", tone: "neutral" },
+  { label: "Missing context surfaced", positionClass: "signalThree", tone: "cool" },
+  { label: "Output delivered", positionClass: "signalFour", tone: "warm" }
+];
+
 export default function BiasDetectionFlowGraphic({ activeStage = 0, flowing = false }) {
+  const active = flowing ? activeStage || 1 : 0;
+
   return (
     <div className={styles.wrapper} aria-hidden="true">
-      <div className={styles.backdrop} />
-      <svg className={styles.connections} viewBox="0 0 320 500" preserveAspectRatio="none">
-        <path className={`${styles.path} ${flowing ? styles.pathActive : ""}`} d="M60 52 C110 76, 132 92, 142 132" />
-        <path
-          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
-          d="M150 174 C166 212, 186 238, 212 276"
-        />
-        <path
-          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
-          d="M214 318 C198 352, 178 382, 168 414"
-        />
-        <path
-          className={`${styles.path} ${flowing ? styles.pathActive : ""}`}
-          d="M164 454 C154 470, 154 480, 160 492"
-        />
+      <div className={styles.grid} />
+      <div className={styles.glow} />
+
+      <svg className={styles.connections} viewBox="0 0 680 520" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="neutraleye-flow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(139, 103, 65, 0.22)" />
+            <stop offset="100%" stopColor="rgba(42, 35, 29, 0.52)" />
+          </linearGradient>
+          <path id="neutraleye-main-flow" d="M92 104 C168 128 204 144 250 194 C306 252 348 286 418 286 C474 286 514 252 548 204 C578 162 600 128 616 112" />
+          <path id="neutraleye-branch-flow" d="M418 286 C402 340 374 386 324 432" />
+        </defs>
+
+        <path className={styles.pathBase} d="M92 104 C168 128 204 144 250 194 C306 252 348 286 418 286 C474 286 514 252 548 204 C578 162 600 128 616 112" />
+        <path className={styles.pathHighlight} d="M92 104 C168 128 204 144 250 194 C306 252 348 286 418 286 C474 286 514 252 548 204 C578 162 600 128 616 112" />
+        <path className={styles.pathBase} d="M418 286 C402 340 374 386 324 432" />
+        <path className={styles.pathHighlight} d="M418 286 C402 340 374 386 324 432" />
+
+        <circle r="7" className={styles.tracer}>
+          <animateMotion dur="6.8s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#neutraleye-main-flow" />
+          </animateMotion>
+        </circle>
+
+        <circle r="5" className={styles.tracerSecondary}>
+          <animateMotion begin="3.1s" dur="2.1s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#neutraleye-branch-flow" />
+          </animateMotion>
+        </circle>
       </svg>
 
-      <div className={styles.graphic}>
-        {NODES.map((node, index) => (
+      {NODES.map((node, index) => {
+        const isActive = active === index + 1;
+        return (
           <div
-            key={node.title}
-            className={`${styles.node} ${styles[`node${index + 1}`]} ${
-              activeStage === index + 1 ? styles.nodeActive : ""
-            }`}
+            key={node.key}
+            className={`${styles.node} ${styles[node.positionClass]} ${isActive ? styles.nodeActive : ""}`}
+            style={{ animationDelay: node.pulseDelay }}
           >
-            <div className={styles.nodeMarker}>
-              <span className={styles.nodeCore} />
-            </div>
+            <span className={styles.nodePin} />
             <div className={styles.nodeCard}>
+              <p className={styles.nodeIndex}>0{index + 1}</p>
               <p className={styles.nodeTitle}>{node.title}</p>
               <p className={styles.nodeDescription}>{node.description}</p>
-              {node.tags ? (
-                <div className={styles.tags}>
-                  {node.tags.map((tag) => (
-                    <span key={tag} className={styles.tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
-        ))}
+        );
+      })}
+
+      {SIGNALS.map((signal, index) => (
+        <div
+          key={signal.label}
+          className={`${styles.signal} ${styles[signal.positionClass]} ${styles[`tone${signal.tone[0].toUpperCase()}${signal.tone.slice(1)}`]}`}
+          style={{ animationDelay: `${1.1 + index * 1.05}s` }}
+        >
+          {signal.label}
+        </div>
+      ))}
+
+      <div className={styles.legend}>
+        <span className={styles.legendLabel}>System flow</span>
+        <p>The website follows the same extension logic: validate article, inspect writing patterns, and return structured output.</p>
       </div>
     </div>
   );
