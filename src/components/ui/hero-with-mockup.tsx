@@ -1,4 +1,4 @@
-import { GitHub } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export function HeroWithMockup({
   secondaryCta = {
     text: "GitHub",
     href: "https://github.com/your-repo",
-    icon: <Github className="mr-2 h-4 w-4" />
+    icon: <FaGithub className="mr-2 h-4 w-4" />
   },
   mockupImage,
   className
