@@ -8,7 +8,7 @@ export default function BlogPage() {
     <MarketingShell>
       <main className={styles.page}>
         <div className={styles.breadcrumbs}>
-          <Link href="/#journal">Home journal</Link>
+          <Link href="/#analysis">Back to analysis</Link>
           <span>/</span>
           <span>Archive</span>
         </div>
@@ -43,7 +43,7 @@ export default function BlogPage() {
             <p className={styles.eyebrow}>Return to the product</p>
             <h2>Go back to the homepage analyzer whenever you want to test what you just read.</h2>
           </div>
-          <Link href="/#demo" className={styles.returnLink}>
+          <Link href="/#analysis" className={styles.returnLink}>
             Open live analysis
           </Link>
         </section>

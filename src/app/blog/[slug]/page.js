@@ -15,7 +15,7 @@ export default async function BlogPostPage({ params }) {
     <MarketingShell>
       <main className={styles.page}>
         <div className={styles.breadcrumbs}>
-          <Link href="/#journal">Home journal</Link>
+          <Link href="/#analysis">Back to analysis</Link>
           <span>/</span>
           <Link href="/blog">Archive</Link>
           <span>/</span>
@@ -39,7 +39,7 @@ export default async function BlogPostPage({ params }) {
                 </p>
               </div>
               <div className={styles.returnLinks}>
-                <Link href="/#demo">Open homepage analyzer</Link>
+                <Link href="/#analysis">Open homepage analyzer</Link>
                 <Link href="/analyze">Open workspace</Link>
               </div>
             </div>
