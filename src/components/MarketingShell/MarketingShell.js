@@ -4,15 +4,16 @@ import styles from "./MarketingShell.module.css";
 import { EXTENSION_URL } from "@/lib/content";
 
 const NAV_ITEMS = [
-  { href: "/#analysis", label: "Analyze" },
+  { href: "/analyze", label: "Analyze" },
   { href: "/#journal", label: "Journal" },
   { href: "/methodology", label: "Methodology" }
 ];
 
 const FOOTER_LINKS = [
-  { href: "/#analysis", label: "Analyze" },
+  { href: "/analyze", label: "Analyze" },
   { href: "/blog", label: "Journal" },
   { href: "/methodology", label: "Methodology" },
+  { href: "/privacy", label: "Privacy Policy" },
   { href: EXTENSION_URL, label: "Install Extension", external: true }
 ];
 

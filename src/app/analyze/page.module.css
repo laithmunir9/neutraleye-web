@@ -1,62 +1,100 @@
 .root {
   display: grid;
-  gap: 1.6rem;
+  gap: 2rem;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: minmax(18rem, 23rem) minmax(0, 1fr);
-  gap: 1rem;
+  grid-template-columns: minmax(20rem, 24rem) minmax(0, 1fr);
+  gap: 1.5rem;
   align-items: start;
 }
 
-.grid > :nth-child(1) {
-  grid-row: span 4;
-  position: sticky;
-  top: 1.5rem;
-}
-
-.grid > :nth-child(2),
-.grid > :nth-child(3),
-.grid > :nth-child(4),
-.grid > :nth-child(5) {
+.outputColumn {
+  display: grid;
+  gap: 1rem;
   min-width: 0;
 }
 
-.paragraph {
-  margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.72;
+.outputCard {
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.4rem;
 }
 
-.examples {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.list {
-  margin: 0;
-  padding-left: 1rem;
-  display: grid;
-  gap: 0.55rem;
-}
-
-.list li {
-  font-size: 0.92rem;
-  line-height: 1.62;
-}
-
-.list a,
-.note a {
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
   color: var(--accent-strong);
-  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-.muted {
+.biasRow {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.biasRow strong {
+  font-size: clamp(2.3rem, 4vw, 3.3rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: var(--text);
+}
+
+.biasRow span {
+  color: var(--secondary-text);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.helperText,
+.bodyText,
+.orderedList li p,
+.simpleList li,
+.note {
   margin: 0;
   color: var(--secondary-text);
-  font-size: 0.92rem;
-  line-height: 1.65;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.helperText {
+  margin-top: 0.8rem;
+}
+
+.orderedList,
+.simpleList {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.orderedList li strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.simpleList a,
+.note a {
+  color: var(--accent-strong);
+}
+
+.simpleList a:hover,
+.note a:hover {
+  color: #6e4f2f;
 }
 
 .note {
@@ -65,17 +103,10 @@
   background: rgba(239, 231, 220, 0.45);
   padding: 1rem 1.1rem;
   font-size: 0.84rem;
-  line-height: 1.65;
-  color: var(--secondary-text);
 }
 
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .grid > :nth-child(1) {
-    grid-row: auto;
-    position: static;
   }
 }
