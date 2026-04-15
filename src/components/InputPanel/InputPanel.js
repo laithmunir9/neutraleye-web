@@ -26,15 +26,13 @@ export default function InputPanel({
   onTextChange,
   onUrlChange,
   onAnalyze,
-  onCopy,
+  onExample,
   canAnalyze,
   loading,
   loadingStage,
   extractionStatus,
   extractedPreview,
-  errorState,
-  copied,
-  requestMeta
+  errorState
 }) {
   const activeText = mode === "text" ? text : extractedPreview || "";
   const chars = activeText.length;
@@ -121,20 +119,12 @@ export default function InputPanel({
         </div>
       ) : null}
 
-      {requestMeta?.requestCompletedAt ? (
-        <div className={styles.requestMeta}>
-          <span>Last response: {new Date(requestMeta.requestCompletedAt).toLocaleTimeString()}</span>
-          <span>Status {requestMeta.status || 200}</span>
-          {requestMeta.requestId ? <span>Req {requestMeta.requestId}</span> : null}
-        </div>
-      ) : null}
-
       <div className={styles.actions}>
         <button className={styles.primary} type="button" disabled={!canAnalyze || loading} onClick={onAnalyze}>
-          {mode === "url" ? "Fetch & Analyze" : "Analyze"}
+          Analyze
         </button>
-        <button className={styles.secondary} type="button" disabled={loading} onClick={onCopy}>
-          {copied ? "Copied" : "Copy result"}
+        <button className={styles.secondary} type="button" disabled={loading} onClick={onExample}>
+          Try Example
         </button>
       </div>
     </section>

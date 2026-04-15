@@ -6,9 +6,6 @@ import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import InputPanel from "@/components/InputPanel/InputPanel";
-import ResultsHeader from "@/components/ResultsHeader/ResultsHeader";
-import ResultCard from "@/components/ResultCard/ResultCard";
-import QuoteEvidence from "@/components/QuoteEvidence/QuoteEvidence";
 import { analyzeText, analyzeUrl, ApiError } from "@/lib/api";
 import { getAnalysis, saveAnalysis } from "@/lib/storage";
 import styles from "./page.module.css";
@@ -31,10 +28,11 @@ const DEFAULT_RESULT = {
   recommendations: []
 };
 
-function sourcesToText(sources) {
-  return (sources || [])
-    .map((item) => (typeof item === "string" ? item : `${item.name || "Source"}${item.url ? ` (${item.url})` : ""}`))
-    .join("\n");
+function isNoBiasResult(result) {
+  const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
+  const score = Math.abs(Number(result?.score) || 0);
+
+  return label.includes("neutral") || label.includes("no significant bias") || score < 0.12;
 }
 
 function AnalyzePageContent() {
@@ -46,11 +44,10 @@ function AnalyzePageContent() {
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(STAGES[0]);
   const [errorState, setErrorState] = useState(null);
-  const [copied, setCopied] = useState(false);
   const [extractionStatus, setExtractionStatus] = useState("Extraction status: idle");
   const [extractedPreview, setExtractedPreview] = useState("");
-  const [showDiagnostics, setShowDiagnostics] = useState(true);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [examplePending, setExamplePending] = useState(false);
 
   useEffect(() => {
     const id = searchParams.get("id");
@@ -68,10 +65,8 @@ function AnalyzePageContent() {
     if (typeof window === "undefined") return;
     try {
       const settings = JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || "{}") || {};
-      setShowDiagnostics(settings.showDiagnostics !== false);
       setReduceMotion(Boolean(settings.reduceMotion));
     } catch {
-      setShowDiagnostics(true);
       setReduceMotion(false);
     }
   }, []);
@@ -95,7 +90,6 @@ function AnalyzePageContent() {
 
   async function handleAnalyze() {
     setErrorState(null);
-    setCopied(false);
     setLoading(true);
     if (mode === "url") {
       setExtractedPreview("");
@@ -226,39 +220,20 @@ function AnalyzePageContent() {
     }
   }
 
-  async function handleCopy() {
-    const payload = [
-      `Direction: ${result.direction}`,
-      `Score: ${result.score.toFixed(2)}`,
-      `Confidence: ${Math.round(result.confidence * 100)}%`,
-      "",
-      "Summary",
-      result.summary,
-      "",
-      "Examples",
-      result.examples.map((item) => `- ${item.label}: ${item.quote}`).join("\n") || "- None",
-      "",
-      "Sources",
-      sourcesToText(result.sources) || "- None",
-      "",
-      "Recommendations",
-      (result.recommendations || []).map((item) => `- ${item}`).join("\n") || "- None"
-    ].join("\n");
-
-    try {
-      await navigator.clipboard.writeText(payload);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1200);
-    } catch {
-      setErrorState({
-        title: "Copy failed",
-        message: "Try again.",
-        status: 0,
-        requestId: "",
-        suggestions: []
-      });
-    }
+  function handleExample() {
+    const sampleText =
+      "The article frames one side as reckless and dangerous, quotes only sympathetic experts, and leaves out the strongest objections that would challenge its main thesis. It repeatedly describes one group as responsible while portraying the opposing view as chaotic and unserious. The piece includes supportive quotes from aligned analysts but gives little space to counterarguments or competing evidence. Readers are guided toward a single interpretation through selective emphasis and emotionally weighted wording.";
+    setMode("text");
+    setText(sampleText);
+    setUrl("");
+    setExamplePending(true);
   }
+
+  useEffect(() => {
+    if (!examplePending) return;
+    setExamplePending(false);
+    handleAnalyze();
+  }, [examplePending]);
 
   return (
     <AppShell>
@@ -277,79 +252,107 @@ function AnalyzePageContent() {
             onTextChange={setText}
             onUrlChange={setUrl}
             onAnalyze={handleAnalyze}
-            onCopy={handleCopy}
+            onExample={handleExample}
             canAnalyze={canAnalyze}
             loading={loading}
             loadingStage={loadingStage}
             extractionStatus={extractionStatus}
             extractedPreview={extractedPreview}
             errorState={errorState}
-            copied={copied}
-            requestMeta={showDiagnostics ? result.requestMeta : null}
           />
 
-          <ResultsHeader
-            direction={result.directionLabel || result.direction}
-            score={result.score}
-            confidence={result.confidence}
-            drivers={result.drivers}
-          />
+          <section className={styles.outputColumn}>
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Bias Level</span>
+                <span>{result.directionLabel || result.direction}</span>
+              </div>
+              <div className={styles.biasRow}>
+                <strong>{result.directionLabel || result.direction}</strong>
+                <span>{result.score >= 0 ? `+${result.score.toFixed(2)}` : result.score.toFixed(2)}</span>
+              </div>
+              <p className={styles.helperText}>
+                {isNoBiasResult(result)
+                  ? "No significant bias detected. Please feel free to continue reading."
+                  : "Direction reflects how the article's framing and language lean overall."}
+              </p>
+            </section>
 
-          <ResultCard title="Summary">
-            <p className={styles.paragraph}>{result.summary}</p>
-          </ResultCard>
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Summary</span>
+              </div>
+              <p className={styles.bodyText}>{result.summary}</p>
+            </section>
 
-          <ResultCard title="Examples Of Bias">
-            <div className={styles.examples}>
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Examples of Bias</span>
+              </div>
               {result.examples.length ? (
-                result.examples.map((example, index) => (
-                  <QuoteEvidence
-                    key={`${example.quote}-${index}`}
-                    quote={example.quote}
-                    label={example.label}
-                    explanation={example.explanation}
-                    highlight={example.highlights}
-                  />
-                ))
+                <ul className={styles.orderedList}>
+                  {result.examples.map((example, index) => (
+                    <li key={`${example.quote}-${index}`}>
+                      <strong>{example.label}</strong>
+                      <p>{example.quote}</p>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className={styles.muted}>Run an analysis to see quoted language and framing examples.</p>
+                <p className={styles.bodyText}>Run an analysis to see quoted language and framing examples.</p>
               )}
-            </div>
-          </ResultCard>
+            </section>
 
-          <ResultCard title="Suggested Sources">
-            {result.sources.length ? (
-              <ul className={styles.list}>
-                {result.sources.map((source, index) => (
-                  <li key={`${index}-${typeof source === "string" ? source : source?.url || source?.name}`}>
-                    {typeof source === "string" ? (
-                      source
-                    ) : source?.url ? (
-                      <a href={source.url} target="_blank" rel="noreferrer">
-                        {source.name || source.url}
-                      </a>
-                    ) : (
-                      source?.name || "Source"
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.muted}>Suggested sources will appear here when the analysis has comparison ideas.</p>
-            )}
-          </ResultCard>
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Suggested Sources</span>
+              </div>
+              {result.sources.length ? (
+                <ul className={styles.simpleList}>
+                  {result.sources.map((source, index) => (
+                    <li key={`${index}-${typeof source === "string" ? source : source?.url || source?.name}`}>
+                      {typeof source === "string" ? (
+                        source
+                      ) : source?.url ? (
+                        <a href={source.url} target="_blank" rel="noreferrer">
+                          {source.name || source.url}
+                        </a>
+                      ) : (
+                        source?.name || "Source"
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.bodyText}>Suggested sources will appear here when the analysis has comparison ideas.</p>
+              )}
+            </section>
 
-          <ResultCard title="Recommendations">
-            {result.recommendations.length ? (
-              <ul className={styles.list}>
-                {result.recommendations.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.muted}>Recommendations will appear here when NeutralEye finds useful next reading steps.</p>
-            )}
-          </ResultCard>
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Recommendations</span>
+              </div>
+              {result.recommendations.length ? (
+                <ul className={styles.simpleList}>
+                  {result.recommendations.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.bodyText}>Recommendations will appear here when NeutralEye finds useful next reading steps.</p>
+              )}
+            </section>
+
+            <section className={styles.outputCard}>
+              <div className={styles.sectionHeader}>
+                <span>Analysis Confidence</span>
+                <span>{Math.round(result.confidence * 100)}%</span>
+              </div>
+              <p className={styles.bodyText}>
+                Confidence reflects how consistent the signals are in the writing, not whether the article is objectively true.
+              </p>
+            </section>
+          </section>
         </section>
 
         <aside className={styles.note}>

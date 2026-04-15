@@ -2,8 +2,8 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
-  gap: var(--space-5);
-  max-width: 90rem;
+  gap: 1.5rem;
+  max-width: 88rem;
   margin: 0 auto;
   padding: 1.5rem;
 }
@@ -12,8 +12,8 @@
   min-width: 0;
   display: grid;
   align-content: start;
-  gap: var(--space-5);
-  padding: 1rem 0 2rem;
+  gap: 1.5rem;
+  padding: 0.5rem 0 2rem;
 }
 
 @media (max-width: 980px) {
