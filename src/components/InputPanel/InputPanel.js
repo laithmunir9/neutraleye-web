@@ -38,6 +38,11 @@ export default function InputPanel({
   const chars = activeText.length;
   const words = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
   const remaining = Math.max(0, MIN_CHARS - chars);
+  const readinessLabel = remaining > 0
+    ? `Minimum ${MIN_CHARS} chars (${remaining} remaining)`
+    : mode === "url" && extractedPreview
+      ? "Readable text captured"
+      : "Ready to analyze";
   const friendlyDetail = formatErrorDetail(errorState?.details);
 
   return (
@@ -70,7 +75,7 @@ export default function InputPanel({
           {extractedPreview ? (
             <details className={styles.preview}>
               <summary>Preview extracted text</summary>
-              <p>{extractedPreview.slice(0, 1200)}</p>
+              <p>{extractedPreview}</p>
             </details>
           ) : null}
         </>
@@ -79,7 +84,7 @@ export default function InputPanel({
       <div className={styles.metrics}>
         <span>{words} words</span>
         <span>{chars} chars</span>
-        <span>{remaining > 0 ? `Minimum ${MIN_CHARS} chars (${remaining} remaining)` : "Minimum reached"}</span>
+        <span>{readinessLabel}</span>
       </div>
 
       {loading ? (
@@ -121,7 +126,7 @@ export default function InputPanel({
 
       <div className={styles.actions}>
         <button className={styles.primary} type="button" disabled={!canAnalyze || loading} onClick={onAnalyze}>
-          Analyze
+          {mode === "url" ? "Fetch & Analyze" : "Analyze"}
         </button>
         <button className={styles.secondary} type="button" disabled={loading} onClick={onExample}>
           Try Example

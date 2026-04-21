@@ -30,19 +30,6 @@ export default async function BlogPostPage({ params }) {
             </div>
             <h1>{post.title}</h1>
             <p className={styles.intro}>{post.intro}</p>
-
-            <div className={styles.returnBand}>
-              <div>
-                <p className={styles.returnEyebrow}>Return paths</p>
-                <p className={styles.returnText}>
-                  Stay inside the same system: go back to the homepage analyzer or jump into the full workspace.
-                </p>
-              </div>
-              <div className={styles.returnLinks}>
-                <Link href="/#analysis">Open homepage analyzer</Link>
-                <Link href="/analyze">Open workspace</Link>
-              </div>
-            </div>
           </header>
 
           <div className={styles.content}>

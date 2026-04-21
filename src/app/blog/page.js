@@ -37,16 +37,6 @@ export default function BlogPage() {
             </Link>
           ))}
         </section>
-
-        <section className={styles.inlineReturn}>
-          <div>
-            <p className={styles.eyebrow}>Return to the product</p>
-            <h2>Go back to the homepage analyzer whenever you want to test what you just read.</h2>
-          </div>
-          <Link href="/#analysis" className={styles.returnLink}>
-            Open live analysis
-          </Link>
-        </section>
       </main>
     </MarketingShell>
   );

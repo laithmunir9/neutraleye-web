@@ -21,7 +21,7 @@ const DEFAULT_RESULT = {
   directionLabel: "Neutral",
   confidence: 0.5,
   score: 0,
-  summary: "Run an analysis to see how the article's tone, framing, and omissions may shape the story.",
+  summary: "Run an analysis to see tone, framing, and omissions.",
   drivers: ["Loaded wording", "Framing", "Source imbalance", "Attribution gaps"],
   examples: [],
   sources: [],
@@ -31,8 +31,15 @@ const DEFAULT_RESULT = {
 function isNoBiasResult(result) {
   const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
   const score = Math.abs(Number(result?.score) || 0);
+  const hasBiasLabel = /\b(slight|moderate|heavy|uncertain)\s+bias\b/.test(label);
 
-  return label.includes("neutral") || label.includes("no significant bias") || score < 0.12;
+  return label.includes("no significant bias") || label === "neutral" || (!hasBiasLabel && score > 0 && score < 0.12);
+}
+
+function resultHelperText(result, hasAnalysis) {
+  if (!hasAnalysis) return "Run an analysis to see tone, framing, and omissions.";
+  if (isNoBiasResult(result)) return "No clear bias signals were found in the article text.";
+  return "Overall finding based on the article's tone, framing, sourcing, and attribution.";
 }
 
 function AnalyzePageContent() {
@@ -41,11 +48,13 @@ function AnalyzePageContent() {
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
   const [result, setResult] = useState(DEFAULT_RESULT);
+  const [hasAnalysis, setHasAnalysis] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(STAGES[0]);
   const [errorState, setErrorState] = useState(null);
   const [extractionStatus, setExtractionStatus] = useState("Extraction status: idle");
   const [extractedPreview, setExtractedPreview] = useState("");
+  const [extractedPreviewUrl, setExtractedPreviewUrl] = useState("");
   const [reduceMotion, setReduceMotion] = useState(false);
   const [examplePending, setExamplePending] = useState(false);
 
@@ -55,6 +64,7 @@ function AnalyzePageContent() {
     const saved = getAnalysis(id);
     if (saved) {
       setResult(saved);
+      setHasAnalysis(true);
       setMode(saved.inputType || "text");
       setUrl(saved.url || "");
       setErrorState(null);
@@ -88,6 +98,16 @@ function AnalyzePageContent() {
     return text.trim().length >= 200;
   }, [mode, text, url, loading]);
 
+  function handleUrlChange(nextUrl) {
+    const cleaned = String(nextUrl || "").trim();
+    if (!cleaned || cleaned !== extractedPreviewUrl) {
+      setExtractedPreview("");
+      setExtractedPreviewUrl("");
+      setExtractionStatus("Extraction status: idle");
+    }
+    setUrl(nextUrl);
+  }
+
   async function handleAnalyze() {
     setErrorState(null);
     setLoading(true);
@@ -108,6 +128,7 @@ function AnalyzePageContent() {
         response = await analyzeUrl(url.trim());
         if (response.extractedText) {
           setExtractedPreview(response.extractedText);
+          setExtractedPreviewUrl(url.trim());
           setExtractionStatus("Extraction status: extracted and analyzed");
         } else {
           setExtractionStatus("Extraction status: analyzed from backend pipeline");
@@ -118,6 +139,7 @@ function AnalyzePageContent() {
 
       saveAnalysis(response);
       setResult(response);
+      setHasAnalysis(true);
       setErrorState(null);
       if (process.env.NODE_ENV !== "production") {
         console.info("[neutraleye:web] analyze success", {
@@ -250,7 +272,7 @@ function AnalyzePageContent() {
             text={text}
             url={url}
             onTextChange={setText}
-            onUrlChange={setUrl}
+            onUrlChange={handleUrlChange}
             onAnalyze={handleAnalyze}
             onExample={handleExample}
             canAnalyze={canAnalyze}
@@ -261,21 +283,19 @@ function AnalyzePageContent() {
             errorState={errorState}
           />
 
-          <section className={styles.outputColumn}>
+          <section
+            className={`${styles.outputColumn} ${loading ? styles.isLoading : ""} ${
+              hasAnalysis ? styles.hasResult : styles.emptyState
+            }`}
+          >
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
                 <span>Bias Level</span>
-                <span>{result.directionLabel || result.direction}</span>
               </div>
               <div className={styles.biasRow}>
-                <strong>{result.directionLabel || result.direction}</strong>
-                <span>{result.score >= 0 ? `+${result.score.toFixed(2)}` : result.score.toFixed(2)}</span>
+                <strong>{hasAnalysis ? result.directionLabel || result.direction : "Ready to analyze"}</strong>
               </div>
-              <p className={styles.helperText}>
-                {isNoBiasResult(result)
-                  ? "No significant bias detected. Please feel free to continue reading."
-                  : "Direction reflects how the article's framing and language lean overall."}
-              </p>
+              <p className={styles.helperText}>{resultHelperText(result, hasAnalysis)}</p>
             </section>
 
             <section className={styles.outputCard}>
@@ -293,13 +313,16 @@ function AnalyzePageContent() {
                 <ul className={styles.orderedList}>
                   {result.examples.map((example, index) => (
                     <li key={`${example.quote}-${index}`}>
-                      <strong>{example.label}</strong>
                       <p>{example.quote}</p>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>Run an analysis to see quoted language and framing examples.</p>
+                <p className={styles.bodyText}>
+                  {hasAnalysis && isNoBiasResult(result)
+                    ? "No clear biased language or framing examples were found."
+                    : "Quoted language and framing examples will appear here."}
+                </p>
               )}
             </section>
 
@@ -324,7 +347,11 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>Suggested sources will appear here when the analysis has comparison ideas.</p>
+                <p className={styles.bodyText}>
+                  {hasAnalysis && isNoBiasResult(result)
+                    ? "No comparison sources were suggested for this result."
+                    : "Suggested sources will appear here when the analysis has comparison ideas."}
+                </p>
               )}
             </section>
 
@@ -339,14 +366,18 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>Recommendations will appear here when NeutralEye finds useful next reading steps.</p>
+                <p className={styles.bodyText}>
+                  {hasAnalysis && isNoBiasResult(result)
+                    ? "No follow-up reading steps were suggested."
+                    : "Useful next reading steps will appear here."}
+                </p>
               )}
             </section>
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
                 <span>Analysis Confidence</span>
-                <span>{Math.round(result.confidence * 100)}%</span>
+                <span>{hasAnalysis ? `${Math.round(result.confidence * 100)}%` : "--"}</span>
               </div>
               <p className={styles.bodyText}>
                 Confidence reflects how consistent the signals are in the writing, not whether the article is objectively true.

@@ -9,12 +9,16 @@ const NAV_ITEMS = [
   { href: "/methodology", label: "Methodology" }
 ];
 
-const FOOTER_LINKS = [
+const FOOTER_PRODUCT_LINKS = [
+  { href: "/methodology", label: "Methodology" },
   { href: "/analyze", label: "Analyze" },
   { href: "/blog", label: "Journal" },
-  { href: "/methodology", label: "Methodology" },
-  { href: "/privacy", label: "Privacy Policy" },
   { href: EXTENSION_URL, label: "Install Extension", external: true }
+];
+
+const FOOTER_LEGAL_LINKS = [
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms & Conditions" }
 ];
 
 function FooterLink({ href, label, external = false }) {
@@ -57,19 +61,26 @@ export default function MarketingShell({ children }) {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.footerBrand}>
-            <Link href="/" className={styles.brand} aria-label="NeutralEye home">
+            <Link href="/" className={styles.footerBrandLink} aria-label="NeutralEye home">
               <Image src="/neutraleye-logo-48.png" alt="" width={30} height={30} />
               <span>NeutralEye</span>
             </Link>
-            <p>
-              The extension is the product. This website gives you the same analysis flow with manual input.
-            </p>
+            <p>© 2026 NeutralEye. All rights reserved.</p>
           </div>
 
-          <div className={styles.footerLinks}>
-            {FOOTER_LINKS.map((link) => (
+          <nav className={styles.footerProductLinks} aria-label="Footer product">
+            {FOOTER_PRODUCT_LINKS.map((link) => (
               <FooterLink key={link.label} {...link} />
             ))}
+          </nav>
+
+          <div className={styles.footerLegal}>
+            <p>Legal</p>
+            <nav className={styles.footerLegalLinks} aria-label="Footer legal">
+              {FOOTER_LEGAL_LINKS.map((link) => (
+                <FooterLink key={link.label} {...link} />
+              ))}
+            </nav>
           </div>
         </div>
       </footer>

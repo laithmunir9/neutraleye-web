@@ -3,24 +3,51 @@ import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { BLOG_POSTS } from "@/lib/content";
 import styles from "./page.module.css";
 
+const HERO_FLOW_NODES = [
+  { label: "Input", detail: "Text or URL", className: "flowInput" },
+  { label: "Analysis", detail: "Tone / framing / omissions", className: "flowAnalysis" },
+  { label: "Output", detail: "Structured bias read", className: "flowOutput" }
+];
+
 export default function Home() {
   return (
     <MarketingShell>
       <main className={styles.page}>
         <section className={styles.hero}>
-          <div className={styles.copy}>
-            <p className={styles.eyebrow}>NeutralEye</p>
-            <h1>A calm analysis tool for checking tone, framing, and omission.</h1>
-            <p className={styles.lead}>
-              NeutralEye is a single workspace for pasting article text or a URL and getting a structured bias read.
-              The website introduces the tool. The analyzer lives in one place.
-            </p>
+          <div className={styles.heroText}>
+            <div className={styles.copy}>
+              <p className={styles.eyebrow}>NeutralEye</p>
+              <h1>A calm analysis tool for checking tone, framing, and omission.</h1>
+              <p className={styles.lead}>
+                NeutralEye is a single workspace for pasting article text or a URL and getting a structured bias read.
+                The website introduces the tool. The analyzer lives in one place.
+              </p>
+            </div>
+
+            <div className={styles.actions}>
+              <Link href="/analyze" className={styles.primaryAction}>
+                Open Analyzer
+              </Link>
+            </div>
           </div>
 
-          <div className={styles.actions}>
-            <Link href="/analyze" className={styles.primaryAction}>
-              Open Analyzer
-            </Link>
+          <div className={styles.heroVisual} aria-hidden="true">
+            <div className={styles.flowLine} />
+            <div className={styles.flowLineSoft} />
+            {HERO_FLOW_NODES.map((node, index) => (
+              <div key={node.label} className={`${styles.flowNode} ${styles[node.className]}`}>
+                <span className={styles.flowDot} style={{ animationDelay: `${index * 0.7}s` }} />
+                <div>
+                  <strong>{node.label}</strong>
+                  <span>{node.detail}</span>
+                </div>
+              </div>
+            ))}
+            <div className={styles.flowMeta}>
+              <span>Readable article</span>
+              <span>Signal check</span>
+              <span>Confidence</span>
+            </div>
           </div>
         </section>
 

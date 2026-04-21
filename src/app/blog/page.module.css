@@ -17,13 +17,11 @@
 }
 
 .breadcrumbs a:hover,
-.returnLink:hover,
 .cardLink {
   color: var(--accent-strong);
 }
 
-.header,
-.inlineReturn {
+.header {
   display: grid;
   gap: 1rem;
 }
@@ -44,7 +42,6 @@
 }
 
 .header h1,
-.inlineReturn h2,
 .card h2 {
   margin: 0;
   color: var(--text);
@@ -74,8 +71,7 @@
   margin-top: 2rem;
 }
 
-.card,
-.inlineReturn {
+.card {
   border: 1px solid var(--border);
   border-radius: 1.6rem;
   background: var(--surface);
@@ -108,34 +104,16 @@
   letter-spacing: -0.04em;
 }
 
-.cardLink,
-.returnLink {
+.cardLink {
   display: inline-flex;
   align-items: center;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-.inlineReturn {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  margin-top: 2rem;
-  padding: 1.55rem;
-}
-
-.inlineReturn h2 {
-  max-width: 18ch;
-  margin-top: 0.6rem;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 3vw, 2.7rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
-}
-
 @media (max-width: 960px) {
   .header,
-  .grid,
-  .inlineReturn {
+  .grid {
     grid-template-columns: 1fr;
   }
 }

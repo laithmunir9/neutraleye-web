@@ -1,9 +1,9 @@
 .panel {
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 1.6rem;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 1.25rem;
+  padding: 1.45rem;
 }
 
 .tabs {
@@ -87,6 +87,9 @@
 }
 
 .preview p {
+  max-height: 28rem;
+  overflow: auto;
+  white-space: pre-wrap;
   margin: 0.8rem 0 0;
   color: var(--secondary-text);
   font-size: 0.86rem;
@@ -100,6 +103,10 @@
   gap: 0.6rem;
   font-size: 0.72rem;
   color: var(--secondary-text);
+}
+
+.metrics span:last-child {
+  opacity: 0.68;
 }
 
 .loading {
@@ -232,7 +239,8 @@
 .primary,
 .secondary {
   border-radius: 1rem;
-  padding: 0.85rem 1rem;
+  min-height: 3.05rem;
+  padding: 0.85rem 1.05rem;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
@@ -242,20 +250,24 @@
   border: 0;
   background: #2d2823;
   color: #f8f4ee;
+  box-shadow: 0 0.9rem 1.8rem rgba(45, 40, 35, 0.14);
 }
 
 .primary:hover:not(:disabled) {
   background: #1f1b18;
+  transform: translateY(-1px);
 }
 
 .secondary {
   border: 1px solid var(--border);
-  background: rgba(255, 252, 247, 0.82);
-  color: var(--text);
+  background: rgba(255, 252, 247, 0.58);
+  color: var(--secondary-text);
 }
 
 .secondary:hover:not(:disabled) {
   border-color: var(--border-strong);
+  color: var(--text);
+  background: rgba(255, 252, 247, 0.86);
 }
 
 .primary:disabled,

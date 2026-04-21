@@ -5,8 +5,7 @@
 }
 
 .breadcrumbs,
-.metaRow,
-.returnLinks {
+.metaRow {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -18,8 +17,7 @@
   font-size: 0.92rem;
 }
 
-.breadcrumbs a:hover,
-.returnLinks a:hover {
+.breadcrumbs a:hover {
   color: var(--accent-strong);
 }
 
@@ -58,8 +56,7 @@
 }
 
 .intro,
-.section p,
-.returnText {
+.section p {
   margin: 0;
   color: var(--secondary-text);
   line-height: 1.78;
@@ -71,40 +68,9 @@
   margin-top: 1.2rem;
 }
 
-.returnBand {
-  display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1.35rem 1.45rem;
-  border: 1px solid var(--border);
-  border-radius: 1.4rem;
-  background: rgba(255, 252, 247, 0.76);
-  box-shadow: var(--shadow);
-}
-
-.returnEyebrow {
-  margin: 0 0 0.45rem;
-  color: var(--accent-strong);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.returnLinks {
-  flex-wrap: wrap;
-}
-
-.returnLinks a {
-  display: inline-flex;
-  align-items: center;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
 .content {
   grid-column: 1 / 2;
-  margin-top: 2.4rem;
+  margin-top: 2rem;
 }
 
 .section + .section {

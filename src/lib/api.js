@@ -58,7 +58,24 @@ function listFromBlock(text) {
 
 function sectionValue(markdown, heading, fallbackHeading) {
   const titles = [heading, fallbackHeading].filter(Boolean).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const pattern = new RegExp(`(?:^|\\n)\\*\\*(${titles.join("|")})\\*\\*\\s*\\n?([\\s\\S]*?)(?=\\n\\*\\*[^\\n]+\\*\\*|$)`, "i");
+  const knownHeadings = [
+    "Bias Level",
+    "Direction",
+    "Summary of Bias",
+    "Summary",
+    "Examples of Bias",
+    "Examples",
+    "Suggested Unbiased Sources",
+    "Suggested unbiased sources",
+    "Recommendations",
+    "Recommendations to look up",
+    "Analysis Confidence",
+    "Confidence level"
+  ].map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const pattern = new RegExp(
+    `(?:^|\\s)\\*\\*(${titles.join("|")})\\*\\*\\s*([\\s\\S]*?)(?=(?:\\s|\\n)\\*\\*(?:${knownHeadings.join("|")})\\*\\*|$)`,
+    "i"
+  );
   const match = String(markdown || "").match(pattern);
   return match ? match[2].trim() : "";
 }
@@ -74,7 +91,8 @@ function parseLegacyMarkdown(raw) {
     label: "Bias signal",
     explanation: "Legacy response item."
   }));
-  const sources = listFromBlock(sectionValue(markdown, "Suggested Unbiased Sources", "Suggested unbiased sources"));
+  const sources = listFromBlock(sectionValue(markdown, "Suggested Unbiased Sources", "Suggested unbiased sources"))
+    .filter((item) => !/^no verified specific urls available/i.test(item));
   const recommendations = listFromBlock(sectionValue(markdown, "Recommendations", "Recommendations to look up"));
 
   const confidenceText = sectionValue(markdown, "Analysis Confidence", "Confidence level");
@@ -91,6 +109,12 @@ function parseLegacyMarkdown(raw) {
     sources,
     recommendations
   };
+}
+
+function looksLikeSectionedMarkdown(value) {
+  return /\*\*(Bias Level|Summary of Bias|Examples of Bias|Suggested Unbiased Sources|Recommendations|Analysis Confidence)\*\*/i.test(
+    String(value || "")
+  );
 }
 
 function toArray(value) {
@@ -156,16 +180,20 @@ function stringOrFallback(value, fallback) {
 
 function normalizeResponse(data, inputType, requestMeta = {}) {
   const raw = data || {};
-  const legacy = parseLegacyMarkdown(raw.result);
-  const fallbackSummary = compactSummaryFromMixedResult(raw.result) || firstTextBlock(raw.result);
+  const sectionedText = looksLikeSectionedMarkdown(raw.summary) ? raw.summary : raw.result;
+  const legacy = parseLegacyMarkdown(sectionedText);
+  const fallbackSummary = compactSummaryFromMixedResult(sectionedText) || firstTextBlock(sectionedText);
 
   const score = normalizeScore(raw.score ?? raw.biasScore ?? legacy.score ?? 0);
   const directionLabel = raw.directionLabel || raw.direction || raw.biasLevel || legacy.directionLabel || scoreToDirection(score);
   const createdAt = new Date().toISOString();
   const requestTimestamp = requestMeta.requestStartedAt || createdAt;
-  const normalizedExamples = toArray(raw.examples ?? legacy.examples).map(normalizeExample).filter(Boolean);
-  const normalizedSources = toArray(raw.sources ?? legacy.sources).map(normalizeSource).filter(Boolean);
-  const normalizedRecommendations = toArray(raw.recommendations ?? legacy.recommendations)
+  const rawExamples = toArray(raw.examples).length ? raw.examples : legacy.examples;
+  const rawSources = toArray(raw.sources).length ? raw.sources : legacy.sources;
+  const rawRecommendations = toArray(raw.recommendations).length ? raw.recommendations : legacy.recommendations;
+  const normalizedExamples = toArray(rawExamples).map(normalizeExample).filter(Boolean);
+  const normalizedSources = toArray(rawSources).map(normalizeSource).filter(Boolean);
+  const normalizedRecommendations = toArray(rawRecommendations)
     .map((item) => String(item).trim())
     .filter(Boolean);
   const normalizedDrivers = toArray(raw.drivers).map((item) => String(item).trim()).filter(Boolean).slice(0, 6);
@@ -180,7 +208,7 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
     directionLabel: String(directionLabel || "Neutral"),
     confidence: normalizeConfidence(raw.confidence ?? raw.confidenceValue ?? legacy.confidence ?? 0.5),
     score,
-    summary: stringOrFallback(raw.summary || legacy.summary || fallbackSummary, "No summary returned."),
+    summary: stringOrFallback(looksLikeSectionedMarkdown(raw.summary) ? legacy.summary : raw.summary || legacy.summary || fallbackSummary, "No summary returned."),
     drivers: normalizedDrivers,
     examples: normalizedExamples,
     sources: normalizedSources,
