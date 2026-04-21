@@ -178,6 +178,10 @@ function stringOrFallback(value, fallback) {
   return next || fallback;
 }
 
+function isGenericDirectionLabel(value) {
+  return /^(analysis\s+complete|complete|completed|success|ok)$/i.test(String(value || "").trim());
+}
+
 function normalizeResponse(data, inputType, requestMeta = {}) {
   const raw = data || {};
   const sectionedText = looksLikeSectionedMarkdown(raw.summary) ? raw.summary : raw.result;
@@ -185,7 +189,10 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
   const fallbackSummary = compactSummaryFromMixedResult(sectionedText) || firstTextBlock(sectionedText);
 
   const score = normalizeScore(raw.score ?? raw.biasScore ?? legacy.score ?? 0);
-  const directionLabel = raw.directionLabel || raw.direction || raw.biasLevel || legacy.directionLabel || scoreToDirection(score);
+  const rawDirectionLabel = raw.directionLabel || raw.direction || raw.biasLevel;
+  const directionLabel = isGenericDirectionLabel(rawDirectionLabel)
+    ? legacy.directionLabel || scoreToDirection(score)
+    : rawDirectionLabel || legacy.directionLabel || scoreToDirection(score);
   const createdAt = new Date().toISOString();
   const requestTimestamp = requestMeta.requestStartedAt || createdAt;
   const rawExamples = toArray(raw.examples).length ? raw.examples : legacy.examples;

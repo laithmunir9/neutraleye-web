@@ -11,18 +11,68 @@
 }
 
 .outputColumn {
+  position: relative;
   display: grid;
   gap: var(--space-3);
   min-width: 0;
+  padding-left: 2rem;
+  counter-reset: analysis-signal;
+}
+
+.outputColumn::before {
+  content: "";
+  position: absolute;
+  top: 1.1rem;
+  bottom: 1.1rem;
+  left: 0.7rem;
+  width: 1px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(139, 103, 65, 0.08), rgba(45, 40, 35, 0.28), rgba(139, 103, 65, 0.08));
+  opacity: 0.72;
 }
 
 .outputCard {
+  position: relative;
+  counter-increment: analysis-signal;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow);
   padding: 1.45rem;
   animation: resultIn 260ms ease-out both;
+}
+
+.outputCard::before,
+.outputCard::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+}
+
+.outputCard::before {
+  content: counter(analysis-signal, decimal-leading-zero);
+  top: 1.25rem;
+  left: -2rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid rgba(139, 103, 65, 0.24);
+  background: var(--surface-strong);
+  color: var(--accent-strong);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 0.45rem rgba(248, 244, 238, 0.88);
+}
+
+.outputCard::after {
+  top: 1.74rem;
+  left: -0.65rem;
+  width: 0.64rem;
+  height: 1px;
+  background: rgba(93, 75, 53, 0.2);
 }
 
 .sectionHeader {
@@ -152,6 +202,10 @@
   animation-delay: 200ms;
 }
 
+.hasResult::before {
+  animation: flowGuide 3.6s ease-in-out infinite;
+}
+
 @keyframes resultIn {
   from {
     opacity: 0;
@@ -161,6 +215,18 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes flowGuide {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+
+  45%,
+  65% {
+    opacity: 0.82;
   }
 }
 
@@ -177,7 +243,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .outputCard,
-  .isLoading .outputCard:first-child {
+  .isLoading .outputCard:first-child,
+  .hasResult::before {
     animation: none;
   }
 }
@@ -185,5 +252,17 @@
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .outputColumn {
+    padding-left: 1.6rem;
+  }
+
+  .outputColumn::before {
+    left: 0.52rem;
+  }
+
+  .outputCard::before {
+    left: -1.8rem;
   }
 }

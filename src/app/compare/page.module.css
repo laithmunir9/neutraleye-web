@@ -74,6 +74,7 @@
   margin: 0 0 10px;
   font-size: 14px;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .panel p:last-child {

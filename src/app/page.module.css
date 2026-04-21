@@ -6,7 +6,8 @@
 
 .hero,
 .value,
-.journal {
+.journal,
+.cta {
   display: grid;
   gap: 2rem;
   padding-top: clamp(5rem, 8vw, 7rem);
@@ -34,6 +35,7 @@
 
 .copy h1,
 .sectionHeader h2,
+.cta h2,
 .valueCard h3,
 .journalCard h3 {
   margin: 0;
@@ -41,7 +43,8 @@
 }
 
 .copy h1,
-.sectionHeader h2 {
+.sectionHeader h2,
+.cta h2 {
   font-family: var(--font-display);
   letter-spacing: -0.05em;
 }
@@ -69,127 +72,6 @@
 
 .actions {
   display: flex;
-}
-
-.heroVisual {
-  position: relative;
-  min-height: clamp(28rem, 44vw, 37rem);
-  overflow: hidden;
-  border: 1px solid rgba(32, 27, 22, 0.1);
-  border-radius: 1.5rem;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.68), rgba(239, 235, 229, 0.42)),
-    radial-gradient(circle at 50% 45%, rgba(32, 27, 22, 0.06) 1px, transparent 1.5px);
-  background-size: auto, 1.25rem 1.25rem;
-  box-shadow: 0 1.1rem 2.4rem rgba(40, 29, 19, 0.045);
-}
-
-.flowLine,
-.flowLineSoft {
-  position: absolute;
-  left: 13%;
-  right: 13%;
-  top: 48%;
-  height: 1px;
-  background: rgba(32, 27, 22, 0.2);
-}
-
-.flowLineSoft {
-  top: 49.3%;
-  background: linear-gradient(90deg, transparent, rgba(32, 27, 22, 0.18), transparent);
-  animation: flowFade 4.8s ease-in-out infinite;
-}
-
-.flowNode {
-  position: absolute;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 0.8rem;
-  width: min(13.5rem, 42%);
-  padding: 0.95rem 1rem;
-  border: 1px solid rgba(32, 27, 22, 0.12);
-  border-radius: 1rem;
-  background: rgba(255, 252, 247, 0.84);
-  color: var(--text);
-  box-shadow: 0 0.9rem 1.8rem rgba(40, 29, 19, 0.05);
-}
-
-.flowInput {
-  left: 8%;
-  top: 39%;
-}
-
-.flowAnalysis {
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.flowOutput {
-  right: 8%;
-  top: 39%;
-}
-
-.flowDot {
-  width: 0.68rem;
-  height: 0.68rem;
-  border-radius: 999px;
-  background: #28231f;
-  box-shadow: 0 0 0 0.45rem rgba(32, 27, 22, 0.08);
-  animation: nodePulse 3.4s ease-in-out infinite;
-}
-
-.flowNode strong,
-.flowNode span {
-  display: block;
-}
-
-.flowNode strong {
-  font-size: 0.95rem;
-  line-height: 1.1;
-}
-
-.flowNode span {
-  margin-top: 0.25rem;
-  color: var(--secondary-text);
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.flowMeta {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: 16%;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-
-.flowMeta span {
-  min-height: 2.3rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(32, 27, 22, 0.08);
-  border-radius: 999px;
-  background: rgba(255, 252, 247, 0.46);
-  color: rgba(32, 27, 22, 0.58);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  line-height: 1.2;
-  text-align: center;
-  text-transform: uppercase;
-  animation: metaFade 4.8s ease-in-out infinite;
-}
-
-.flowMeta span:nth-child(2) {
-  animation-delay: 0.8s;
-}
-
-.flowMeta span:nth-child(3) {
-  animation-delay: 1.6s;
 }
 
 .primaryAction,
@@ -280,57 +162,22 @@
   text-transform: uppercase;
 }
 
-@keyframes nodePulse {
-  0%,
-  100% {
-    opacity: 0.72;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.16);
-  }
+.cta {
+  justify-items: center;
+  gap: 1.45rem;
+  padding-bottom: 1rem;
+  text-align: center;
 }
 
-@keyframes flowFade {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 0.75;
-  }
-}
-
-@keyframes metaFade {
-  0%,
-  100% {
-    opacity: 0.48;
-  }
-
-  45%,
-  60% {
-    opacity: 0.86;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flowDot,
-  .flowLineSoft,
-  .flowMeta span {
-    animation: none;
-  }
+.cta h2 {
+  max-width: 13ch;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 0.96;
 }
 
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
-  }
-
-  .heroVisual {
-    min-height: 22rem;
   }
 
   .sectionHeader {
@@ -347,5 +194,21 @@
 @media (max-width: 720px) {
   .page {
     padding: 0 1rem 4rem;
+    overflow-x: clip;
+  }
+
+  .hero {
+    padding-top: 4rem;
+  }
+
+  .copy h1 {
+    max-width: 9.5ch;
+    font-size: clamp(2.85rem, 14vw, 3.45rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .lead {
+    max-width: 100%;
   }
 }

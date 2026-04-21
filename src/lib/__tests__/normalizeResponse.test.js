@@ -39,4 +39,32 @@ describe("normalizeResponse", () => {
     expect(normalized.recommendations).toEqual(["Compare with wire-service reporting."]);
     expect(normalized.confidence).toBe(0.75);
   });
+
+  test("uses legacy bias level when raw direction is only a completion status", () => {
+    const { normalizeResponse } = require("@/lib/api");
+    const rawSummary = [
+      "**Bias Level** Moderate bias against President Donald Trump.",
+      "**Summary of Bias** The text exhibits selective emphasis and loaded framing.",
+      "**Examples of Bias**",
+      "- Public commentary is described as damaging — framing",
+      "**Recommendations**",
+      "- Compare with wire-service reporting.",
+      "**Analysis Confidence** 0.75"
+    ].join(" ");
+
+    const normalized = normalizeResponse(
+      {
+        direction: "Analysis complete",
+        summary: rawSummary,
+        drivers: ["Loaded wording"]
+      },
+      "url"
+    );
+
+    expect(normalized.directionLabel).toBe("Moderate bias against President Donald Trump.");
+    expect(normalized.summary).toBe("The text exhibits selective emphasis and loaded framing.");
+    expect(normalized.examples[0].quote).toBe("Public commentary is described as damaging — framing");
+    expect(normalized.recommendations).toEqual(["Compare with wire-service reporting."]);
+    expect(normalized.confidence).toBe(0.75);
+  });
 });

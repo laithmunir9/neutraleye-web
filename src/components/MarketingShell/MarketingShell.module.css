@@ -87,14 +87,11 @@
   grid-template-columns: minmax(13rem, 1fr) minmax(18rem, auto) minmax(12rem, 0.5fr);
   gap: var(--space-5);
   align-items: start;
-  padding: 2.1rem 2.2rem;
-  border: 1px solid rgba(123, 100, 70, 0.18);
-  border-radius: 1.5rem;
-  background:
-    linear-gradient(135deg, rgba(52, 43, 34, 0.96), rgba(34, 29, 25, 0.98)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
-  color: #f6f1e8;
-  box-shadow: 0 1.6rem 3rem rgba(31, 27, 24, 0.18);
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem 0 0;
+  border-top: 1px solid rgba(93, 75, 53, 0.14);
+  color: var(--text);
 }
 
 .footerBrand {
@@ -107,7 +104,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  color: #f6f1e8;
+  color: var(--text);
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -115,7 +112,7 @@
 
 .footerBrand p {
   margin: 0;
-  color: rgba(246, 241, 232, 0.76);
+  color: var(--secondary-text);
   line-height: 1.5;
 }
 
@@ -129,14 +126,14 @@
 
 .footerProductLinks a,
 .footerLegalLinks a {
-  color: #f6f1e8;
+  color: var(--secondary-text);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .footerProductLinks a:hover,
 .footerLegalLinks a:hover {
-  color: rgba(246, 241, 232, 0.78);
+  color: var(--text);
 }
 
 .footerLegal {
@@ -147,7 +144,7 @@
 
 .footerLegal p {
   margin: 0;
-  color: rgba(246, 241, 232, 0.8);
+  color: var(--accent-strong);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.18em;

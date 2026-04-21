@@ -1,0 +1,115 @@
+.page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 7rem) 2rem 5rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+  max-width: 48rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 7vw, 5.6rem);
+  letter-spacing: -0.05em;
+  line-height: 0.94;
+}
+
+.hero p,
+.notice p,
+.content p,
+.content li {
+  color: var(--secondary-text);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.hero p,
+.notice p,
+.content p,
+.content ul {
+  margin: 0;
+}
+
+.hero span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.notice {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 2rem;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 252, 247, 0.62);
+}
+
+.notice strong {
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.content {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.content article {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.content h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.content ul {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.1rem;
+}
+
+.content a {
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 4rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.85rem, 14vw, 3.5rem);
+    line-height: 0.98;
+  }
+}

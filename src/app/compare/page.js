@@ -4,11 +4,40 @@ import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import ResultCard from "@/components/ResultCard/ResultCard";
+import { normalizeResponse } from "@/lib/api";
 import { listAnalyses } from "@/lib/storage";
 import styles from "./page.module.css";
 
 function itemLabel(item) {
   return item.title || item.url || `Analysis ${new Date(item.createdAt).toLocaleString()}`;
+}
+
+function normalizeSavedAnalysis(item) {
+  if (!item) return null;
+  const normalized = normalizeResponse(item, item.inputType || "text", {
+    url: item.url,
+    title: item.title,
+    requestStartedAt: item.createdAt,
+    requestId: item.requestMeta?.requestId,
+    status: item.requestMeta?.status,
+    endpoint: item.requestMeta?.endpoint
+  });
+
+  return {
+    ...normalized,
+    id: item.id || normalized.id,
+    createdAt: item.createdAt || normalized.createdAt,
+    title: item.title || normalized.title,
+    url: item.url || normalized.url,
+    inputType: item.inputType || normalized.inputType
+  };
+}
+
+function directionComparison(leftItem, rightItem) {
+  if (!leftItem || !rightItem) return "";
+  const leftLabel = String(leftItem.directionLabel || leftItem.direction || "").trim().toLowerCase();
+  const rightLabel = String(rightItem.directionLabel || rightItem.direction || "").trim().toLowerCase();
+  return leftLabel && rightLabel && leftLabel === rightLabel ? "Same bias direction" : "Different bias direction";
 }
 
 export default function ComparePage() {
@@ -17,9 +46,9 @@ export default function ComparePage() {
   const [left, setLeft] = useState(() => initialItems[0]?.id || "");
   const [right, setRight] = useState(() => initialItems[1]?.id || initialItems[0]?.id || "");
 
-  const leftItem = useMemo(() => items.find((item) => item.id === left), [items, left]);
-  const rightItem = useMemo(() => items.find((item) => item.id === right), [items, right]);
-  const scoreDelta = leftItem && rightItem ? Math.abs((leftItem.score || 0) - (rightItem.score || 0)).toFixed(2) : null;
+  const leftItem = useMemo(() => normalizeSavedAnalysis(items.find((item) => item.id === left)), [items, left]);
+  const rightItem = useMemo(() => normalizeSavedAnalysis(items.find((item) => item.id === right)), [items, right]);
+  const comparisonLabel = directionComparison(leftItem, rightItem);
 
   return (
     <AppShell>
@@ -57,11 +86,11 @@ export default function ComparePage() {
                   </select>
                 </label>
               </div>
-              {scoreDelta ? (
+              {comparisonLabel ? (
                 <div className={styles.overview}>
                   <div>
-                    <span>Bias difference</span>
-                    <strong>{scoreDelta}</strong>
+                    <span>Bias direction</span>
+                    <strong>{comparisonLabel}</strong>
                   </div>
                   <div>
                     <span>Confidence gap</span>
@@ -77,7 +106,6 @@ export default function ComparePage() {
                     <div className={styles.panel}>
                       <p className={styles.directionLine}>
                         <strong>{item.directionLabel || item.direction}</strong>
-                        <span>{item.score >= 0 ? `+${item.score.toFixed(2)}` : item.score.toFixed(2)}</span>
                       </p>
                       <p className={styles.meta}>Confidence: {Math.round((item.confidence || 0) * 100)}%</p>
                       <p className={styles.summary}>{item.summary}</p>

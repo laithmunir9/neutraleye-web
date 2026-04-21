@@ -17,7 +17,8 @@ const FOOTER_PRODUCT_LINKS = [
 ];
 
 const FOOTER_LEGAL_LINKS = [
-  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/privacy", label: "Website Privacy" },
+  { href: "/extension-privacy", label: "Extension Privacy" },
   { href: "/terms", label: "Terms & Conditions" }
 ];
 

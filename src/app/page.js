@@ -1,13 +1,8 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
 import { BLOG_POSTS } from "@/lib/content";
 import styles from "./page.module.css";
-
-const HERO_FLOW_NODES = [
-  { label: "Input", detail: "Text or URL", className: "flowInput" },
-  { label: "Analysis", detail: "Tone / framing / omissions", className: "flowAnalysis" },
-  { label: "Output", detail: "Structured bias read", className: "flowOutput" }
-];
 
 export default function Home() {
   return (
@@ -31,24 +26,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={styles.heroVisual} aria-hidden="true">
-            <div className={styles.flowLine} />
-            <div className={styles.flowLineSoft} />
-            {HERO_FLOW_NODES.map((node, index) => (
-              <div key={node.label} className={`${styles.flowNode} ${styles[node.className]}`}>
-                <span className={styles.flowDot} style={{ animationDelay: `${index * 0.7}s` }} />
-                <div>
-                  <strong>{node.label}</strong>
-                  <span>{node.detail}</span>
-                </div>
-              </div>
-            ))}
-            <div className={styles.flowMeta}>
-              <span>Readable article</span>
-              <span>Signal check</span>
-              <span>Confidence</span>
-            </div>
-          </div>
+          <HeroSystemVisualization />
         </section>
 
         <section className={styles.value}>
@@ -101,6 +79,13 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </section>
+
+        <section className={styles.cta}>
+          <h2>Analyze an article with NeutralEye.</h2>
+          <Link href="/analyze" className={styles.primaryAction}>
+            Open Analyzer
+          </Link>
         </section>
       </main>
     </MarketingShell>
