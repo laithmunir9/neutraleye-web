@@ -1,41 +1,32 @@
-## NeutralEye Web
+# NeutralEye — Web Frontend
 
-This project is the website frontend (`neutraleye-web`) and should point to the website-only backend (`neutraleye-web-backend`), not the extension backend.
+## Overview
+The NeutralEye Web Frontend is the user-facing website that allows users to analyze articles for potential bias via URL input or pasted text.
 
-## Environment
+## Role in the System
+This repository handles all UI and user interaction for the web product.  
+It communicates with the NeutralEye Web Backend for all analysis operations.
 
-Create `.env.local` from `.env.local.example` and set:
+## How It Works
+- User inputs a URL or text
+- The frontend sends a request to the backend API
+- The backend processes the request using AI
+- The frontend displays structured bias analysis results
 
-```bash
+## Tech Stack
+- Next.js
+- React
+- CSS Modules
+
+## Setup
+Create `.env.local`:
 NEXT_PUBLIC_NEUTRALEYE_API_URL=http://localhost:3000
-```
 
-`src/lib/api.js` resolves backend URL in this order:
-1. `NEXT_PUBLIC_NEUTRALEYE_API_URL` (required)
-
-## Local Development
-
-Run the website:
-
-```bash
+Run locally:
 npm install
 npm run dev
-```
 
-Run the website backend (from `Desktop/neutraleye-web-backend`):
-
-```bash
-npm install
-npm start
-```
-
-## Safety Boundary
-
-- `bias-checker-backend`: extension backend (do not modify for website work)
-- `neutraleye-web-backend`: website backend (safe place for website-only hardening)
-- `bias-checker-frontend`: extension frontend (still points to extension backend)
-- `neutraleye-web`: website frontend (points to website backend via env var)
-
-## Deploy
-
-Set `NEXT_PUBLIC_NEUTRALEYE_API_URL` in Vercel to the deployed URL of `neutraleye-web-backend`.
+## Notes
+- Must point to `neutraleye-web-backend`
+- Does not interact with extension backend
+- Backend URL is controlled via environment variable
