@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
 const NAV_GROUPS = [
@@ -10,8 +10,7 @@ const NAV_GROUPS = [
     title: "Core",
     items: [
       { href: "/analyze", label: "Analyze", icon: "AN" },
-      { href: "/history", label: "History", icon: "HI" },
-      { href: "/methodology", label: "Methodology", icon: "ME" }
+      { href: "/history", label: "History", icon: "HI" }
     ]
   },
   {
@@ -23,18 +22,22 @@ const NAV_GROUPS = [
   }
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed = false, onToggle }) {
   const pathname = usePathname();
 
   return (
-    <aside className={styles.sidebar}>
-      <Link href="/" className={styles.brand}>
-        <Image src="/neutraleye-logo-48.png" alt="NeutralEye logo" width={28} height={28} />
-        <div>
-          <strong>NeutralEye</strong>
-          <span>Bias reading workspace</span>
-        </div>
-      </Link>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
+      <div className={styles.sidebarTop}>
+        <button
+          type="button"
+          className={styles.toggle}
+          onClick={onToggle}
+          aria-label={collapsed ? "Open workspace sidebar" : "Close workspace sidebar"}
+          aria-pressed={collapsed}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
 
       <div className={styles.mission}>
         <span className={styles.missionLabel}>What this workspace does</span>
@@ -47,15 +50,20 @@ export default function Sidebar() {
           <div className={styles.groupTitle}>{group.title}</div>
           <nav className={styles.nav}>
             {group.items.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link key={item.href} href={item.href} className={`${styles.navItem} ${active ? styles.active : ""}`}>
-                  <span className={styles.icon} aria-hidden>
-                    {item.icon}
-                  </span>
-                  <span>{item.label}</span>
-                </Link>
-              );
+                const active = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`${styles.navItem} ${active ? styles.active : ""}`}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <span className={styles.icon} aria-hidden>
+                      {item.icon}
+                    </span>
+                    <span className={styles.navLabel}>{item.label}</span>
+                  </Link>
+                );
             })}
           </nav>
         </section>

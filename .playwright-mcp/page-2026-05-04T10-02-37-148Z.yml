@@ -1,0 +1,121 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /system
+        - link "Blog" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - generic [ref=e12]:
+      - complementary [ref=e13]:
+        - button "Close workspace sidebar" [ref=e15]:
+          - img [ref=e16]
+        - generic [ref=e18]:
+          - generic [ref=e19]: What this workspace does
+          - strong [ref=e20]: Read tone, framing, and omission more clearly
+          - paragraph [ref=e21]: Analyze articles, revisit past results, compare narratives, and check how the system explains its output.
+        - generic [ref=e22]:
+          - generic [ref=e23]: Core
+          - navigation [ref=e24]:
+            - link "Analyze" [ref=e25] [cursor=pointer]:
+              - /url: /analyze
+              - generic [ref=e26]: AN
+              - generic [ref=e27]: Analyze
+            - link "History" [ref=e28] [cursor=pointer]:
+              - /url: /history
+              - generic [ref=e29]: HI
+              - generic [ref=e30]: History
+        - generic [ref=e31]:
+          - generic [ref=e32]: Workspace
+          - navigation [ref=e33]:
+            - link "Compare" [ref=e34] [cursor=pointer]:
+              - /url: /compare
+              - generic [ref=e35]: CP
+              - generic [ref=e36]: Compare
+            - link "Settings" [ref=e37] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e38]: ST
+              - generic [ref=e39]: Settings
+      - main [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - heading "Analyze an Article" [level=1] [ref=e44]
+            - paragraph [ref=e45]: Paste article text or a URL to check how tone, framing, and omission may be influencing the reader.
+          - generic [ref=e46]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - generic [ref=e50]:
+                  - generic [ref=e51]: Analyzer
+                  - strong [ref=e52]: Article input
+                - generic [ref=e53]: Invalid URL
+              - generic [ref=e54]:
+                - button "Paste Text" [ref=e55] [cursor=pointer]
+                - button "Paste URL" [active] [pressed] [ref=e56] [cursor=pointer]
+              - textbox "https://example.com/news/article" [ref=e120]
+              - generic [ref=e58]:
+                - generic [ref=e59]: 0 words
+                - generic [ref=e60]: 0 chars
+              - generic [ref=e61]:
+                - button "Enter Article URL" [disabled] [ref=e121]
+                - button "Try Example" [ref=e63] [cursor=pointer]
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - generic [ref=e67]: Analysis Result
+                - strong [ref=e69]: Ready to analyze
+                - paragraph [ref=e70]: Run an analysis to see tone, framing, and omissions.
+              - generic [ref=e71]:
+                - generic [ref=e73]: Summary of Bias
+                - paragraph [ref=e74]: A focused summary of the detected bias will appear here after analysis.
+              - generic [ref=e75]:
+                - generic [ref=e77]: Examples of Bias
+                - paragraph [ref=e78]: Quoted language and framing examples will appear here.
+              - generic [ref=e79]:
+                - generic [ref=e81]: Suggested Unbiased Sources
+                - paragraph [ref=e82]: Suggested sources will appear here when the analysis has comparison ideas.
+              - generic [ref=e83]:
+                - generic [ref=e85]: Recommendations
+                - paragraph [ref=e86]: Useful next reading steps will appear here.
+              - generic [ref=e87]:
+                - generic [ref=e89]: Analysis Confidence
+                - generic [ref=e90]:
+                  - strong [ref=e91]: "--"
+                  - paragraph [ref=e92]: Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing, and omission. It is not a claim of factual certainty.
+    - contentinfo [ref=e93]:
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - link "NeutralEye home" [ref=e96] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e97]: NeutralEye
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: © 2026 NeutralEye. All rights reserved.
+            - generic [ref=e100]: Status
+        - generic [ref=e102]:
+          - paragraph [ref=e103]: Explore
+          - navigation "Footer product" [ref=e104]:
+            - link "Analyze" [ref=e105] [cursor=pointer]:
+              - /url: /analyze
+            - link "System" [ref=e106] [cursor=pointer]:
+              - /url: /system
+            - link "Blog" [ref=e107] [cursor=pointer]:
+              - /url: /blog
+            - link "Methodology" [ref=e108] [cursor=pointer]:
+              - /url: /methodology
+        - generic [ref=e109]:
+          - paragraph [ref=e110]: Legal
+          - navigation "Footer legal" [ref=e111]:
+            - link "Website Privacy" [ref=e112] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e113] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e114] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e115]

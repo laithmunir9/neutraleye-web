@@ -2,7 +2,7 @@
   position: relative;
   min-height: 32rem;
   border: 1px solid rgba(93, 75, 53, 0.14);
-  border-radius: 2rem;
+  border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 253, 249, 0.95), rgba(245, 238, 229, 0.96)),
     radial-gradient(circle at top right, rgba(215, 196, 171, 0.22), transparent 35%);
@@ -115,7 +115,7 @@
 .nodeCard {
   padding: 1rem 1rem 1.05rem;
   border: 1px solid rgba(93, 75, 53, 0.14);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-md);
   background: rgba(255, 253, 249, 0.9);
   box-shadow: 0 1rem 2rem rgba(39, 29, 21, 0.08);
 }
@@ -131,7 +131,7 @@
   color: var(--accent-strong);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -140,7 +140,7 @@
   color: var(--text);
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .nodeDescription {
@@ -206,7 +206,7 @@
   width: min(16rem, calc(100% - 3rem));
   padding: 1rem;
   border: 1px solid rgba(93, 75, 53, 0.12);
-  border-radius: 1.15rem;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.82);
   box-shadow: 0 1rem 2rem rgba(39, 29, 21, 0.07);
 }
@@ -216,7 +216,7 @@
   color: var(--accent-strong);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 

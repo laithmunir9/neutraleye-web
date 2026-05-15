@@ -2,22 +2,6 @@ import styles from "./InputPanel.module.css";
 
 const MIN_CHARS = 200;
 
-function formatErrorDetail(details) {
-  const value = String(details || "").trim();
-  if (!value) return "";
-
-  const retryAfterMatch = value.match(/retry_after_seconds=(\d+)/i);
-  if (retryAfterMatch) return `Retry after ${retryAfterMatch[1]} seconds.`;
-
-  const minimumCharsMatch = value.match(/minimum_characters=(\d+)/i);
-  if (minimumCharsMatch) return `Minimum readable text required: ${minimumCharsMatch[1]} characters.`;
-
-  const upstreamStatusMatch = value.match(/^status=(.+)$/i);
-  if (upstreamStatusMatch) return `Upstream fetch status: ${upstreamStatusMatch[1]}.`;
-
-  return value;
-}
-
 export default function InputPanel({
   mode,
   onModeChange,
@@ -30,28 +14,61 @@ export default function InputPanel({
   canAnalyze,
   loading,
   loadingStage,
-  extractionStatus,
   extractedPreview,
-  errorState
+  errorState,
+  analysisComplete = false
 }) {
-  const activeText = mode === "text" ? text : extractedPreview || "";
+  const activeText = mode === "text" ? text : extractedPreview || url;
   const chars = activeText.length;
   const words = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
   const remaining = Math.max(0, MIN_CHARS - chars);
-  const readinessLabel = remaining > 0
-    ? `Minimum ${MIN_CHARS} chars (${remaining} remaining)`
-    : mode === "url" && extractedPreview
-      ? "Readable text captured"
-      : "Ready to analyze";
-  const friendlyDetail = formatErrorDetail(errorState?.details);
+  const trimmedUrl = url.trim();
+  const hasUrl = Boolean(trimmedUrl);
+  const validUrl = /^https?:\/\//i.test(trimmedUrl);
+  const textReadinessLabel = remaining > 0 ? `Minimum ${MIN_CHARS} chars` : "Ready to analyze";
+  const urlReadinessLabel = extractedPreview
+    ? "Article text ready"
+    : validUrl
+      ? "Ready to fetch"
+      : "Invalid URL";
+  const readinessLabel = analysisComplete ? "Analyzed!" : mode === "url" ? urlReadinessLabel : textReadinessLabel;
+  const analyzeLabel = loading
+    ? "Analyzing"
+    : mode === "url"
+      ? validUrl
+        ? "Fetch & Analyze"
+        : "Enter Article URL"
+      : remaining > 0
+        ? "Enter Article Text"
+        : "Analyze";
 
   return (
-    <section className={styles.panel}>
+    <section className={`${styles.panel} ${loading ? styles.isAnalyzing : ""}`} aria-busy={loading}>
+      <div className={styles.panelHeader}>
+        <div>
+          <span>Analyzer</span>
+          <strong>Article input</strong>
+        </div>
+        <span className={`${styles.panelStatus} ${loading ? styles.panelStatusActive : ""}`}>
+          {loading ? loadingStage : readinessLabel}
+        </span>
+      </div>
+
       <div className={styles.tabs}>
-        <button className={mode === "text" ? styles.active : ""} onClick={() => onModeChange("text")} type="button">
+        <button
+          className={mode === "text" ? styles.active : ""}
+          onClick={() => onModeChange("text")}
+          type="button"
+          aria-pressed={mode === "text"}
+        >
           Paste Text
         </button>
-        <button className={mode === "url" ? styles.active : ""} onClick={() => onModeChange("url")} type="button">
+        <button
+          className={mode === "url" ? styles.active : ""}
+          onClick={() => onModeChange("url")}
+          type="button"
+          aria-pressed={mode === "url"}
+        >
           Paste URL
         </button>
       </div>
@@ -61,7 +78,7 @@ export default function InputPanel({
           className={styles.textarea}
           value={text}
           onChange={(event) => onTextChange(event.target.value)}
-          placeholder="Paste article text for analysis..."
+          placeholder="Paste article text for analysis"
         />
       ) : (
         <>
@@ -71,7 +88,6 @@ export default function InputPanel({
             onChange={(event) => onUrlChange(event.target.value)}
             placeholder="https://example.com/news/article"
           />
-          <div className={styles.status}>{extractionStatus || "Extraction status: idle"}</div>
           {extractedPreview ? (
             <details className={styles.preview}>
               <summary>Preview extracted text</summary>
@@ -84,7 +100,6 @@ export default function InputPanel({
       <div className={styles.metrics}>
         <span>{words} words</span>
         <span>{chars} chars</span>
-        <span>{readinessLabel}</span>
       </div>
 
       {loading ? (
@@ -107,26 +122,19 @@ export default function InputPanel({
         <div className={styles.error} role="alert">
           <strong>{errorState.title || "Request failed"}</strong>
           <p>{errorState.message || "Analysis failed."}</p>
-          <div className={styles.errorMetaRow}>
-            {errorState.status ? <p className={styles.errorMeta}>Status: {errorState.status}</p> : null}
-            {errorState.code ? <p className={styles.errorMeta}>Code: {errorState.code}</p> : null}
-            {errorState.endpoint ? <p className={styles.errorMeta}>Endpoint: {errorState.endpoint}</p> : null}
-            {errorState.requestId ? <p className={styles.errorMeta}>Request ID: {errorState.requestId}</p> : null}
-          </div>
-          {friendlyDetail ? <p className={styles.errorDetails}>{friendlyDetail}</p> : null}
-          {errorState.suggestions?.length ? (
-            <ul className={styles.suggestions}>
-              {errorState.suggestions.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
+          {errorState.detail ? <p className={styles.errorDetail}>{errorState.detail}</p> : null}
         </div>
       ) : null}
 
       <div className={styles.actions}>
-        <button className={styles.primary} type="button" disabled={!canAnalyze || loading} onClick={onAnalyze}>
-          {mode === "url" ? "Fetch & Analyze" : "Analyze"}
+        <button
+          className={styles.primary}
+          type="button"
+          disabled={!canAnalyze || loading}
+          onClick={onAnalyze}
+          title={!canAnalyze && !loading ? readinessLabel : undefined}
+        >
+          {analyzeLabel}
         </button>
         <button className={styles.secondary} type="button" disabled={loading} onClick={onExample}>
           Try Example

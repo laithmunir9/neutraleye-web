@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import HistoryTable from "@/components/HistoryTable/HistoryTable";
@@ -8,12 +8,43 @@ import ResultCard from "@/components/ResultCard/ResultCard";
 import { deleteAnalysis, listAnalyses } from "@/lib/storage";
 import styles from "./page.module.css";
 
+const HISTORY_CHANGE_EVENT = "neutraleye:history-change";
+const EMPTY_HISTORY = [];
+let cachedHistoryKey = "";
+let cachedHistorySnapshot = [];
+
+function subscribeToHistory(callback) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(HISTORY_CHANGE_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(HISTORY_CHANGE_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getHistorySnapshot() {
+  const next = listAnalyses();
+  const nextKey = JSON.stringify(next);
+  if (nextKey !== cachedHistoryKey) {
+    cachedHistoryKey = nextKey;
+    cachedHistorySnapshot = next;
+  }
+  return cachedHistorySnapshot;
+}
+
+function getServerHistorySnapshot() {
+  return EMPTY_HISTORY;
+}
+
 export default function HistoryPage() {
-  const [items, setItems] = useState(() => listAnalyses());
+  const items = useSyncExternalStore(subscribeToHistory, getHistorySnapshot, getServerHistorySnapshot);
 
   function handleDelete(id) {
     deleteAnalysis(id);
-    setItems(listAnalyses());
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(HISTORY_CHANGE_EVENT));
+    }
   }
 
   return (

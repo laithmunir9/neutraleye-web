@@ -1,63 +1,88 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
 import styles from "./HeroSystemVisualization.module.css";
 
-const LOOP_DURATION = 8.8;
-
 const NODES = [
-  { key: "input", label: "Article input", detail: "Text or URL", className: "nodeInput", delay: 0.15 },
-  { key: "extract", label: "Text extracted", detail: "Readable body", className: "nodeExtract", delay: 1.1 },
-  { key: "signals", label: "Bias signals", detail: "Tone + framing", className: "nodeSignals", delay: 2.05, primary: true },
-  { key: "output", label: "Structured result", detail: "Evidence stack", className: "nodeOutput", delay: 4.2 }
+  {
+    key: "input",
+    x: 82,
+    y: 318,
+    className: "nodeInput",
+    labelX: 98,
+    labelY: 332,
+    title: "Article input"
+  },
+  {
+    key: "extract",
+    x: 196,
+    y: 264,
+    className: "nodeExtract",
+    labelX: 214,
+    labelY: 281,
+    title: "Text extracted"
+  },
+  {
+    key: "signals",
+    x: 324,
+    y: 204,
+    className: "nodeSignals",
+    primary: true,
+    labelX: 338,
+    labelY: 194,
+    title: "Signals checked"
+  },
+  {
+    key: "evidence",
+    x: 448,
+    y: 246,
+    className: "nodeEvidence",
+    labelX: 462,
+    labelY: 258,
+    title: "Evidence linked"
+  },
+  {
+    key: "output",
+    x: 562,
+    y: 148,
+    className: "nodeOutput",
+    labelX: 558,
+    labelY: 128,
+    title: "Structured output",
+    align: "end"
+  }
 ];
 
 const PATHS = [
-  { key: "input-extract", d: "M108 286 L206 140", delay: 0.95 },
-  { key: "extract-signals", d: "M206 140 L344 204", delay: 1.8 },
-  { key: "signals-output", d: "M344 204 L518 314", delay: 3.25 },
-  { key: "signals-source", d: "M344 204 L560 154", delay: 3.65 }
+  { key: "input-extract", d: "M82 318 C116 304 156 286 196 264", className: "pathOne" },
+  { key: "extract-signals", d: "M196 264 C236 244 278 222 324 204", className: "pathTwo" },
+  { key: "signals-evidence", d: "M324 204 C364 214 404 230 448 246", className: "pathThree" },
+  { key: "evidence-output", d: "M448 246 C482 224 524 182 562 148", className: "pathFour" }
 ];
-
-const SIGNALS = [
-  { label: "Emotional wording", className: "signalTone", delay: 2.75 },
-  { label: "Framing imbalance", className: "signalFrame", delay: 3.05 },
-  { label: "Missing counterargument", className: "signalOmission", delay: 3.35 },
-  { label: "Source balance checked", className: "signalSource", delay: 3.65 }
-];
-
-function nodeTransition(delay) {
-  return {
-    duration: 6.9,
-    delay,
-    times: [0, 0.12, 0.76, 0.9, 1],
-    repeat: Infinity,
-    repeatDelay: LOOP_DURATION - 6.9,
-    ease: "easeInOut"
-  };
-}
-
-function labelTransition(delay) {
-  return {
-    duration: 2.55,
-    delay,
-    times: [0, 0.18, 0.78, 1],
-    repeat: Infinity,
-    repeatDelay: LOOP_DURATION - 2.55,
-    ease: "easeInOut"
-  };
-}
 
 export default function HeroSystemVisualization() {
-  const reduceMotion = useReducedMotion();
+  const [paused, setPaused] = useState(false);
 
   return (
     <section className={styles.system} aria-label="NeutralEye article analysis system visualization">
-      <div className={styles.surface}>
-        <div className={styles.header}>
-          <span>NeutralEye system</span>
-          <span className={styles.status}>Live analysis</span>
-        </div>
+      <div className={`${styles.surface} ${paused ? styles.paused : ""}`}>
+        <button
+          className={styles.playToggle}
+          type="button"
+          aria-pressed={paused}
+          aria-label={paused ? "Play graph animation" : "Pause graph animation"}
+          onClick={() => setPaused((current) => !current)}
+        >
+          {paused ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+            </svg>
+          )}
+        </button>
 
         <div className={styles.field} aria-hidden="true" />
 
@@ -65,66 +90,38 @@ export default function HeroSystemVisualization() {
           <defs>
             <linearGradient id="neutraleye-live-path" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="rgba(32, 27, 22, 0.18)" />
-              <stop offset="100%" stopColor="rgba(139, 103, 65, 0.4)" />
+              <stop offset="100%" stopColor="rgba(139, 103, 65, 0.42)" />
             </linearGradient>
           </defs>
 
           {PATHS.map((path) => (
             <g key={path.key}>
               <path className={styles.pathBase} d={path.d} />
-              <motion.path
-                className={styles.pathActive}
+              <path
+                className={`${styles.pathActive} ${styles[path.className]}`}
                 d={path.d}
-                initial={reduceMotion ? { pathLength: 1, opacity: 0.38 } : { pathLength: 0, opacity: 0 }}
-                animate={reduceMotion ? { pathLength: 1, opacity: 0.38 } : { pathLength: [0, 1, 1, 0], opacity: [0, 0.72, 0.42, 0] }}
-                transition={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        duration: 5.1,
-                        delay: path.delay,
-                        times: [0, 0.24, 0.82, 1],
-                        repeat: Infinity,
-                        repeatDelay: LOOP_DURATION - 5.1,
-                        ease: "easeInOut"
-                      }
-                }
+                pathLength="1"
               />
             </g>
           ))}
-        </svg>
 
-        <div className={styles.nodes}>
           {NODES.map((node) => (
-            <motion.div
+            <g
               key={node.key}
-              className={`${styles.node} ${styles[node.className]} ${node.primary ? styles.nodePrimary : ""}`}
-              initial={reduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.94 }}
-              animate={reduceMotion ? { opacity: 1, scale: 1 } : { opacity: [0, 1, 1, 0.46, 0], scale: [0.94, 1, 1, 1, 0.98] }}
-              transition={reduceMotion ? undefined : nodeTransition(node.delay)}
+              className={`${styles.nodeGroup} ${styles[node.className]} ${node.primary ? styles.nodePrimary : ""}`}
             >
-              <span className={styles.pin} />
-              <span className={styles.nodeLabel}>
-                <strong>{node.label}</strong>
-                <span>{node.detail}</span>
-              </span>
-            </motion.div>
+              <circle className={styles.node} cx={node.x} cy={node.y} r="7" />
+              <text
+                className={styles.nodeLabel}
+                x={node.labelX}
+                y={node.labelY}
+                textAnchor={node.align ?? "start"}
+              >
+                {node.title}
+              </text>
+            </g>
           ))}
-        </div>
-
-        <div className={styles.signals}>
-          {SIGNALS.map((signal) => (
-            <motion.span
-              key={signal.label}
-              className={`${styles.signal} ${styles[signal.className]}`}
-              initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-              animate={reduceMotion ? { opacity: 1, y: 0 } : { opacity: [0, 1, 1, 0], y: [8, 0, 0, -4] }}
-              transition={reduceMotion ? undefined : labelTransition(signal.delay)}
-            >
-              {signal.label}
-            </motion.span>
-          ))}
-        </div>
+        </svg>
       </div>
     </section>
   );

@@ -1,19 +1,19 @@
 .card {
   border: 1px solid var(--border);
-  border-radius: 1.2rem;
+  border-radius: var(--radius-md);
   padding: 1rem;
-  background: rgba(255, 252, 247, 0.86);
+  background: rgba(255, 252, 247, 0.88);
 }
 
 .chip {
   display: inline-flex;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(246, 240, 232, 0.84);
+  background: rgba(239, 231, 220, 0.86);
   padding: 0.35rem 0.65rem;
   font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   font-weight: 700;
   color: var(--accent-strong);
 }
@@ -29,13 +29,13 @@
 }
 
 .mark {
-  color: rgba(139, 103, 65, 0.5);
+  color: rgba(139, 103, 65, 0.52);
   font-size: 2rem;
   line-height: 1;
 }
 
 .quote mark {
-  background: rgba(219, 203, 181, 0.62);
+  background: rgba(205, 188, 163, 0.42);
   color: inherit;
   border-radius: 0.35rem;
   padding: 0.05rem 0.2rem;

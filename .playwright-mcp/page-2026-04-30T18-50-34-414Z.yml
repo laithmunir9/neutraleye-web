@@ -1,0 +1,151 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /#analysis
+        - link "Journal" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - region "NeutralEye article analysis system visualization" [ref=e15]:
+          - generic [ref=e16]:
+            - button "Pause graph animation" [ref=e17]:
+              - img [ref=e18]
+            - img [ref=e21]:
+              - generic [ref=e36]: Article input
+              - generic [ref=e39]: Text extracted
+              - generic [ref=e42]: Signals checked
+              - generic [ref=e45]: Evidence linked
+              - generic [ref=e48]: Structured output
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: NeutralEye
+            - heading "See how an article moves the reader." [level=1] [ref=e52]
+            - paragraph [ref=e53]: NeutralEye turns article text into a structured read of tone, framing, sourcing, and omission, so the analyzer feels like a workspace instead of a black box.
+          - generic [ref=e54]:
+            - link "Open Analyzer" [ref=e55] [cursor=pointer]:
+              - /url: /analyze
+            - link "See the flow" [ref=e56] [cursor=pointer]:
+              - /url: "#analysis"
+      - region "NeutralEye trust principles" [ref=e57]:
+        - article [ref=e58]:
+          - generic [ref=e59]: Method visible
+          - paragraph [ref=e60]: Bias signals are named instead of hidden behind a single opaque verdict.
+        - article [ref=e61]:
+          - generic [ref=e62]: Evidence attached
+          - paragraph [ref=e63]: Outputs point back to quotes, sourcing patterns, and framing choices.
+        - article [ref=e64]:
+          - generic [ref=e65]: Confidence separated
+          - paragraph [ref=e66]: Confidence describes signal consistency, not whether a story is true.
+        - article [ref=e67]:
+          - generic [ref=e68]: Reader controlled
+          - paragraph [ref=e69]: Paste text, inspect the result, and decide what context to read next.
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - paragraph [ref=e73]: How it works
+            - heading "One continuous read from input to evidence." [level=2] [ref=e74]
+          - link "Read methodology" [ref=e75] [cursor=pointer]:
+            - /url: /methodology
+        - generic [ref=e76]:
+          - generic "NeutralEye analysis log" [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - strong [ref=e80]: "5"
+                - generic [ref=e81]: signal families
+              - generic [ref=e82]:
+                - strong [ref=e83]: "0"
+                - generic [ref=e84]: truth verdicts
+              - generic [ref=e85]:
+                - strong [ref=e86]: "1"
+                - generic [ref=e87]: evidence stack
+            - list [ref=e88]:
+              - listitem [ref=e89]:
+                - generic [ref=e91]:
+                  - generic [ref=e92]: 00:01
+                  - generic [ref=e93]: Input
+                - generic [ref=e94]:
+                  - heading "Article intake" [level=3] [ref=e95]
+                  - paragraph [ref=e96]: Paste text or a URL. NeutralEye treats the article as the source of record.
+              - listitem [ref=e97]:
+                - generic [ref=e99]:
+                  - generic [ref=e100]: 00:04
+                  - generic [ref=e101]: Extraction
+                - generic [ref=e102]:
+                  - heading "Readable text extracted" [level=3] [ref=e103]
+                  - paragraph [ref=e104]: Navigation, ads, and unrelated page furniture are removed before analysis.
+              - listitem [ref=e105]:
+                - generic [ref=e107]:
+                  - generic [ref=e108]: 00:08
+                  - generic [ref=e109]: Signals
+                - generic [ref=e110]:
+                  - heading "Bias signals checked" [level=3] [ref=e111]
+                  - paragraph [ref=e112]: Tone, framing, attribution, source balance, and omitted counter-context are reviewed together.
+              - listitem [ref=e113]:
+                - generic [ref=e115]:
+                  - generic [ref=e116]: 00:12
+                  - generic [ref=e117]: Calibration
+                - generic [ref=e118]:
+                  - heading "Confidence separated" [level=3] [ref=e119]
+                  - paragraph [ref=e120]: Confidence reflects how consistent the signals are, not whether the article is true.
+              - listitem [ref=e121]:
+                - generic [ref=e123]:
+                  - generic [ref=e124]: 00:16
+                  - generic [ref=e125]: Trace
+                - generic [ref=e126]:
+                  - heading "Evidence attached" [level=3] [ref=e127]
+                  - paragraph [ref=e128]: Quoted examples and source suggestions make the output inspectable.
+          - complementary "Example structured output" [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e131]: Evidence packet
+              - strong [ref=e132]: Review ready
+            - generic [ref=e133]:
+              - generic [ref=e134]: Reader direction
+              - strong [ref=e135]: Framing pressure identified
+            - generic [ref=e136]:
+              - generic [ref=e137]: Quoted phrase with reason
+              - generic [ref=e138]: Missing counter-context
+              - generic [ref=e139]: Source mix checked
+              - generic [ref=e140]: Next reading step
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - paragraph [ref=e143]: Analyzer
+          - heading "Run the same structured read on an article." [level=2] [ref=e144]
+        - link "Open Analyzer" [ref=e146] [cursor=pointer]:
+          - /url: /analyze
+    - contentinfo [ref=e147]:
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - link "NeutralEye home" [ref=e150] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e151]: NeutralEye
+          - paragraph [ref=e152]: © 2026 NeutralEye. All rights reserved.
+        - navigation "Footer product" [ref=e153]:
+          - link "Methodology" [ref=e154] [cursor=pointer]:
+            - /url: /methodology
+          - link "Analyze" [ref=e155] [cursor=pointer]:
+            - /url: /analyze
+          - link "Journal" [ref=e156] [cursor=pointer]:
+            - /url: /blog
+          - link "Install Extension" [ref=e157] [cursor=pointer]:
+            - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+        - generic [ref=e158]:
+          - paragraph [ref=e159]: Legal
+          - navigation "Footer legal" [ref=e160]:
+            - link "Website Privacy" [ref=e161] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e162] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e163] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e164]

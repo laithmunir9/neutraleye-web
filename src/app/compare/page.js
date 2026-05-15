@@ -33,11 +33,79 @@ function normalizeSavedAnalysis(item) {
   };
 }
 
-function directionComparison(leftItem, rightItem) {
+function confidencePercent(item) {
+  return Math.round((item?.confidence || 0) * 100);
+}
+
+function isNoBiasResult(item) {
+  const label = String(item?.directionLabel || item?.direction || "").toLowerCase();
+  return label.includes("no significant bias") || label === "neutral";
+}
+
+function displayDirection(item) {
+  if (!item) return "";
+  if (isNoBiasResult(item)) return "No significant bias detected.";
+  return item.directionLabel || item.direction || "Analysis result";
+}
+
+function directionPhrase(item) {
+  return displayDirection(item).replace(/[.!?]+$/u, "");
+}
+
+function stripEmoji(value) {
+  return String(value || "").replace(/[\u{1f300}-\u{1faff}\u{2600}-\u{27bf}]/gu, "").trim();
+}
+
+function neutralSummaryText(item) {
+  const drivers = Array.isArray(item?.drivers)
+    ? item.drivers.map((driver) => String(driver || "").trim()).filter(Boolean)
+    : [];
+
+  if (!drivers.length) {
+    return "This read stayed below the threshold for a meaningful bias flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as biased.";
+  }
+
+  return `This read stayed below the threshold for a meaningful bias flag. The review did not find a repeated bias signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
+}
+
+function displaySummary(item) {
+  if (!item) return "";
+  if (isNoBiasResult(item)) return neutralSummaryText(item);
+  return stripEmoji(item.summary) || "No summary returned.";
+}
+
+function sameAnalysis(leftItem, rightItem) {
+  return Boolean(leftItem?.id && rightItem?.id && leftItem.id === rightItem.id);
+}
+
+function comparisonSummary(leftItem, rightItem) {
   if (!leftItem || !rightItem) return "";
-  const leftLabel = String(leftItem.directionLabel || leftItem.direction || "").trim().toLowerCase();
-  const rightLabel = String(rightItem.directionLabel || rightItem.direction || "").trim().toLowerCase();
-  return leftLabel && rightLabel && leftLabel === rightLabel ? "Same bias direction" : "Different bias direction";
+  if (sameAnalysis(leftItem, rightItem)) {
+    return "Both sides are showing the same saved analysis, so there is no meaningful difference to compare yet.";
+  }
+
+  const leftDirection = directionPhrase(leftItem) || "the left result";
+  const rightDirection = directionPhrase(rightItem) || "the right result";
+  const leftConfidence = confidencePercent(leftItem);
+  const rightConfidence = confidencePercent(rightItem);
+  const confidenceGap = Math.abs(leftConfidence - rightConfidence);
+  const confidenceLine = confidenceGap
+    ? `The confidence differs by ${confidenceGap} percentage points.`
+    : "Both results carry the same confidence score.";
+
+  if (leftDirection === rightDirection) {
+    return `Both analyses point in the same direction: ${leftDirection}. ${confidenceLine} Read the summaries below for the finer difference in emphasis, evidence, and framing.`;
+  }
+
+  if (isNoBiasResult(leftItem) && !isNoBiasResult(rightItem)) {
+    return `The left analysis did not find a significant bias signal, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and bias signals.`;
+  }
+
+  if (!isNoBiasResult(leftItem) && isNoBiasResult(rightItem)) {
+    return `The left analysis reads as ${leftDirection}, while the right analysis did not find a significant bias signal. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and bias signals.`;
+  }
+
+  return `The left analysis reads as ${leftDirection}, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how each result frames the article's tone, emphasis, and bias signals.`;
 }
 
 export default function ComparePage() {
@@ -48,7 +116,7 @@ export default function ComparePage() {
 
   const leftItem = useMemo(() => normalizeSavedAnalysis(items.find((item) => item.id === left)), [items, left]);
   const rightItem = useMemo(() => normalizeSavedAnalysis(items.find((item) => item.id === right)), [items, right]);
-  const comparisonLabel = directionComparison(leftItem, rightItem);
+  const summary = comparisonSummary(leftItem, rightItem);
 
   return (
     <AppShell>
@@ -86,15 +154,15 @@ export default function ComparePage() {
                   </select>
                 </label>
               </div>
-              {comparisonLabel ? (
+              {summary ? (
                 <div className={styles.overview}>
-                  <div>
-                    <span>Bias direction</span>
-                    <strong>{comparisonLabel}</strong>
+                  <div className={styles.summaryCard}>
+                    <span>Comparison Summary</span>
+                    <p>{summary}</p>
                   </div>
                   <div>
                     <span>Confidence gap</span>
-                    <strong>{Math.abs(Math.round((leftItem.confidence - rightItem.confidence) * 100))}%</strong>
+                    <strong>{Math.abs(confidencePercent(leftItem) - confidencePercent(rightItem))}%</strong>
                   </div>
                 </div>
               ) : null}
@@ -105,15 +173,10 @@ export default function ComparePage() {
                   {item ? (
                     <div className={styles.panel}>
                       <p className={styles.directionLine}>
-                        <strong>{item.directionLabel || item.direction}</strong>
+                        <strong>{displayDirection(item)}</strong>
                       </p>
                       <p className={styles.meta}>Confidence: {Math.round((item.confidence || 0) * 100)}%</p>
-                      <p className={styles.summary}>{item.summary}</p>
-                      <div className={styles.driverList}>
-                        {(item.drivers || []).slice(0, 4).map((driver) => (
-                          <span key={driver}>{driver}</span>
-                        ))}
-                      </div>
+                      <p className={styles.summary}>{displaySummary(item)}</p>
                     </div>
                   ) : (
                     <p className={styles.text}>Choose a saved analysis to begin the comparison.</p>

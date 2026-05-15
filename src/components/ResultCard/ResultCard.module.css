@@ -1,16 +1,16 @@
 .card {
   border: 1px solid var(--border);
-  border-radius: 1.45rem;
+  border-radius: var(--radius-md);
   background: var(--surface);
   box-shadow: var(--shadow);
-  padding: 1.2rem;
+  padding: clamp(1.1rem, 1.8vw, 1.35rem);
 }
 
 .title {
   margin-bottom: 0.9rem;
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--accent-strong);
 }

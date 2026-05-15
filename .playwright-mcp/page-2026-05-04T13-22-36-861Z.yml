@@ -1,0 +1,128 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /system
+        - link "Blog" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - generic [ref=e12]:
+      - complementary [ref=e13]:
+        - button "Close workspace sidebar" [ref=e15]:
+          - img [ref=e16]
+        - generic [ref=e18]:
+          - generic [ref=e19]: What this workspace does
+          - strong [ref=e20]: Read tone, framing, and omission more clearly
+          - paragraph [ref=e21]: Analyze articles, revisit past results, compare narratives, and check how the system explains its output.
+        - generic [ref=e22]:
+          - generic [ref=e23]: Core
+          - navigation [ref=e24]:
+            - link "Analyze" [ref=e25] [cursor=pointer]:
+              - /url: /analyze
+              - generic [ref=e26]: AN
+              - generic [ref=e27]: Analyze
+            - link "History" [ref=e28] [cursor=pointer]:
+              - /url: /history
+              - generic [ref=e29]: HI
+              - generic [ref=e30]: History
+        - generic [ref=e31]:
+          - generic [ref=e32]: Workspace
+          - navigation [ref=e33]:
+            - link "Compare" [ref=e34] [cursor=pointer]:
+              - /url: /compare
+              - generic [ref=e35]: CP
+              - generic [ref=e36]: Compare
+            - link "Settings" [ref=e37] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e38]: ST
+              - generic [ref=e39]: Settings
+      - main [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - heading "Analysis History" [level=1] [ref=e44]
+            - paragraph [ref=e45]: Review past article checks, revisit the output, and compare how different stories were framed.
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - generic [ref=e48]: Saved runs
+              - generic [ref=e49]:
+                - paragraph [ref=e50]: "3"
+                - paragraph [ref=e51]: Analyses currently saved in this browser.
+            - generic [ref=e52]:
+              - generic [ref=e53]: Latest activity
+              - generic [ref=e54]:
+                - paragraph [ref=e55]: 5/4/2026, 1:43:35 PM
+                - paragraph [ref=e56]: Most recent time an article was reviewed in this workspace.
+            - generic [ref=e57]:
+              - generic [ref=e58]: Storage model
+              - generic [ref=e59]:
+                - paragraph [ref=e60]: Browser-local
+                - paragraph [ref=e61]: Saved history stays on this device unless you remove it.
+          - table [ref=e63]:
+            - rowgroup [ref=e64]:
+              - row "Date Domain / Title Direction Confidence" [ref=e65] [cursor=pointer]:
+                - columnheader "Date" [ref=e66]
+                - columnheader "Domain / Title" [ref=e67]
+                - columnheader "Direction" [ref=e68]
+                - columnheader "Confidence" [ref=e69]
+                - columnheader [ref=e70]
+            - rowgroup [ref=e71]:
+              - row "5/4/2026, 1:43:35 PM edition.cnn.com Moderate bias against the Kremlin and Vladimir Putin. 75% Actions" [ref=e72] [cursor=pointer]:
+                - cell "5/4/2026, 1:43:35 PM" [ref=e73]
+                - cell "edition.cnn.com" [ref=e74]
+                - cell "Moderate bias against the Kremlin and Vladimir Putin." [ref=e75]
+                - cell "75%" [ref=e76]
+                - cell "Actions" [ref=e77]:
+                  - button "Actions" [ref=e79]
+              - row "5/4/2026, 1:33:01 PM Direct text input Moderate bias against one group. 75% Actions" [ref=e80] [cursor=pointer]:
+                - cell "5/4/2026, 1:33:01 PM" [ref=e81]
+                - cell "Direct text input" [ref=e82]
+                - cell "Moderate bias against one group." [ref=e83]
+                - cell "75%" [ref=e84]
+                - cell "Actions" [ref=e85]:
+                  - button "Actions" [ref=e87]
+              - row "5/4/2026, 1:31:00 PM Direct text input Moderate bias against one group. 75% Actions" [ref=e88] [cursor=pointer]:
+                - cell "5/4/2026, 1:31:00 PM" [ref=e89]
+                - cell "Direct text input" [ref=e90]
+                - cell "Moderate bias against one group." [ref=e91]
+                - cell "75%" [ref=e92]
+                - cell "Actions" [ref=e93]:
+                  - button "Actions" [ref=e95]
+    - contentinfo [ref=e96]:
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - link "NeutralEye home" [ref=e99] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e100]: NeutralEye
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: © 2026 NeutralEye. All rights reserved.
+            - generic [ref=e103]: Status
+        - generic [ref=e105]:
+          - paragraph [ref=e106]: Explore
+          - navigation "Footer product" [ref=e107]:
+            - link "Analyze" [ref=e108] [cursor=pointer]:
+              - /url: /analyze
+            - link "System" [ref=e109] [cursor=pointer]:
+              - /url: /system
+            - link "Blog" [ref=e110] [cursor=pointer]:
+              - /url: /blog
+            - link "Methodology" [ref=e111] [cursor=pointer]:
+              - /url: /methodology
+        - generic [ref=e112]:
+          - paragraph [ref=e113]: Legal
+          - navigation "Footer legal" [ref=e114]:
+            - link "Website Privacy" [ref=e115] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e116] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e117] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e118]

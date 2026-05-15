@@ -1,0 +1,86 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "NeutralEye logo NeutralEye Bias reading workspace" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "NeutralEye logo" [ref=e5]
+        - generic [ref=e6]:
+          - strong [ref=e7]: NeutralEye
+          - generic [ref=e8]: Bias reading workspace
+      - generic [ref=e9]:
+        - generic [ref=e10]: What this workspace does
+        - strong [ref=e11]: Read tone, framing, and omission more clearly
+        - paragraph [ref=e12]: Analyze articles, revisit past results, compare narratives, and check how the system explains its output.
+      - generic [ref=e13]:
+        - generic [ref=e14]: Core
+        - navigation [ref=e15]:
+          - link "Analyze" [ref=e16] [cursor=pointer]:
+            - /url: /analyze
+            - generic [ref=e17]: AN
+            - generic [ref=e18]: Analyze
+          - link "History" [ref=e19] [cursor=pointer]:
+            - /url: /history
+            - generic [ref=e20]: HI
+            - generic [ref=e21]: History
+          - link "Methodology" [ref=e22] [cursor=pointer]:
+            - /url: /methodology
+            - generic [ref=e23]: ME
+            - generic [ref=e24]: Methodology
+      - generic [ref=e25]:
+        - generic [ref=e26]: Workspace
+        - navigation [ref=e27]:
+          - link "Compare" [ref=e28] [cursor=pointer]:
+            - /url: /compare
+            - generic [ref=e29]: CP
+            - generic [ref=e30]: Compare
+          - link "Settings" [ref=e31] [cursor=pointer]:
+            - /url: /settings
+            - generic [ref=e32]: ST
+            - generic [ref=e33]: Settings
+    - main [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - heading "Analyze an Article" [level=1] [ref=e37]
+          - paragraph [ref=e38]: Paste article text or a URL to check how tone, framing, and omission may be influencing the reader.
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: Analyzer
+                - strong [ref=e44]: Article input
+              - generic [ref=e45]: Minimum 200 chars (200 remaining)
+            - generic [ref=e46]:
+              - button "Paste Text" [pressed] [ref=e47] [cursor=pointer]
+              - button "Paste URL" [ref=e48] [cursor=pointer]
+            - textbox "Paste article text for analysis..." [ref=e49]
+            - generic [ref=e50]:
+              - generic [ref=e51]: 0 words
+              - generic [ref=e52]: 0 chars
+            - generic [ref=e53]:
+              - button "Add More Text" [disabled] [ref=e54]
+              - button "Try Example" [ref=e55] [cursor=pointer]
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - generic [ref=e59]: Analysis Result
+                - generic [ref=e60]: Awaiting input
+              - strong [ref=e62]: Ready to analyze
+              - paragraph [ref=e63]: Run an analysis to see tone, framing, and omissions.
+            - generic [ref=e64]:
+              - generic [ref=e66]: Summary of Bias
+              - paragraph [ref=e67]: Run an analysis to see tone, framing, and omissions.
+            - generic [ref=e68]:
+              - generic [ref=e70]: Examples of Bias
+              - paragraph [ref=e71]: Quoted language and framing examples will appear here.
+            - generic [ref=e72]:
+              - generic [ref=e74]: Suggested Unbiased Sources
+              - paragraph [ref=e75]: Suggested sources will appear here when the analysis has comparison ideas.
+            - generic [ref=e76]:
+              - generic [ref=e78]: Recommendations
+              - paragraph [ref=e79]: Useful next reading steps will appear here.
+            - generic [ref=e80]:
+              - generic [ref=e82]: Analysis Confidence
+              - generic [ref=e83]:
+                - strong [ref=e84]: "--"
+                - paragraph [ref=e85]: Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing, and omission. It is not a claim of factual certainty.
+  - alert [ref=e86]

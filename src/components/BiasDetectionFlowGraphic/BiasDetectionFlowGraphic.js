@@ -32,7 +32,7 @@ const NODES = [
   {
     key: "output",
     title: "Structured result built",
-    description: "Bias level, examples, sources, recommendation, and confidence are returned.",
+    description: "Summary, examples, sources, recommendation, and confidence are returned.",
     positionClass: "nodeOutput",
     pulseDelay: "3.8s"
   }

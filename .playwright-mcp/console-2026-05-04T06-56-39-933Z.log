@@ -1,0 +1,74 @@
+[    1889ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    1952ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  124782ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  124997ms] [LOG] [Fast Refresh] done in 140ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  244388ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  244406ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  245314ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  245335ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  593041ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  593170ms] [LOG] [Fast Refresh] done in 210ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 1399619ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 1977081ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 2899233ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 2899437ms] [LOG] [Fast Refresh] done in 306ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 2900050ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 2900415ms] [LOG] [Fast Refresh] done in 467ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 3781872ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 4178307ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7000581ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7000794ms] [LOG] [Fast Refresh] done in 292ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7102196ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7102303ms] [LOG] [Fast Refresh] done in 208ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7179182ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7179229ms] [LOG] [Fast Refresh] done in 123ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7306877ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7307042ms] [LOG] [Fast Refresh] done in 265ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7307145ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7307401ms] [LOG] [Fast Refresh] done in 358ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7317606ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T08:58:37.534Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7317607ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: 19106834-c4c6-467b-834f-5095aab396df, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7317631ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7317632ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: 19106834-c4c6-467b-834f-5095aab396df, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7317632ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: 19106834-c4c6-467b-834f-5095aab396df} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7393337ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7393341ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7393612ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7393684ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7398406ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T08:59:58.337Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7398409ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: f8fa2331-de48-43bf-8337-aff874dd755d, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7398425ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7398426ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: f8fa2331-de48-43bf-8337-aff874dd755d, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7398426ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: f8fa2331-de48-43bf-8337-aff874dd755d} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7400137ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7400270ms] [LOG] [Fast Refresh] done in 179ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7400375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7400946ms] [LOG] [Fast Refresh] done in 670ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7510860ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T09:01:50.790Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7510865ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: c88546da-32ba-4aff-b13d-e1b0a1e73efe, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7510900ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7510901ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: c88546da-32ba-4aff-b13d-e1b0a1e73efe, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7510902ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: c88546da-32ba-4aff-b13d-e1b0a1e73efe} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7512254ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T09:01:52.186Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7512254ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: 199ceeb7-a8f5-4d07-a3d9-3dfd601d27a2, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7512277ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7512277ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: 199ceeb7-a8f5-4d07-a3d9-3dfd601d27a2, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7512277ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: 199ceeb7-a8f5-4d07-a3d9-3dfd601d27a2} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7531356ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T09:02:11.288Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7531359ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: 9e74017d-83c7-4ecb-9d1e-c03fd798ceea, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7531382ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7531383ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: 9e74017d-83c7-4ecb-9d1e-c03fd798ceea, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7531384ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: 9e74017d-83c7-4ecb-9d1e-c03fd798ceea} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7533407ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7533436ms] [LOG] [Fast Refresh] done in 129ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7533606ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7533643ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7540573ms] [INFO] [neutraleye:web] analyze click {mode: url, startedAt: 2026-05-04T09:02:20.505Z, url: https://edition.cnn.com/2026/05/04/europe/putin-russia-security-intelligence-intl} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7540574ms] [INFO] [neutraleye:web] request start /analyze-url {requestId: 2e6dafa7-f031-4139-aaef-71d7e0473be5, payload: Object} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7540614ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:8000/analyze-url:0
+[ 7540614ms] [INFO] [neutraleye:web] request network error /analyze-url {requestId: 2e6dafa7-f031-4139-aaef-71d7e0473be5, error: Failed to fetch} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7540614ms] [INFO] [neutraleye:web] analyze failed {mode: url, status: 0, message: NeutralEye could not reach the analysis backend., requestId: 2e6dafa7-f031-4139-aaef-71d7e0473be5} @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7580677ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7580698ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7581800ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7583416ms] [LOG] [Fast Refresh] done in 1713ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

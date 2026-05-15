@@ -39,7 +39,7 @@ const Feature108 = ({
       label: "Boost Revenue",
       content: {
         badge: "Modern Tactics",
-        title: "Make your site a true standout.",
+        title: "Make your site a true standout",
         description:
           "Discover new web trends that help you craft sleek, highly functional sites that drive traffic and convert leads into customers.",
         buttonText: "See Plans",
@@ -54,7 +54,7 @@ const Feature108 = ({
       label: "Higher Engagement",
       content: {
         badge: "Expert Features",
-        title: "Boost your site with top-tier design.",
+        title: "Boost your site with top-tier design",
         description:
           "Use stellar design to easily engage users and strengthen their loyalty. Create a seamless experience that keeps them coming back for more.",
         buttonText: "See Tools",
@@ -69,7 +69,7 @@ const Feature108 = ({
       label: "Stunning Layouts",
       content: {
         badge: "Elite Solutions",
-        title: "Build an advanced web experience.",
+        title: "Build an advanced web experience",
         description:
           "Lift your brand with modern tech that grabs attention and drives action. Create a digital experience that stands out from the crowd.",
         buttonText: "See Options",

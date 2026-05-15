@@ -55,8 +55,8 @@ export const TracingBeam = ({
               delay: 0.5
             }}
             animate={{
-              backgroundColor: scrollYProgress.get() > 0 ? "white" : "rgb(34 197 94)",
-              borderColor: scrollYProgress.get() > 0 ? "white" : "rgb(22 163 74)"
+              backgroundColor: scrollYProgress.get() > 0 ? "white" : "rgb(139 103 65)",
+              borderColor: scrollYProgress.get() > 0 ? "white" : "rgb(110 79 47)"
             }}
             className="h-2 w-2 rounded-full border border-neutral-300 bg-white"
           />

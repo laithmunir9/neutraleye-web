@@ -59,7 +59,7 @@ export default function SettingsPage() {
               <label className={styles.row}>
                 <span>
                   <strong>Reduce loading motion</strong>
-                  <small>Use a calmer loading experience while NeutralEye reads and scores an article.</small>
+                  <small>Use a calmer loading experience while NeutralEye reads and analyzes an article.</small>
                 </span>
                 <input
                   type="checkbox"

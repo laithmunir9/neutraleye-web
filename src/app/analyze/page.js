@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
@@ -10,9 +9,16 @@ import { analyzeText, analyzeUrl, ApiError } from "@/lib/api";
 import { getAnalysis, saveAnalysis } from "@/lib/storage";
 import styles from "./page.module.css";
 
-const STAGES = ["Reading...", "Checking framing...", "Reviewing tone...", "Writing analysis..."];
+const STAGES = ["Reading", "Checking framing", "Reviewing tone", "Writing analysis"];
 const SETTINGS_KEY = "neutraleye.settings.v1";
-
+const DEFAULT_SUMMARY = "A focused summary of the detected bias will appear here after analysis.";
+const NEUTRAL_SUMMARY_TEMPLATE =
+  "This read stayed below the threshold for a meaningful bias flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as biased.";
+const NEUTRAL_NOTE_ITEMS = [
+  "No strong directional pattern repeated across wording, framing, and attribution.",
+  "Visible signals stayed below the threshold required for a meaningful bias flag.",
+  "This result reflects the current text only and is not a guarantee that every relevant context is present."
+];
 const DEFAULT_RESULT = {
   id: "",
   createdAt: "",
@@ -20,26 +26,119 @@ const DEFAULT_RESULT = {
   direction: "Neutral",
   directionLabel: "Neutral",
   confidence: 0.5,
-  score: 0,
-  summary: "Run an analysis to see tone, framing, and omissions.",
+  summary: DEFAULT_SUMMARY,
   drivers: ["Loaded wording", "Framing", "Source imbalance", "Attribution gaps"],
   examples: [],
   sources: [],
   recommendations: []
 };
+const UNREADABLE_PAGE_TITLE = "Could not analyze this page";
+const UNREADABLE_PAGE_MESSAGE = "Please open a real article or website and try again.";
+const UNREADABLE_TEXT_TITLE = "Could not analyze this text";
+const UNREADABLE_TEXT_MESSAGE = "Please paste a real article body and try again.";
+const INVALID_URL_TITLE = "Could not analyze this URL";
+const INVALID_URL_MESSAGE = "Please enter a full article URL and try again.";
 
 function isNoBiasResult(result) {
   const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
-  const score = Math.abs(Number(result?.score) || 0);
-  const hasBiasLabel = /\b(slight|moderate|heavy|uncertain)\s+bias\b/.test(label);
 
-  return label.includes("no significant bias") || label === "neutral" || (!hasBiasLabel && score > 0 && score < 0.12);
+  return label.includes("no significant bias") || label === "neutral";
+}
+
+function resultTitle(result, hasAnalysis) {
+  if (!hasAnalysis) return "Ready to analyze";
+  if (isNoBiasResult(result)) return "No significant bias detected.";
+  return result.directionLabel || result.direction;
 }
 
 function resultHelperText(result, hasAnalysis) {
   if (!hasAnalysis) return "Run an analysis to see tone, framing, and omissions.";
-  if (isNoBiasResult(result)) return "No clear bias signals were found in the article text.";
+  if (isNoBiasResult(result)) return "Please feel free to continue reading.";
   return "Overall finding based on the article's tone, framing, sourcing, and attribution.";
+}
+
+function summaryText(result, hasAnalysis) {
+  if (!hasAnalysis) return DEFAULT_SUMMARY;
+  if (isNoBiasResult(result)) return neutralSummaryText(result);
+  return result?.summary || "No summary returned.";
+}
+
+function neutralNoteItems(result) {
+  const customDrivers = Array.isArray(result?.drivers)
+    ? result.drivers.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+
+  if (!customDrivers.length) return NEUTRAL_NOTE_ITEMS;
+
+  return [
+    `No strong bias signal repeated consistently across ${customDrivers.slice(0, 3).join(", ").toLowerCase()}.`,
+    "Visible signals stayed below the threshold required for a meaningful bias flag.",
+    "This result reflects the current text only and is not a guarantee that every relevant context is present."
+  ];
+}
+
+function neutralSummaryText(result) {
+  const drivers = Array.isArray(result?.drivers)
+    ? result.drivers.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+
+  if (!drivers.length) return NEUTRAL_SUMMARY_TEMPLATE;
+
+  return `This read stayed below the threshold for a meaningful bias flag. The review did not find a repeated bias signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
+}
+
+function formatConfidenceScore(value) {
+  const confidence = Number(value);
+  if (!Number.isFinite(confidence)) return "--";
+  return confidence.toFixed(2);
+}
+
+function getTextQualityError(value) {
+  const cleaned = String(value || "").trim().replace(/\s+/g, " ");
+  if (!cleaned) return null;
+
+  const words = cleaned.toLowerCase().match(/[a-z0-9']+/g) || [];
+  const sentences = cleaned.split(/[.!?]+/).map((item) => item.trim()).filter((item) => item.length >= 18);
+  const uniqueWords = new Set(words);
+  const uniqueRatio = words.length ? uniqueWords.size / words.length : 0;
+  const counts = words.reduce((map, word) => map.set(word, (map.get(word) || 0) + 1), new Map());
+  const mostRepeatedCount = counts.size ? Math.max(...counts.values()) : 0;
+  const repeatedShare = words.length ? mostRepeatedCount / words.length : 0;
+
+  if (words.length >= 40 && (uniqueWords.size < 12 || uniqueRatio < 0.18 || repeatedShare > 0.45)) {
+    return "Text appears too repetitive to evaluate as an article.";
+  }
+
+  if (cleaned.length >= 200 && sentences.length < 2) {
+    return "Text does not appear to contain enough article-like sentences.";
+  }
+
+  return null;
+}
+
+function getUrlQualityError(value) {
+  const cleaned = String(value || "").trim();
+  if (!cleaned) return "Paste the full article link, including https://.";
+  if (!/^https?:\/\//i.test(cleaned)) return "Start the link with https:// or http://.";
+
+  try {
+    const parsed = new URL(cleaned);
+    const hostname = parsed.hostname.replace(/^www\./i, "");
+    const hasReadableHost = hostname.includes(".") && hostname.split(".").some((part) => part.length >= 2);
+    const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(hostname);
+
+    if (!hasReadableHost && !isLocalhost) {
+      return "Use a complete website address, like https://example.com/news/story.";
+    }
+
+    if (!parsed.pathname || parsed.pathname === "/") {
+      return "Open the specific article page first, then paste that full URL here.";
+    }
+  } catch {
+    return "This does not look like a usable article link yet.";
+  }
+
+  return null;
 }
 
 function AnalyzePageContent() {
@@ -94,9 +193,19 @@ function AnalyzePageContent() {
 
   const canAnalyze = useMemo(() => {
     if (loading) return false;
-    if (mode === "url") return /^https?:\/\//i.test(url.trim());
+    if (mode === "url") return Boolean(url.trim());
     return text.trim().length >= 200;
   }, [mode, text, url, loading]);
+
+  function handleModeChange(nextMode) {
+    setMode(nextMode);
+    setErrorState(null);
+  }
+
+  function handleTextChange(nextText) {
+    setText(nextText);
+    if (errorState) setErrorState(null);
+  }
 
   function handleUrlChange(nextUrl) {
     const cleaned = String(nextUrl || "").trim();
@@ -105,10 +214,11 @@ function AnalyzePageContent() {
       setExtractedPreviewUrl("");
       setExtractionStatus("Extraction status: idle");
     }
+    if (errorState) setErrorState(null);
     setUrl(nextUrl);
   }
 
-  async function handleAnalyze() {
+  const handleAnalyze = useCallback(async () => {
     setErrorState(null);
     setLoading(true);
     if (mode === "url") {
@@ -125,6 +235,15 @@ function AnalyzePageContent() {
     try {
       let response;
       if (mode === "url") {
+        const urlQualityError = getUrlQualityError(url);
+        if (urlQualityError) {
+          throw new ApiError(INVALID_URL_MESSAGE, {
+            status: 0,
+            code: "URL_VALIDATION_FAILED",
+            endpoint: "/analyze-url",
+            details: urlQualityError
+          });
+        }
         response = await analyzeUrl(url.trim());
         if (response.extractedText) {
           setExtractedPreview(response.extractedText);
@@ -134,6 +253,15 @@ function AnalyzePageContent() {
           setExtractionStatus("Extraction status: analyzed from backend pipeline");
         }
       } else {
+        const textQualityError = getTextQualityError(text);
+        if (textQualityError) {
+          throw new ApiError(UNREADABLE_TEXT_MESSAGE, {
+            status: 0,
+            code: "ARTICLE_VALIDATION_FAILED",
+            endpoint: "/analyze-text",
+            details: textQualityError
+          });
+        }
         response = await analyzeText(text.trim());
       }
 
@@ -151,69 +279,63 @@ function AnalyzePageContent() {
       }
     } catch (analysisError) {
       const isApiError = analysisError instanceof ApiError;
-      const baseMessage = String(analysisError?.message || "Failed to analyze.");
+      const baseMessage = String(analysisError?.message || "Failed to analyze.").trim();
       const status = isApiError ? analysisError.status : 0;
       const details = isApiError ? analysisError.details : "";
       const code = isApiError ? analysisError.code : "";
       let message = details ? `${baseMessage} ${details}` : baseMessage;
       let title = mode === "url" ? "URL analysis failed" : "Text analysis failed";
-      let suggestions = mode === "url"
-        ? ["Try Paste Text mode with article body text.", "Try another URL (non-paywalled article)."]
-        : ["Reduce text length and retry.", "Refresh and run analysis again."];
 
       if (status === 429) {
         title = "Rate limit exceeded";
         message = "Too many requests. Please wait a minute and try again.";
-        suggestions = ["Wait 60 seconds and retry.", "Send fewer requests per minute."];
       }
 
       if (status === 503 || code === "AI_DISABLED") {
         title = "Analysis unavailable";
-        message = "Analysis is temporarily unavailable.";
-        suggestions = ["Try again later."];
+        message = "Failed to check bias. Please try again later.";
       }
 
       if (code === "VALIDATION_ERROR") {
-        title = mode === "url" ? "Check the URL" : "Check the article text";
-        suggestions = mode === "url"
-          ? ["Use a full article URL starting with http:// or https://.", "If extraction keeps failing, use Paste Text mode."]
-          : ["Paste more article text before retrying.", "Use article body content instead of a short snippet."];
+        title = mode === "url" ? INVALID_URL_TITLE : "Check the article text";
+        message = mode === "url"
+          ? INVALID_URL_MESSAGE
+          : "Please paste a real article body and try again.";
+      }
+
+      if (code === "URL_VALIDATION_FAILED") {
+        title = INVALID_URL_TITLE;
+        message = INVALID_URL_MESSAGE;
       }
 
       if (code === "ARTICLE_VALIDATION_FAILED") {
-        title = "Article text required";
-        message = "NeutralEye could not confirm that this content is a readable article.";
-        suggestions = ["Paste a full article body.", "Use a direct article URL instead of a homepage or feed."];
+        title = mode === "url" ? UNREADABLE_PAGE_TITLE : UNREADABLE_TEXT_TITLE;
+        message = mode === "url" ? UNREADABLE_PAGE_MESSAGE : UNREADABLE_TEXT_MESSAGE;
       }
 
       if (code === "URL_FETCH_TIMEOUT") {
         title = "URL fetch timed out";
         message = "The article took too long to load for analysis.";
-        suggestions = ["Retry in a moment.", "Try another direct article URL or paste the text manually."];
       }
 
       if (code === "URL_FETCH_FAILED" || code === "URL_EXTRACTION_ERROR") {
-        title = "Article could not be retrieved";
-        message = "NeutralEye could not fetch readable content from that URL.";
-        suggestions = ["Try a public non-paywalled article URL.", "Use Paste Text mode if the page blocks extraction."];
+        title = UNREADABLE_PAGE_TITLE;
+        message = UNREADABLE_PAGE_MESSAGE;
       }
 
       if (code === "URL_EXTRACTION_TOO_SHORT") {
-        title = "Not enough article text";
-        message = "NeutralEye found the page, but not enough readable article text to analyze.";
-        suggestions = ["Open the full article page and retry.", "Use Paste Text mode with the article body."];
+        title = UNREADABLE_PAGE_TITLE;
+        message = UNREADABLE_PAGE_MESSAGE;
       }
 
       if (code === "TIMEOUT") {
         title = "Analysis timed out";
-        message = "The analysis service took too long to respond.";
-        suggestions = ["Retry in a moment.", "Try a shorter article or another URL."];
+        message = "Failed to check bias. Please try again later.";
       }
 
       if (code === "NETWORK_ERROR") {
-        title = "Service connection failed";
-        message = "NeutralEye could not reach the analysis backend.";
-        suggestions = ["Confirm the website backend is running.", "Check NEXT_PUBLIC_NEUTRALEYE_API_URL and retry."];
+        title = "Analysis unavailable";
+        message = "Failed to check bias. Please try again later.";
       }
 
       if (mode === "url") {
@@ -230,17 +352,12 @@ function AnalyzePageContent() {
       setErrorState({
         title,
         message,
-        status,
-        code,
-        endpoint: analysisError?.endpoint || "",
-        details,
-        requestId: analysisError?.requestId || "",
-        suggestions
+        detail: details
       });
     } finally {
       setLoading(false);
     }
-  }
+  }, [mode, text, url]);
 
   function handleExample() {
     const sampleText =
@@ -255,72 +372,87 @@ function AnalyzePageContent() {
     if (!examplePending) return;
     setExamplePending(false);
     handleAnalyze();
-  }, [examplePending]);
+  }, [examplePending, handleAnalyze]);
 
   return (
     <AppShell>
       <div className={styles.root}>
         <HeaderBar
-          title="Analyze An Article"
+          title="Analyze an Article"
           subtitle="Paste article text or a URL to check how tone, framing, and omission may be influencing the reader."
         />
 
         <section className={styles.grid}>
-          <InputPanel
-            mode={mode}
-            onModeChange={setMode}
-            text={text}
-            url={url}
-            onTextChange={setText}
-            onUrlChange={handleUrlChange}
-            onAnalyze={handleAnalyze}
-            onExample={handleExample}
-            canAnalyze={canAnalyze}
-            loading={loading}
-            loadingStage={loadingStage}
-            extractionStatus={extractionStatus}
-            extractedPreview={extractedPreview}
-            errorState={errorState}
-          />
+          <div className={styles.inputColumn}>
+            <InputPanel
+              mode={mode}
+              onModeChange={handleModeChange}
+              text={text}
+              url={url}
+              onTextChange={handleTextChange}
+              onUrlChange={handleUrlChange}
+              onAnalyze={handleAnalyze}
+              onExample={handleExample}
+              canAnalyze={canAnalyze}
+              loading={loading}
+              loadingStage={loadingStage}
+              extractedPreview={extractedPreview}
+              errorState={errorState}
+              analysisComplete={hasAnalysis && !loading}
+            />
+          </div>
 
           <section
             className={`${styles.outputColumn} ${loading ? styles.isLoading : ""} ${
               hasAnalysis ? styles.hasResult : styles.emptyState
             }`}
           >
-            <section className={styles.outputCard}>
+            <section className={`${styles.outputCard} ${styles.resultHero}`}>
               <div className={styles.sectionHeader}>
-                <span>Bias Level</span>
+                <span>Analysis Result</span>
               </div>
               <div className={styles.biasRow}>
-                <strong>{hasAnalysis ? result.directionLabel || result.direction : "Ready to analyze"}</strong>
+                <strong>{resultTitle(result, hasAnalysis)}</strong>
               </div>
               <p className={styles.helperText}>{resultHelperText(result, hasAnalysis)}</p>
             </section>
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
-                <span>Summary</span>
+                <span>Summary of Bias</span>
               </div>
-              <p className={styles.bodyText}>{result.summary}</p>
+              <p className={`${styles.bodyText} ${!hasAnalysis ? styles.placeholderText : ""}`}>
+                {summaryText(result, hasAnalysis)}
+              </p>
             </section>
+
+            {hasAnalysis && isNoBiasResult(result) ? (
+              <section className={styles.outputCard}>
+                <div className={styles.sectionHeader}>
+                  <span>Why this was judged low-bias</span>
+                </div>
+                <ul className={styles.simpleList}>
+                  {neutralNoteItems(result).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
                 <span>Examples of Bias</span>
               </div>
               {result.examples.length ? (
-                <ul className={styles.orderedList}>
+                <ul className={styles.simpleList}>
                   {result.examples.map((example, index) => (
-                    <li key={`${example.quote}-${index}`}>
-                      <p>{example.quote}</p>
-                    </li>
+                    <li key={`${example.quote}-${index}`}>{example.quote}</li>
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>
+                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
                   {hasAnalysis && isNoBiasResult(result)
-                    ? "No clear biased language or framing examples were found."
+                    ? "No strong language or framing examples crossed the threshold for a meaningful bias flag in this pass."
                     : "Quoted language and framing examples will appear here."}
                 </p>
               )}
@@ -328,7 +460,7 @@ function AnalyzePageContent() {
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
-                <span>Suggested Sources</span>
+                <span>Suggested Unbiased Sources</span>
               </div>
               {result.sources.length ? (
                 <ul className={styles.simpleList}>
@@ -347,9 +479,9 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>
+                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
                   {hasAnalysis && isNoBiasResult(result)
-                    ? "No comparison sources were suggested for this result."
+                    ? "No specific comparison sources were required to clarify a strong directional pattern. A second source may still be useful for high-stakes topics."
                     : "Suggested sources will appear here when the analysis has comparison ideas."}
                 </p>
               )}
@@ -366,9 +498,9 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.bodyText}>
+                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
                   {hasAnalysis && isNoBiasResult(result)
-                    ? "No follow-up reading steps were suggested."
+                    ? "No urgent follow-up steps were generated. For consequential topics, compare with one additional source and continue reading with normal judgment."
                     : "Useful next reading steps will appear here."}
                 </p>
               )}
@@ -377,19 +509,19 @@ function AnalyzePageContent() {
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
                 <span>Analysis Confidence</span>
-                <span>{hasAnalysis ? `${Math.round(result.confidence * 100)}%` : "--"}</span>
               </div>
-              <p className={styles.bodyText}>
-                Confidence reflects how consistent the signals are in the writing, not whether the article is objectively true.
-              </p>
+              <div className={styles.confidenceScore}>
+                <strong>{hasAnalysis ? formatConfidenceScore(result.confidence) : "--"}</strong>
+                {!hasAnalysis ? (
+                  <p>
+                    Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing,
+                    and omission. It is not a claim of factual certainty.
+                  </p>
+                ) : null}
+              </div>
             </section>
           </section>
         </section>
-
-        <aside className={styles.note}>
-          Confidence reflects how consistent the signals are in the writing, not whether the article is objectively
-          true. <Link href="/methodology">Read the full methodology</Link>.
-        </aside>
       </div>
     </AppShell>
   );

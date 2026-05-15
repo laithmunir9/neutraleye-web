@@ -1,0 +1,21 @@
+{
+  "heading": {
+    "x": 480,
+    "y": 230,
+    "w": 288,
+    "h": 113
+  },
+  "firstRow": {
+    "x": 848,
+    "y": 230,
+    "w": 720,
+    "h": 100
+  },
+  "lastRow": {
+    "x": 848,
+    "y": 561,
+    "w": 720,
+    "h": 116
+  },
+  "text": "Messy inputVery short passages, failed extraction, navigation text, or blocked pages can weaken the read"
+}

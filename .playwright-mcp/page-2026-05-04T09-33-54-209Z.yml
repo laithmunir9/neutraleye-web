@@ -1,0 +1,111 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /system
+        - link "Blog" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - generic [ref=e12]:
+      - complementary [ref=e13]:
+        - button "Open workspace sidebar" [pressed] [ref=e15]:
+          - img [ref=e16]
+        - navigation [ref=e19]:
+          - link "Analyze" [ref=e20] [cursor=pointer]:
+            - /url: /analyze
+            - generic [ref=e21]: AN
+          - link "History" [ref=e22] [cursor=pointer]:
+            - /url: /history
+            - generic [ref=e23]: HI
+        - navigation [ref=e25]:
+          - link "Compare" [ref=e26] [cursor=pointer]:
+            - /url: /compare
+            - generic [ref=e27]: CP
+          - link "Settings" [ref=e28] [cursor=pointer]:
+            - /url: /settings
+            - generic [ref=e29]: ST
+      - main [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - heading "Analyze an Article" [level=1] [ref=e34]
+            - paragraph [ref=e35]: Paste article text or a URL to check how tone, framing, and omission may be influencing the reader.
+          - generic [ref=e36]:
+            - generic [ref=e38]:
+              - generic [ref=e39]:
+                - generic [ref=e40]:
+                  - generic [ref=e41]: Analyzer
+                  - strong [ref=e42]: Article input
+                - generic [ref=e43]: Analyzed!
+              - generic [ref=e44]:
+                - button "Paste Text" [pressed] [ref=e45] [cursor=pointer]
+                - button "Paste URL" [ref=e46] [cursor=pointer]
+              - textbox "Paste article text for analysis" [ref=e108]: The article frames one side as reckless and dangerous, quotes only sympathetic experts, and leaves out the strongest objections that would challenge its main thesis. It repeatedly describes one group as responsible while portraying the opposing view as chaotic and unserious. The piece includes supportive quotes from aligned analysts but gives little space to counterarguments or competing evidence. Readers are guided toward a single interpretation through selective emphasis and emotionally weighted wording.
+              - generic [ref=e48]:
+                - generic [ref=e49]: 72 words
+                - generic [ref=e50]: 511 chars
+              - generic [ref=e51]:
+                - button "Analyze" [ref=e109] [cursor=pointer]
+                - button "Try Example" [ref=e53] [cursor=pointer]
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e57]: Analysis Result
+                - strong [ref=e60]: Moderate bias against one group.
+                - paragraph [ref=e61]: Overall finding based on the article's tone, framing, sourcing, and attribution.
+              - generic [ref=e62]:
+                - generic [ref=e64]: Summary of Bias
+                - paragraph [ref=e65]: The text exhibits moderate bias by framing one side as "reckless and dangerous" while portraying the opposing view as "responsible." It quotes only sympathetic experts and omits strong objections that could challenge its thesis, guiding readers toward a single interpretation.
+              - generic [ref=e66]:
+                - generic [ref=e68]: Examples of Bias
+                - list [ref=e110]:
+                  - listitem [ref=e111]: "\"frames one side as reckless and dangerous\" — framing"
+                  - listitem [ref=e112]: "\"quotes only sympathetic experts\" — source"
+                  - listitem [ref=e113]: "\"describes one group as responsible while portraying the opposing view as chaotic and unserious\" — language"
+              - generic [ref=e70]:
+                - generic [ref=e72]: Suggested Unbiased Sources
+                - paragraph [ref=e73]: Suggested sources will appear here when the analysis has comparison ideas.
+              - generic [ref=e74]:
+                - generic [ref=e76]: Recommendations
+                - list [ref=e114]:
+                  - listitem [ref=e115]: Compare with wire-service reporting.
+              - generic [ref=e78]:
+                - generic [ref=e80]: Analysis Confidence
+                - strong [ref=e82]: "0.75"
+    - contentinfo [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - link "NeutralEye home" [ref=e87] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e88]: NeutralEye
+          - generic [ref=e89]:
+            - paragraph [ref=e90]: © 2026 NeutralEye. All rights reserved.
+            - generic [ref=e91]: Status
+        - generic [ref=e93]:
+          - paragraph [ref=e94]: Explore
+          - navigation "Footer product" [ref=e95]:
+            - link "Analyze" [ref=e96] [cursor=pointer]:
+              - /url: /analyze
+            - link "System" [ref=e97] [cursor=pointer]:
+              - /url: /system
+            - link "Blog" [ref=e98] [cursor=pointer]:
+              - /url: /blog
+            - link "Methodology" [ref=e99] [cursor=pointer]:
+              - /url: /methodology
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: Legal
+          - navigation "Footer legal" [ref=e102]:
+            - link "Website Privacy" [ref=e103] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e104] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e105] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e106]

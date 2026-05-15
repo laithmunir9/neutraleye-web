@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import styles from "./HistoryTable.module.css";
 
 function domainOrTitle(record) {
@@ -16,19 +17,42 @@ function domainOrTitle(record) {
 
 export default function HistoryTable({ items, onDelete }) {
   const router = useRouter();
+  const [openMenuId, setOpenMenuId] = useState("");
+  const tableRef = useRef(null);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (tableRef.current?.contains(event.target)) return;
+      setOpenMenuId("");
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenMenuId("");
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   if (!items.length) {
     return (
       <div className={styles.empty}>
         <h3>No analyses yet</h3>
         <p>Run your first text or URL analysis to populate history.</p>
-        <Link href="/analyze">Open Analyze</Link>
+        <Link href="/analyze">Open Analyzer</Link>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} ref={tableRef}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -40,33 +64,65 @@ export default function HistoryTable({ items, onDelete }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.id} onClick={() => router.push(`/analyze?id=${item.id}`)}>
-              <td>{new Date(item.createdAt).toLocaleString()}</td>
-              <td>{domainOrTitle(item)}</td>
-              <td>{item.directionLabel || item.direction}</td>
-              <td>{Math.round((item.confidence || 0) * 100)}%</td>
-              <td>
-                <details
-                  className={styles.menu}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                  }}
-                >
-                  <summary aria-label="Actions">Actions</summary>
-                  <button
-                    type="button"
+          {items.map((item, index) => {
+            const menuId = item.id || `${item.createdAt}-${index}`;
+            const isOpen = openMenuId === menuId;
+
+            return (
+              <tr key={menuId}>
+                <td>{new Date(item.createdAt).toLocaleString()}</td>
+                <td>{domainOrTitle(item)}</td>
+                <td>{item.directionLabel || item.direction}</td>
+                <td>{Math.round((item.confidence || 0) * 100)}%</td>
+                <td>
+                  <div
+                    className={`${styles.menu} ${isOpen ? styles.menuOpen : ""}`}
                     onClick={(event) => {
                       event.stopPropagation();
-                      onDelete(item.id);
                     }}
                   >
-                    Delete analysis
-                  </button>
-                </details>
-              </td>
-            </tr>
-          ))}
+                    <button
+                      className={styles.actionButton}
+                      type="button"
+                      aria-expanded={isOpen}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenMenuId(isOpen ? "" : menuId);
+                      }}
+                    >
+                      Actions
+                    </button>
+                    <button
+                      className={styles.inspectButton}
+                      type="button"
+                      aria-hidden={!isOpen}
+                      tabIndex={isOpen ? 0 : -1}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenMenuId("");
+                        router.push(`/analyze?id=${item.id}`);
+                      }}
+                    >
+                      Inspect
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      type="button"
+                      aria-hidden={!isOpen}
+                      tabIndex={isOpen ? 0 : -1}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenMenuId("");
+                        onDelete(item.id);
+                      }}
+                    >
+                      Delete analysis
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

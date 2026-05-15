@@ -1,8 +1,8 @@
 .card {
   border: 1px solid var(--border);
-  border-radius: 1.45rem;
+  border-radius: var(--radius-md);
   background:
-    radial-gradient(circle at top left, rgba(205, 188, 163, 0.18), transparent 32%),
+    radial-gradient(circle at top left, rgba(139, 103, 65, 0.08), transparent 32%),
     var(--surface);
   box-shadow: var(--shadow);
   padding: 1.2rem;
@@ -23,7 +23,7 @@
   font-size: 0.76rem;
   color: var(--accent-strong);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0;
   font-weight: 700;
 }
 
@@ -37,7 +37,7 @@
   max-width: 18ch;
   font-size: clamp(1.9rem, 3vw, 2.5rem);
   line-height: 1.02;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   color: var(--text);
   text-wrap: balance;
 }
@@ -68,7 +68,7 @@
   height: 1.2rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 252, 247, 0.8);
+  background: rgba(255, 252, 247, 0.82);
   font-size: 0.72rem;
   color: var(--secondary-text);
 }

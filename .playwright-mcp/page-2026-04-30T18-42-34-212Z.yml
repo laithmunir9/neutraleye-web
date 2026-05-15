@@ -1,0 +1,73 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /#analysis
+        - link "Journal" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: NeutralEye Journal
+        - heading "Journal" [level=1] [ref=e15]
+        - paragraph [ref=e16]: Reporting notes, methodology essays, and practical reading guides for understanding wording, framing, sourcing, and omission with more discipline.
+      - generic [ref=e17]:
+        - link "Media bias April 23, 2026 What is media bias? A practical guide to wording, framing, sourcing, and omission that goes beyond source labels." [ref=e18] [cursor=pointer]:
+          - /url: /blog/what-is-media-bias
+          - generic [ref=e21]: NeutralEye
+          - generic [ref=e22]:
+            - generic [ref=e23]: Media bias
+            - generic [ref=e24]: April 23, 2026
+          - heading "What is media bias?" [level=2] [ref=e25]
+          - paragraph [ref=e26]: A practical guide to wording, framing, sourcing, and omission that goes beyond source labels.
+        - link "Critical thinking April 18, 2026 How to detect bias in news A repeatable checklist for comparing language, attribution, and missing context." [ref=e27] [cursor=pointer]:
+          - /url: /blog/how-to-detect-bias-in-news
+          - generic [ref=e30]: NeutralEye
+          - generic [ref=e31]:
+            - generic [ref=e32]: Critical thinking
+            - generic [ref=e33]: April 18, 2026
+          - heading "How to detect bias in news" [level=2] [ref=e34]
+          - paragraph [ref=e35]: A repeatable checklist for comparing language, attribution, and missing context.
+        - link "Framing April 11, 2026 How framing shapes the news Why overlapping facts can still push readers toward very different conclusions." [ref=e36] [cursor=pointer]:
+          - /url: /blog/how-framing-shapes-the-news
+          - generic [ref=e39]: NeutralEye
+          - generic [ref=e40]:
+            - generic [ref=e41]: Framing
+            - generic [ref=e42]: April 11, 2026
+          - heading "How framing shapes the news" [level=2] [ref=e43]
+          - paragraph [ref=e44]: Why overlapping facts can still push readers toward very different conclusions.
+    - contentinfo [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - link "NeutralEye home" [ref=e48] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e49]: NeutralEye
+          - paragraph [ref=e50]: © 2026 NeutralEye. All rights reserved.
+        - navigation "Footer product" [ref=e51]:
+          - link "Methodology" [ref=e52] [cursor=pointer]:
+            - /url: /methodology
+          - link "Analyze" [ref=e53] [cursor=pointer]:
+            - /url: /analyze
+          - link "Journal" [ref=e54] [cursor=pointer]:
+            - /url: /blog
+          - link "Install Extension" [ref=e55] [cursor=pointer]:
+            - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+        - generic [ref=e56]:
+          - paragraph [ref=e57]: Legal
+          - navigation "Footer legal" [ref=e58]:
+            - link "Website Privacy" [ref=e59] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e60] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e61] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e62]

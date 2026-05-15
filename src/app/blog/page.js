@@ -7,33 +7,26 @@ export default function BlogPage() {
   return (
     <MarketingShell>
       <main className={styles.page}>
-        <div className={styles.breadcrumbs}>
-          <Link href="/#analysis">Back to analysis</Link>
-          <span>/</span>
-          <span>Archive</span>
-        </div>
-
         <header className={styles.header}>
-          <div>
-            <p className={styles.eyebrow}>Journal archive</p>
-            <h1>Guides that stay connected to the product experience.</h1>
-          </div>
+          <h1>Blog</h1>
           <p className={styles.lead}>
-            Articles live inside the same NeutralEye system: read the guide, jump back to the homepage analyzer, or
-            move into the full workspace without losing context.
+            Practical notes on reading bias, interpreting evidence, and understanding how NeutralEye turns article
+            text into structured analysis.
           </p>
         </header>
 
         <section className={styles.grid}>
-          {BLOG_POSTS.map((post) => (
+          {BLOG_POSTS.map((post, index) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
+              <div className={`${styles.media} ${styles[`media${(index % 4) + 1}`]}`} aria-hidden>
+                <span>NeutralEye</span>
+              </div>
               <div className={styles.metaRow}>
                 <span>{post.category}</span>
-                <span>{post.readTime}</span>
+                <span>{post.date}</span>
               </div>
               <h2>{post.title}</h2>
               <p>{post.excerpt}</p>
-              <span className={styles.cardLink}>Read article</span>
             </Link>
           ))}
         </section>

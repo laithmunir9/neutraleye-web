@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "NeutralEye home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: NeutralEye
+      - navigation "Primary" [ref=e6]:
+        - link "Analyze" [ref=e7] [cursor=pointer]:
+          - /url: /analyze
+        - link "System" [ref=e8] [cursor=pointer]:
+          - /url: /#analysis
+        - link "Blog" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Methodology" [ref=e10] [cursor=pointer]:
+          - /url: /methodology
+      - link "Install Extension" [ref=e11] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - paragraph [ref=e15]: Methodology
+          - heading "How NeutralEye reads an article." [level=1] [ref=e16]
+          - paragraph [ref=e17]: NeutralEye evaluates tone, framing, sourcing, and omission to estimate whether a piece of writing is pushing the reader toward a particular interpretation.
+          - generic [ref=e18]:
+            - link "Open Analyzer" [ref=e19] [cursor=pointer]:
+              - /url: /analyze
+            - link "Read the blog" [ref=e20] [cursor=pointer]:
+              - /url: /blog
+        - generic [ref=e23]:
+          - generic [ref=e24]: Article input
+          - generic [ref=e25]: Readable text
+          - generic [ref=e26]: Signal review
+          - generic [ref=e27]: Structured output
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - paragraph [ref=e35]: What it measures
+          - heading "Bias is read from the writing, not assigned from a publisher label." [level=2] [ref=e36]
+        - generic [ref=e37]:
+          - article [ref=e38]:
+            - generic [ref=e39]: Tone
+            - paragraph [ref=e40]: NeutralEye checks whether wording repeatedly adds emotional weight, certainty, or suspicion beyond the underlying facts.
+          - article [ref=e41]:
+            - generic [ref=e42]: Framing
+            - paragraph [ref=e43]: The system looks at what the story centers, what it backgrounds, and whether the narrative consistently pushes one interpretation.
+          - article [ref=e44]:
+            - generic [ref=e45]: Sourcing
+            - paragraph [ref=e46]: Quoted sources, attribution clarity, and source balance are reviewed together so the output stays tied to visible evidence.
+          - article [ref=e47]:
+            - generic [ref=e48]: Omission
+            - paragraph [ref=e49]: NeutralEye flags when the article appears to leave out counter-context or explanatory detail that could materially change the read.
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - paragraph [ref=e53]: How to read the result
+          - heading "The output is meant to support judgment, not replace it." [level=2] [ref=e54]
+        - generic [ref=e55]:
+          - article [ref=e56]:
+            - strong [ref=e57]: Start with the summary
+            - paragraph [ref=e58]: Read the overall explanation first, then use the examples and evidence sections to see what actually shaped the result.
+          - article [ref=e59]:
+            - strong [ref=e60]: Treat confidence as consistency
+            - paragraph [ref=e61]: Higher confidence usually means the same writing patterns repeat across tone, framing, attribution, and source balance.
+          - article [ref=e62]:
+            - strong [ref=e63]: Use recommendations as context prompts
+            - paragraph [ref=e64]: When the system suggests more reading, it is pointing to missing comparison context rather than trying to end the inquiry.
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - paragraph [ref=e67]: Principles
+          - heading "Three rules shape every NeutralEye result." [level=2] [ref=e68]
+        - generic [ref=e69]:
+          - article [ref=e70]:
+            - generic [ref=e71]: Signals, not verdicts
+            - paragraph [ref=e72]: NeutralEye describes patterns in the writing. It does not certify that a publication, outlet, or viewpoint is objectively unbiased.
+          - article [ref=e73]:
+            - generic [ref=e74]: Confidence separated
+            - paragraph [ref=e75]: Analysis confidence reflects how consistently the same signals appear across the text. It is not a claim of factual certainty.
+          - article [ref=e76]:
+            - generic [ref=e77]: Evidence attached
+            - paragraph [ref=e78]: Results are meant to stay inspectable through quoted language, source patterns, and explicit recommendations for what to read next.
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: Limitations
+          - heading "NeutralEye is strongest when it is treated as an analytical aid." [level=2] [ref=e83]
+        - list [ref=e84]:
+          - listitem [ref=e85]: Short passages may not reveal the full framing of a story.
+          - listitem [ref=e86]: Satire, irony, or unusual rhetoric can resemble bias signals.
+          - listitem [ref=e87]: Weak extraction or blocked pages can reduce analysis quality.
+          - listitem [ref=e88]: The result reflects writing patterns in the submitted text, not objective truth.
+    - contentinfo [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - link "NeutralEye home" [ref=e92] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e93]: NeutralEye
+          - paragraph [ref=e94]: © 2026 NeutralEye. All rights reserved.
+        - navigation "Footer product" [ref=e95]:
+          - link "Methodology" [ref=e96] [cursor=pointer]:
+            - /url: /methodology
+          - link "Analyze" [ref=e97] [cursor=pointer]:
+            - /url: /analyze
+          - link "Blog" [ref=e98] [cursor=pointer]:
+            - /url: /blog
+          - link "Install Extension" [ref=e99] [cursor=pointer]:
+            - /url: https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: Legal
+          - navigation "Footer legal" [ref=e102]:
+            - link "Website Privacy" [ref=e103] [cursor=pointer]:
+              - /url: /privacy
+            - link "Extension Privacy" [ref=e104] [cursor=pointer]:
+              - /url: /extension-privacy
+            - link "Terms & Conditions" [ref=e105] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e106]
