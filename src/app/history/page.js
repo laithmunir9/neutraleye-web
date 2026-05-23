@@ -1,11 +1,13 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import HistoryTable from "@/components/HistoryTable/HistoryTable";
 import ResultCard from "@/components/ResultCard/ResultCard";
 import { deleteAnalysis, listAnalyses } from "@/lib/storage";
+import { deleteAnalysisFromSupabase, listAnalysesFromSupabase } from "@/lib/supabase/analyses";
+import { useAuth } from "@/lib/supabase/AuthProvider";
 import styles from "./page.module.css";
 
 const HISTORY_CHANGE_EVENT = "neutraleye:history-change";
@@ -38,14 +40,46 @@ function getServerHistorySnapshot() {
 }
 
 export default function HistoryPage() {
-  const items = useSyncExternalStore(subscribeToHistory, getHistorySnapshot, getServerHistorySnapshot);
+  const { user, loading: authLoading } = useAuth();
+  const [supabaseItems, setSupabaseItems] = useState(null);
+  const [supabaseError, setSupabaseError] = useState(null);
 
-  function handleDelete(id) {
-    deleteAnalysis(id);
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event(HISTORY_CHANGE_EVENT));
+  const localItems = useSyncExternalStore(subscribeToHistory, getHistorySnapshot, getServerHistorySnapshot);
+
+  useEffect(() => {
+    if (!user) {
+      setSupabaseItems(null);
+      setSupabaseError(null);
+      return;
+    }
+    setSupabaseError(null);
+    listAnalysesFromSupabase()
+      .then(setSupabaseItems)
+      .catch((err) => {
+        setSupabaseError(err);
+        setSupabaseItems(null);
+      });
+  }, [user]);
+
+  const items = user && supabaseItems !== null ? supabaseItems : localItems;
+  const isLoading = authLoading || (user && supabaseItems === null && !supabaseError);
+
+  async function handleDelete(id) {
+    if (user) {
+      await deleteAnalysisFromSupabase(id);
+      setSupabaseItems((prev) => prev ? prev.filter((item) => item.id !== id) : prev);
+    } else {
+      deleteAnalysis(id);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(HISTORY_CHANGE_EVENT));
+      }
     }
   }
+
+  const storageLabel = user ? "Supabase" : "Browser-local";
+  const storageSupport = user
+    ? "History is synced to your account and available across devices."
+    : "Saved history stays on this device unless you remove it.";
 
   return (
     <AppShell>
@@ -56,20 +90,23 @@ export default function HistoryPage() {
         />
         <section className={styles.stats}>
           <ResultCard title="Saved runs">
-            <p className={styles.metric}>{items.length}</p>
-            <p className={styles.support}>Analyses currently saved in this browser.</p>
+            <p className={styles.metric}>{isLoading ? "—" : items.length}</p>
+            <p className={styles.support}>Analyses currently saved{user ? " to your account" : " in this browser"}.</p>
           </ResultCard>
           <ResultCard title="Latest activity">
             <p className={styles.metricSmall}>
-              {items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
+              {isLoading ? "—" : items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
             </p>
             <p className={styles.support}>Most recent time an article was reviewed in this workspace.</p>
           </ResultCard>
           <ResultCard title="Storage model">
-            <p className={styles.metricSmall}>Browser-local</p>
-            <p className={styles.support}>Saved history stays on this device unless you remove it.</p>
+            <p className={styles.metricSmall}>{storageLabel}</p>
+            <p className={styles.support}>{storageSupport}</p>
           </ResultCard>
         </section>
+        {supabaseError && (
+          <p className={styles.errorNote}>Could not load cloud history. Showing local analyses.</p>
+        )}
         <HistoryTable items={items} onDelete={handleDelete} />
       </div>
     </AppShell>

@@ -6,7 +6,9 @@ import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import InputPanel from "@/components/InputPanel/InputPanel";
 import { analyzeText, analyzeUrl, ApiError } from "@/lib/api";
-import { getAnalysis, saveAnalysis } from "@/lib/storage";
+import { saveAnalysis } from "@/lib/storage";
+import { resolveAnalysis } from "@/lib/supabase/analyses";
+import { useAuth } from "@/lib/supabase/AuthProvider";
 import styles from "./page.module.css";
 
 const STAGES = ["Reading", "Checking framing", "Reviewing tone", "Writing analysis"];
@@ -143,6 +145,7 @@ function getUrlQualityError(value) {
 
 function AnalyzePageContent() {
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const [mode, setMode] = useState("text");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
@@ -160,15 +163,16 @@ function AnalyzePageContent() {
   useEffect(() => {
     const id = searchParams.get("id");
     if (!id) return;
-    const saved = getAnalysis(id);
-    if (saved) {
-      setResult(saved);
-      setHasAnalysis(true);
-      setMode(saved.inputType || "text");
-      setUrl(saved.url || "");
-      setErrorState(null);
-    }
-  }, [searchParams]);
+    resolveAnalysis(id, user).then((saved) => {
+      if (saved) {
+        setResult(saved);
+        setHasAnalysis(true);
+        setMode(saved.inputType || "text");
+        setUrl(saved.url || "");
+        setErrorState(null);
+      }
+    });
+  }, [searchParams, user]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -265,7 +269,7 @@ function AnalyzePageContent() {
         response = await analyzeText(text.trim());
       }
 
-      saveAnalysis(response);
+      saveAnalysis(response, user);
       setResult(response);
       setHasAnalysis(true);
       setErrorState(null);

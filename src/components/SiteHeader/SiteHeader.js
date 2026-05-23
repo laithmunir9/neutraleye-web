@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { EXTENSION_URL } from "@/lib/content";
+import { useAuth } from "@/lib/supabase/AuthProvider";
 import styles from "./SiteHeader.module.css";
 
 const NAV_ITEMS = [
@@ -13,8 +15,14 @@ const NAV_ITEMS = [
   { href: "/methodology", label: "Methodology" }
 ];
 
+function userInitial(user) {
+  const name = user?.user_metadata?.full_name || user?.email || "";
+  return name[0]?.toUpperCase() || "?";
+}
+
 export default function SiteHeader({ compact = false, defaultDark = false }) {
   const [isDark, setIsDark] = useState(defaultDark);
+  const { user, loading, supabase } = useAuth();
 
   useEffect(() => {
     function updateTheme() {
@@ -43,6 +51,10 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
     };
   }, []);
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+  }
+
   return (
     <header className={`${styles.header} ${compact ? styles.compact : ""} ${isDark ? styles.dark : ""}`}>
       <Link href="/" className={styles.brand} aria-label="NeutralEye home">
@@ -58,9 +70,37 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
         ))}
       </nav>
 
-      <a href={EXTENSION_URL} target="_blank" rel="noreferrer" className={styles.headerCta}>
-        Install Extension
-      </a>
+      <div className={styles.headerActions}>
+        {!loading && !user && (
+          <>
+            <Link href="/login" className={styles.loginLink}>Log in</Link>
+            <Link href="/signup" className={styles.signupCta}>Sign up</Link>
+          </>
+        )}
+
+        {!loading && user && (
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className={styles.avatarButton} aria-label="Account menu">
+                {userInitial(user)}
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className={styles.dropdownContent} align="end" sideOffset={8}>
+                <DropdownMenu.Item className={styles.dropdownItem} asChild>
+                  <Link href="/settings">My Account</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Separator className={styles.dropdownSeparator} />
+                <DropdownMenu.Item className={styles.dropdownItem} onSelect={handleSignOut}>
+                  Sign out
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+        )}
+
+        {loading && <span className={styles.authPlaceholder} aria-hidden="true" />}
+      </div>
     </header>
   );
 }

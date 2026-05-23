@@ -30,6 +30,15 @@
   color: var(--secondary-text);
 }
 
+.errorNote {
+  font-size: 0.83rem;
+  color: var(--error-text);
+  background: var(--error-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  margin: 0;
+}
+
 @media (max-width: 980px) {
   .stats {
     grid-template-columns: 1fr;
