@@ -1,5 +1,6 @@
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
+import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "./page.module.css";
 
 const methodologyCards = [
@@ -89,78 +90,88 @@ export default function MethodologyPage() {
           </p>
         </section>
 
-        <section className={styles.section}>
-          <div className={styles.cardRow}>
-            {methodologyCards.map((card) => (
-              <article key={card.title} className={styles.featureCard}>
-                <h3>{card.title}</h3>
-                <p>{card.body}</p>
-                <ul>
-                  {card.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
-        </section>
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.cardRow}>
+              {methodologyCards.map((card) => (
+                <article key={card.title} className={styles.featureCard}>
+                  <h3>{card.title}</h3>
+                  <p>{card.body}</p>
+                  <ul>
+                    {card.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
 
-        <section className={styles.section}>
-          <div className={styles.sectionIntro}>
-            <h2>Judgment comes first</h2>
-            <p>
-              NeutralEye works best when the result is read as an analytical aid: summary first, evidence second, and
-              wider context whenever the story feels incomplete.
-            </p>
-          </div>
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.sectionIntro}>
+              <h2>Judgment comes first</h2>
+              <p>
+                NeutralEye works best when the result is read as an analytical aid: summary first, evidence second, and
+                wider context whenever the story feels incomplete.
+              </p>
+            </div>
 
-          <div className={styles.cardRow}>
-            {resultReadingCards.map((card) => (
-              <article key={card.title} className={styles.readingCard}>
-                <h3>{card.title}</h3>
-                <p>{card.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.cardRow}>
+              {resultReadingCards.map((card) => (
+                <article key={card.title} className={styles.readingCard}>
+                  <h3>{card.title}</h3>
+                  <p>{card.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
 
-        <section className={`${styles.section} ${styles.auditSection}`}>
-          <div className={styles.auditHeading}>
-            <h2>Where care matters</h2>
-          </div>
+        <ScrollReveal>
+          <section className={`${styles.section} ${styles.auditSection}`}>
+            <div className={styles.auditHeading}>
+              <h2>Where care matters</h2>
+            </div>
 
-          <div className={styles.auditList}>
-            {auditRows.map((row) => (
-              <article key={row.title} className={styles.auditRow}>
-                <h3>{row.title}</h3>
-                <p>{row.detail}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.auditList}>
+              {auditRows.map((row) => (
+                <article key={row.title} className={styles.auditRow}>
+                  <h3>{row.title}</h3>
+                  <p>{row.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
 
-        <section className={styles.section}>
-          <div className={styles.sectionIntro}>
-            <h2>Results stay readable</h2>
-            <p>
-              The output is designed to make readers inspect the article more carefully, not to turn the analysis into a
-              black box verdict.
-            </p>
-          </div>
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.sectionIntro}>
+              <h2>Results stay readable</h2>
+              <p>
+                The output is designed to make readers inspect the article more carefully, not to turn the analysis into a
+                black box verdict.
+              </p>
+            </div>
 
-          <div className={styles.outputRow}>
-            {outputCards.map((card) => (
-              <article key={card.title} className={styles.outputCard}>
-                <h3>{card.title}</h3>
-                <p>{card.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.outputRow}>
+              {outputCards.map((card) => (
+                <article key={card.title} className={styles.outputCard}>
+                  <h3>{card.title}</h3>
+                  <p>{card.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
 
-        <section className={styles.ctaSection}>
-          <AnalyzerCta />
-        </section>
+        <ScrollReveal>
+          <section className={styles.ctaSection}>
+            <AnalyzerCta />
+          </section>
+        </ScrollReveal>
       </main>
     </MarketingShell>
   );

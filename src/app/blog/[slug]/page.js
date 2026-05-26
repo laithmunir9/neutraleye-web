@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import { BLOG_POSTS, BLOG_POSTS_BY_SLUG, getBlogPostSections } from "@/lib/content";
 import styles from "./page.module.css";
 
@@ -37,6 +38,7 @@ export default async function BlogPostPage({ params }) {
             </div>
           </header>
 
+          <ScrollReveal>
           <div className={styles.readingLayout}>
             <aside className={styles.sidebar} aria-label="Article sections">
               <nav>
@@ -66,6 +68,7 @@ export default async function BlogPostPage({ params }) {
               </footer>
             </div>
           </div>
+          </ScrollReveal>
         </article>
       </main>
     </MarketingShell>

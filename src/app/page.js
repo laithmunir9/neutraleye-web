@@ -1,158 +1,176 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
 import styles from "./page.module.css";
 
+const EASE = [0.22, 1, 0.36, 1];
+
+const trustMarkers = [
+  { label: "Method visible", detail: "Signals stay named instead of collapsing into one opaque score." },
+  { label: "Evidence attached", detail: "Quoted language, sourcing patterns, and framing choices stay visible in the output." },
+  { label: "Confidence separated", detail: "Confidence describes signal consistency, not whether the article itself is true." },
+  { label: "Reader controlled", detail: "Readers can inspect the result, compare context, and decide what to read next." },
+];
+
+const SIGNALS = ["Tone", "Framing", "Attribution", "Sources", "Omission"];
+
+const SOURCES = [
+  { label: "Center-left daily", note: "Same story" },
+  { label: "Wire service", note: "Primary coverage" },
+  { label: "Center publication", note: "Counter-context" },
+];
+
 export default function Home() {
-  const trustMarkers = [
-    { label: "Method visible", detail: "Signals stay named instead of collapsing into one opaque score." },
-    { label: "Evidence attached", detail: "Quoted language, sourcing patterns, and framing choices stay visible in the output." },
-    { label: "Confidence separated", detail: "Confidence describes signal consistency, not whether the article itself is true." },
-    { label: "Reader controlled", detail: "Readers can inspect the result, compare context, and decide what to read next." }
-  ];
+  const shouldReduce = useReducedMotion();
 
-  const processLog = [
-    {
-      time: "00:01",
-      title: "Article intake",
-      detail: "Paste text or a URL. NeutralEye treats the article as the source of record.",
-      meta: "Input"
-    },
-    {
-      time: "00:04",
-      title: "Readable text extracted",
-      detail: "Navigation, ads, and unrelated page furniture are removed before analysis.",
-      meta: "Extraction"
-    },
-    {
-      time: "00:08",
-      title: "Bias signals checked",
-      detail: "Tone, framing, attribution, source balance, and omitted counter-context are reviewed together.",
-      meta: "Signals"
-    },
-    {
-      time: "00:12",
-      title: "Confidence separated",
-      detail: "Confidence reflects how consistent the signals are, not whether the article is true.",
-      meta: "Calibration"
-    },
-    {
-      time: "00:16",
-      title: "Evidence attached",
-      detail: "Quoted examples and source suggestions make the output inspectable.",
-      meta: "Trace"
-    }
-  ];
+  const reveal = (delay = 0) =>
+    shouldReduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 36 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, margin: "-80px" },
+          transition: { duration: 0.55, ease: EASE, delay },
+        };
 
-  const metrics = [
-    {
-      value: "5",
-      label: "signal families"
-    },
-    {
-      value: "0",
-      label: "truth verdicts"
-    },
-    {
-      value: "1",
-      label: "evidence stack"
-    }
-  ];
+  const heroContainer = {
+    hidden: {},
+    show: { transition: { staggerChildren: shouldReduce ? 0 : 0.1 } },
+  };
+
+  const heroItem = {
+    hidden: shouldReduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  };
 
   return (
     <MarketingShell>
       <main className={styles.page}>
-        <section className={styles.hero}>
-          <div className={styles.heroSystem}>
-            <HeroSystemVisualization />
-          </div>
 
-          <div className={styles.heroText}>
+        {/* ── Hero ── */}
+        <section className={styles.hero}>
+          <motion.div
+            className={styles.heroSystem}
+            initial={shouldReduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+          >
+            <HeroSystemVisualization />
+          </motion.div>
+
+          <motion.div
+            className={styles.heroText}
+            variants={heroContainer}
+            initial="hidden"
+            animate="show"
+          >
             <div className={styles.copy}>
-              <p className={styles.eyebrow}>Overview</p>
-              <h1>See how an article moves the reader</h1>
-              <p className={styles.lead}>
+              <motion.p className={styles.eyebrow} variants={heroItem}>Overview</motion.p>
+              <motion.h1 variants={heroItem}>See how an article moves the reader</motion.h1>
+              <motion.p className={styles.lead} variants={heroItem}>
                 NeutralEye reads tone, framing, sourcing, and omission, then returns quoted evidence and context for
                 what to read next.
-              </p>
+              </motion.p>
             </div>
-
-            <div className={styles.actions}>
+            <motion.div className={styles.actions} variants={heroItem}>
               <Link href="/analyze" className={styles.primaryAction}>
                 Open Analyzer
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
-        <section className={styles.trust} aria-label="NeutralEye trust principles">
+        {/* ── Trust principles ── */}
+        <motion.section
+          className={styles.trust}
+          aria-label="NeutralEye trust principles"
+          {...reveal()}
+        >
           {trustMarkers.map((marker) => (
             <article className={styles.trustItem} key={marker.label}>
               <span>{marker.label}</span>
               <p>{marker.detail}</p>
             </article>
           ))}
-        </section>
+        </motion.section>
 
-        <section className={styles.value} id="analysis">
-          <div className={styles.sectionHeader}>
-            <div>
+        {/* ── Feature rows ── */}
+        <section className={styles.features}>
+
+          {/* Row 1: Signal detection — visual left, text right */}
+          <motion.div className={styles.featureRow} {...reveal()}>
+            <div className={styles.featureVisual}>
+              <div className={styles.featureCard}>
+                <span className={styles.featureCardLabel}>Signal families</span>
+                <div className={styles.signalPills}>
+                  {SIGNALS.map((s) => (
+                    <span key={s} className={styles.signalPill}>{s}</span>
+                  ))}
+                </div>
+                <p className={styles.cardFootnote}>Checked together, in a single pass</p>
+              </div>
+            </div>
+            <div className={styles.featureText}>
               <p className={styles.eyebrow}>How it works</p>
-              <h2>One read from input to evidence</h2>
+              <h2>Five signals, one read</h2>
+              <p>Every article passes through tone, framing, attribution, source balance, and omitted counter-context together — not independently.</p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className={styles.analysisSystem}>
-            <div className={styles.processPanel} aria-label="NeutralEye analysis log">
-              <div className={styles.metricRow}>
-                {metrics.map((metric) => (
-                  <div className={styles.metric} key={metric.label}>
-                    <strong>{metric.value}</strong>
-                    <span>{metric.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <ol className={styles.timeline}>
-                {processLog.map((step) => (
-                  <li className={styles.timelineItem} key={step.title}>
-                    <span className={styles.timelineNode} aria-hidden />
-                    <div className={styles.timelineMeta}>
-                      <span>{step.time}</span>
-                      <span>{step.meta}</span>
-                    </div>
-                    <div>
-                      <h3>{step.title}</h3>
-                      <p>{step.detail}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+          {/* Row 2: Evidence — text left, visual right */}
+          <motion.div className={`${styles.featureRow} ${styles.featureRowFlip}`} {...reveal()}>
+            <div className={styles.featureText}>
+              <p className={styles.eyebrow}>What you get</p>
+              <h2>Quoted examples, not a verdict</h2>
+              <p>Each signal includes the exact language that triggered it, so you can inspect the analysis against the article yourself.</p>
             </div>
+            <div className={styles.featureVisual}>
+              <div className={styles.featureCard}>
+                <span className={styles.featureCardLabel}>Evidence trace</span>
+                <blockquote className={styles.quotePull}>
+                  "…using language that frames the policy as an attack on ordinary families…"
+                </blockquote>
+                <div className={styles.quoteSignal}>
+                  <span className={styles.quoteSignalBadge}>Loaded phrasing</span>
+                  Paragraph 3
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
-            <aside className={styles.outputPreview} aria-label="Example structured output">
-              <div className={styles.previewHeader}>
-                <span>Evidence packet</span>
-                <strong>Review ready</strong>
+          {/* Row 3: Sources — visual left, text right */}
+          <motion.div className={styles.featureRow} {...reveal()}>
+            <div className={styles.featureVisual}>
+              <div className={styles.featureCard}>
+                <span className={styles.featureCardLabel}>Reading context</span>
+                <div className={styles.sourceList}>
+                  {SOURCES.map((s) => (
+                    <div key={s.label} className={styles.sourceItem}>
+                      <span className={styles.sourceItemLabel}>{s.label}</span>
+                      <span className={styles.sourceItemNote}>{s.note}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className={styles.previewMetric}>
-                <span>Reader direction</span>
-                <strong>Framing pressure identified</strong>
-              </div>
-              <div className={styles.previewRows}>
-                <span>Quoted phrase with reason</span>
-                <span>Missing counter-context</span>
-                <span>Source mix checked</span>
-                <span>Next reading step</span>
-              </div>
-            </aside>
-          </div>
+            </div>
+            <div className={styles.featureText}>
+              <p className={styles.eyebrow}>What comes next</p>
+              <h2>Sources to read alongside</h2>
+              <p>Every review ends with publications that cover the same story from a different vantage point, so you can read across the framing.</p>
+            </div>
+          </motion.div>
+
         </section>
 
-        <section className={styles.cta}>
+        {/* ── CTA ── */}
+        <motion.section className={styles.cta} {...reveal(0.05)}>
           <AnalyzerCta />
-        </section>
+        </motion.section>
+
       </main>
     </MarketingShell>
   );

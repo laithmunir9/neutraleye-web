@@ -89,21 +89,21 @@ export default function HistoryPage() {
           subtitle="Review past article checks, revisit the output, and compare how different stories were framed."
         />
         <section className={styles.stats}>
-          <ResultCard title="Saved runs">
-            <p className={styles.metric}>{isLoading ? "—" : items.length}</p>
-            <p className={styles.support}>Analyses currently saved{user ? " to your account" : " in this browser"}.</p>
-          </ResultCard>
-          <ResultCard title="Latest activity">
-            <p className={styles.metricSmall}>
-              {isLoading ? "—" : items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
-            </p>
-            <p className={styles.support}>Most recent time an article was reviewed in this workspace.</p>
-          </ResultCard>
-          <ResultCard title="Storage model">
-            <p className={styles.metricSmall}>{storageLabel}</p>
-            <p className={styles.support}>{storageSupport}</p>
-          </ResultCard>
-        </section>
+            <ResultCard title="Saved runs">
+              <p className={styles.metric}>{isLoading ? "—" : items.length}</p>
+              <p className={styles.support}>Analyses currently saved{user ? " to your account" : " in this browser"}.</p>
+            </ResultCard>
+            <ResultCard title="Latest activity">
+              <p className={styles.metricSmall}>
+                {isLoading ? "—" : items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
+              </p>
+              <p className={styles.support}>Most recent time an article was reviewed in this workspace.</p>
+            </ResultCard>
+            <ResultCard title="Storage model">
+              <p className={styles.metricSmall}>{storageLabel}</p>
+              <p className={styles.support}>{storageSupport}</p>
+            </ResultCard>
+          </section>
         {supabaseError && (
           <p className={styles.errorNote}>Could not load cloud history. Showing local analyses.</p>
         )}

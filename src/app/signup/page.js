@@ -55,16 +55,18 @@ function SignupForm() {
     return (
       <MarketingShell>
         <main className={styles.main}>
-          <div className={styles.card}>
-            <div className={styles.confirmBox}>
-              <div className={styles.confirmIcon} aria-hidden="true">✉</div>
-              <h1 className={styles.title}>Check your email</h1>
-              <p className={styles.confirmText}>
-                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account and start saving analyses.
-              </p>
-              <Link href="/login" className={styles.backLink}>Back to sign in</Link>
+          <ScrollReveal>
+            <div className={styles.card}>
+              <div className={styles.confirmBox}>
+                <div className={styles.confirmIcon} aria-hidden="true">✉</div>
+                <h1 className={styles.title}>Check your email</h1>
+                <p className={styles.confirmText}>
+                  We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account and start saving analyses.
+                </p>
+                <Link href="/login" className={styles.backLink}>Back to sign in</Link>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </main>
       </MarketingShell>
     );
@@ -73,7 +75,8 @@ function SignupForm() {
   return (
     <MarketingShell>
       <main className={styles.main}>
-        <div className={styles.card}>
+        <ScrollReveal>
+          <div className={styles.card}>
           <div className={styles.heading}>
             <h1 className={styles.title}>Create account</h1>
             <p className={styles.subtitle}>Save and sync your analysis history across devices.</p>
@@ -134,7 +137,8 @@ function SignupForm() {
               Sign in
             </Link>
           </p>
-        </div>
+          </div>
+        </ScrollReveal>
       </main>
     </MarketingShell>
   );

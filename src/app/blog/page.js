@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import { BLOG_POSTS } from "@/lib/content";
 import styles from "./page.module.css";
 
@@ -15,21 +16,23 @@ export default function BlogPage() {
           </p>
         </header>
 
-        <section className={styles.grid}>
-          {BLOG_POSTS.map((post, index) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
-              <div className={`${styles.media} ${styles[`media${(index % 4) + 1}`]}`} aria-hidden>
-                <span>NeutralEye</span>
-              </div>
-              <div className={styles.metaRow}>
-                <span>{post.category}</span>
-                <span>{post.date}</span>
-              </div>
-              <h2>{post.title}</h2>
-              <p>{post.excerpt}</p>
-            </Link>
-          ))}
-        </section>
+        <ScrollReveal>
+          <section className={styles.grid}>
+            {BLOG_POSTS.map((post, index) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
+                <div className={`${styles.media} ${styles[`media${(index % 4) + 1}`]}`} aria-hidden>
+                  <span>NeutralEye</span>
+                </div>
+                <div className={styles.metaRow}>
+                  <span>{post.category}</span>
+                  <span>{post.date}</span>
+                </div>
+                <h2>{post.title}</h2>
+                <p>{post.excerpt}</p>
+              </Link>
+            ))}
+          </section>
+        </ScrollReveal>
       </main>
     </MarketingShell>
   );

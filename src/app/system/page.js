@@ -1,5 +1,6 @@
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
+import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "./page.module.css";
 
 const heroInputs = ["Article text", "Source mix", "Framing", "Attribution"];
@@ -260,50 +261,57 @@ export default function SystemPage() {
           </div>
         </section>
 
-        <section className={styles.principleRow} aria-label="System principles">
-          {principleCards.map((item) => (
-            <article key={item.title} className={styles.principleCard}>
-              <h2>{item.title}</h2>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </section>
+        <ScrollReveal>
+          <section className={styles.principleRow} aria-label="System principles">
+            {principleCards.map((item) => (
+              <article key={item.title} className={styles.principleCard}>
+                <h2>{item.title}</h2>
+                <p>{item.body}</p>
+              </article>
+            ))}
+          </section>
+        </ScrollReveal>
 
         <section className={styles.featureStack}>
           {featureSections.map((section) => (
-            <section
-              key={section.title}
-              className={`${styles.featureSection} ${section.side === "left" ? styles.featureReverse : ""}`}
-            >
-              <div className={styles.featureCopy}>
-                <span className={styles.featureEyebrow}>{section.eyebrow}</span>
-                <h2>{section.title}</h2>
-                <p>{section.body}</p>
-              </div>
-              <FeatureVisual visual={section.visual} />
-            </section>
+            <ScrollReveal key={section.title}>
+              <section
+                className={`${styles.featureSection} ${section.side === "left" ? styles.featureReverse : ""}`}
+              >
+                <div className={styles.featureCopy}>
+                  <span className={styles.featureEyebrow}>{section.eyebrow}</span>
+                  <h2>{section.title}</h2>
+                  <p>{section.body}</p>
+                </div>
+                <FeatureVisual visual={section.visual} />
+              </section>
+            </ScrollReveal>
           ))}
         </section>
 
-        <section className={styles.section}>
-          <div className={styles.sectionIntro}>
-            <h2>Where it helps</h2>
-            <p>Built for readers who want clearer judgment, slower interpretation, and better comparison habits.</p>
-          </div>
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.sectionIntro}>
+              <h2>Where it helps</h2>
+              <p>Built for readers who want clearer judgment, slower interpretation, and better comparison habits.</p>
+            </div>
 
-          <div className={styles.useCaseGrid}>
-            {useCases.map((item) => (
-              <article key={item.title} className={styles.useCaseCard}>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.useCaseGrid}>
+              {useCases.map((item) => (
+                <article key={item.title} className={styles.useCaseCard}>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
 
-        <section className={styles.cta}>
-          <AnalyzerCta />
-        </section>
+        <ScrollReveal>
+          <section className={styles.cta}>
+            <AnalyzerCta />
+          </section>
+        </ScrollReveal>
       </main>
     </MarketingShell>
   );
