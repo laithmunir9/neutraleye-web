@@ -71,11 +71,29 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
       </nav>
 
       <div className={styles.headerActions}>
+        <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Pro</Link>
+
         {!loading && !user && (
-          <>
-            <Link href="/login" className={styles.loginLink}>Log in</Link>
-            <Link href="/signup" className={styles.signupCta}>Sign up</Link>
-          </>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className={styles.personButton} aria-label="Account">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M20 21a8 8 0 1 0-16 0"/>
+                </svg>
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className={styles.dropdownContent} align="end" sideOffset={8}>
+                <DropdownMenu.Item className={styles.dropdownItem} asChild>
+                  <Link href="/login">Log in</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className={styles.dropdownItem} asChild>
+                  <Link href="/login?mode=signup">Sign up</Link>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
         )}
 
         {!loading && user && (
