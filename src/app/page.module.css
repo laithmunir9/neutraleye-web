@@ -236,6 +236,19 @@
   gap: 1.1rem;
 }
 
+/* MagicCard wrapper — border/bg handled by MagicCard */
+.featureCardWrap {
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  --background: #fffcf7;
+}
+
+.featureCardContent {
+  padding: clamp(1.2rem, 2.5vw, 1.75rem);
+  display: grid;
+  gap: 1.1rem;
+}
+
 .featureCardLabel {
   color: var(--accent-strong);
   font-family: var(--font-mono);

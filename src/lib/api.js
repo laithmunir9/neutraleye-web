@@ -1,32 +1,6 @@
 import { normalizeConfidence, normalizeScore, scoreToDirection } from "./score.js";
 
-const RAW_API_BASE = String(process.env.NEXT_PUBLIC_NEUTRALEYE_API_URL || "").trim();
 const IS_DEV = process.env.NODE_ENV !== "production";
-
-function resolveApiBase() {
-  const configured = RAW_API_BASE.replace(/\/$/, "");
-  if (!configured) return "";
-  if (typeof window === "undefined") return configured;
-
-  try {
-    const current = new URL(window.location.href);
-    const target = new URL(configured);
-    const localHosts = new Set(["localhost", "127.0.0.1"]);
-
-    if (
-      localHosts.has(current.hostname) &&
-      localHosts.has(target.hostname) &&
-      current.port === target.port &&
-      current.protocol === target.protocol
-    ) {
-      return `${current.protocol}//${current.host}`.replace(/\/$/, "");
-    }
-  } catch {
-    return configured;
-  }
-
-  return configured;
-}
 
 class ApiError extends Error {
   constructor(message, { status, code, requestId, endpoint, details } = {}) {
@@ -239,20 +213,10 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
   return normalized;
 }
 
-function ensureApiBaseConfigured() {
-  if (resolveApiBase()) return;
-  throw new ApiError("Backend URL is not configured. Set NEXT_PUBLIC_NEUTRALEYE_API_URL.", {
-    status: 0,
-    code: "CONFIG_ERROR",
-    endpoint: ""
-  });
-}
-
 async function request(endpoint, payload, inputType, requestMeta) {
-  ensureApiBaseConfigured();
   const requestId = crypto.randomUUID();
   const requestStartedAt = new Date().toISOString();
-  const target = `${resolveApiBase()}${endpoint}`;
+  const target = endpoint;
   devLog(`request start ${endpoint}`, { requestId, payload });
 
   let response;
@@ -318,11 +282,11 @@ async function request(endpoint, payload, inputType, requestMeta) {
 }
 
 export async function analyzeText(text) {
-  return request("/analyze-text", { text }, "text", { timeoutMs: 30000 });
+  return request("/api/analyze", { text }, "text", { timeoutMs: 30000 });
 }
 
 export async function analyzeUrl(url) {
-  return request("/analyze-url", { url }, "url", { url, timeoutMs: 45000 });
+  return request("/api/analyze", { url }, "url", { url, timeoutMs: 45000 });
 }
 
 export async function analyzeInput({ text, url }) {
@@ -331,7 +295,7 @@ export async function analyzeInput({ text, url }) {
   const payload = hasText ? { text: text.trim() } : { url: String(url || "").trim() };
   const inputType = hasText ? "text" : "url";
   const requestMeta = hasUrl ? { url: String(url || "").trim(), timeoutMs: 45000 } : { timeoutMs: 30000 };
-  return request("/check-bias", payload, inputType, requestMeta);
+  return request("/api/analyze", payload, inputType, requestMeta);
 }
 
-export { ApiError, normalizeResponse, resolveApiBase };
+export { ApiError, normalizeResponse };

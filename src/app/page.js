@@ -5,6 +5,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { MagicCard } from "@/components/ui/magic-card";
 import styles from "./page.module.css";
 
 const EASE = [0.22, 1, 0.36, 1];
@@ -77,8 +79,16 @@ export default function Home() {
               </motion.p>
             </div>
             <motion.div className={styles.actions} variants={heroItem}>
-              <Link href="/analyze" className={styles.primaryAction}>
-                Open Analyzer
+              <Link href="/analyze">
+                <ShimmerButton
+                  background="#8b6741"
+                  shimmerColor="rgba(255, 244, 230, 0.65)"
+                  borderRadius="8px"
+                  shimmerDuration="2.5s"
+                  className="text-[0.9rem] font-medium px-[1.1rem] py-[0.74rem] min-h-[2.75rem]"
+                >
+                  Open Analyzer
+                </ShimmerButton>
               </Link>
             </motion.div>
           </motion.div>
@@ -104,15 +114,23 @@ export default function Home() {
           {/* Row 1: Signal detection — visual left, text right */}
           <motion.div className={styles.featureRow} {...reveal()}>
             <div className={styles.featureVisual}>
-              <div className={styles.featureCard}>
-                <span className={styles.featureCardLabel}>Signal families</span>
-                <div className={styles.signalPills}>
-                  {SIGNALS.map((s) => (
-                    <span key={s} className={styles.signalPill}>{s}</span>
-                  ))}
+              <MagicCard
+                className={styles.featureCardWrap}
+                gradientFrom="#c4973e"
+                gradientTo="#8b6741"
+                gradientColor="rgba(139, 103, 65, 0.07)"
+                gradientSize={180}
+              >
+                <div className={styles.featureCardContent}>
+                  <span className={styles.featureCardLabel}>Signal families</span>
+                  <div className={styles.signalPills}>
+                    {SIGNALS.map((s) => (
+                      <span key={s} className={styles.signalPill}>{s}</span>
+                    ))}
+                  </div>
+                  <p className={styles.cardFootnote}>Checked together, in a single pass</p>
                 </div>
-                <p className={styles.cardFootnote}>Checked together, in a single pass</p>
-              </div>
+              </MagicCard>
             </div>
             <div className={styles.featureText}>
               <p className={styles.eyebrow}>How it works</p>
@@ -129,33 +147,49 @@ export default function Home() {
               <p>Each signal includes the exact language that triggered it, so you can inspect the analysis against the article yourself.</p>
             </div>
             <div className={styles.featureVisual}>
-              <div className={styles.featureCard}>
-                <span className={styles.featureCardLabel}>Evidence trace</span>
-                <blockquote className={styles.quotePull}>
-                  "…using language that frames the policy as an attack on ordinary families…"
-                </blockquote>
-                <div className={styles.quoteSignal}>
-                  <span className={styles.quoteSignalBadge}>Loaded phrasing</span>
-                  Paragraph 3
+              <MagicCard
+                className={styles.featureCardWrap}
+                gradientFrom="#c4973e"
+                gradientTo="#8b6741"
+                gradientColor="rgba(139, 103, 65, 0.07)"
+                gradientSize={180}
+              >
+                <div className={styles.featureCardContent}>
+                  <span className={styles.featureCardLabel}>Evidence trace</span>
+                  <blockquote className={styles.quotePull}>
+                    "…using language that frames the policy as an attack on ordinary families…"
+                  </blockquote>
+                  <div className={styles.quoteSignal}>
+                    <span className={styles.quoteSignalBadge}>Loaded phrasing</span>
+                    Paragraph 3
+                  </div>
                 </div>
-              </div>
+              </MagicCard>
             </div>
           </motion.div>
 
           {/* Row 3: Sources — visual left, text right */}
           <motion.div className={styles.featureRow} {...reveal()}>
             <div className={styles.featureVisual}>
-              <div className={styles.featureCard}>
-                <span className={styles.featureCardLabel}>Reading context</span>
-                <div className={styles.sourceList}>
-                  {SOURCES.map((s) => (
-                    <div key={s.label} className={styles.sourceItem}>
-                      <span className={styles.sourceItemLabel}>{s.label}</span>
-                      <span className={styles.sourceItemNote}>{s.note}</span>
-                    </div>
-                  ))}
+              <MagicCard
+                className={styles.featureCardWrap}
+                gradientFrom="#c4973e"
+                gradientTo="#8b6741"
+                gradientColor="rgba(139, 103, 65, 0.07)"
+                gradientSize={180}
+              >
+                <div className={styles.featureCardContent}>
+                  <span className={styles.featureCardLabel}>Reading context</span>
+                  <div className={styles.sourceList}>
+                    {SOURCES.map((s) => (
+                      <div key={s.label} className={styles.sourceItem}>
+                        <span className={styles.sourceItemLabel}>{s.label}</span>
+                        <span className={styles.sourceItemNote}>{s.note}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </MagicCard>
             </div>
             <div className={styles.featureText}>
               <p className={styles.eyebrow}>What comes next</p>
