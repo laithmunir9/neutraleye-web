@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://neutraleye-web.vercel.app/sitemap.xml
