@@ -1,0 +1,224 @@
+.main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 6.5rem) clamp(1rem, 4vw, 2rem) 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  max-width: 36rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  color: var(--text);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 52rem;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 252, 247, 0.78);
+  box-shadow: var(--shadow);
+}
+
+.cardPro {
+  border-color: rgba(139, 103, 65, 0.28);
+  background: rgba(255, 252, 247, 0.96);
+  box-shadow: 0 0.5rem 2rem rgba(139, 103, 65, 0.1), var(--shadow);
+}
+
+.proBadge {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.22rem 0.75rem;
+  background: #8b6741;
+  color: #f8f4ee;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.cardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.planName {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.priceAmount {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.pricePeriod {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.planDesc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  line-height: 1.55;
+}
+
+/* CTAs */
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.72rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.ctaPrimary {
+  background: #8b6741;
+  color: #f8f4ee;
+  border: none;
+  box-shadow: 0 0.35rem 0.8rem rgba(139, 103, 65, 0.18);
+}
+
+.ctaPrimary:hover:not(:disabled) {
+  background: #6e4f2f;
+  transform: translateY(-0.5px);
+}
+
+.ctaPrimary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ctaSecondary {
+  border: 1px solid rgba(93, 75, 53, 0.18);
+  background: rgba(255, 252, 247, 0.6);
+  color: var(--text);
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+}
+
+.ctaSecondary:hover {
+  border-color: rgba(93, 75, 53, 0.28);
+  background: rgba(255, 252, 247, 0.9);
+  transform: translateY(-0.5px);
+}
+
+/* Feature list */
+.features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--secondary-text);
+  line-height: 1.5;
+}
+
+.check {
+  color: #8b6741;
+  flex-shrink: 0;
+  margin-top: 0.18rem;
+}
+
+/* Footer note */
+.note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+}
