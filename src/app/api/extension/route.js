@@ -233,12 +233,16 @@ function buildHumanResult(json) {
   const levelLabel = `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} bias`;
   const directionText = direction && direction !== "unknown" ? ` ${direction}` : "";
   parts.push(`**Bias Level**\n${levelLabel}${directionText}.`);
-  if (summary) parts.push(`**Summary of Bias**\n${summary}`);
+
+  parts.push(`**Summary of Bias**\n${summary || "No summary returned."}`);
+
   if (explanation && explanation !== summary) parts.push(explanation);
-  if (phrases.length) {
-    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n");
-    parts.push(`**Examples of Bias**\n${exLines}`);
-  }
+
+  const exLines = phrases.length
+    ? phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n")
+    : "No strong language or framing examples crossed the threshold in this pass.";
+  parts.push(`**Examples of Bias**\n${exLines}`);
+
   const srcLines = sources.length
     ? sources.map((s) => {
         const title = String(s.title || "").trim();
@@ -246,9 +250,14 @@ function buildHumanResult(json) {
         const outlet = String(s.outlet || "").trim();
         return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
       }).join("\n")
-    : "- No specific sources flagged — consider cross-checking with Reuters, AP News, or BBC.";
+    : "- No specific comparison sources required. Cross-checking with Reuters or AP News is always useful.";
   parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
-  if (recs.length) parts.push(`**Recommendations**\n${recs.map((r) => `- ${r}`).join("\n")}`);
+
+  const recLines = recs.length
+    ? recs.map((r) => `- ${r}`).join("\n")
+    : "- Continue reading with normal judgment. For high-stakes topics, compare with one additional source.";
+  parts.push(`**Recommendations**\n${recLines}`);
+
   if (Number.isFinite(confidence)) parts.push(`**Analysis Confidence**\n${confidence.toFixed(2)}`);
   return parts.join("\n\n");
 }
