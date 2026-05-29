@@ -255,6 +255,42 @@
   }
 }
 
+.limitBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(139, 103, 65, 0.07);
+  border: 1px solid rgba(139, 103, 65, 0.18);
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.limitBanner svg {
+  flex-shrink: 0;
+  color: #8b6741;
+}
+
+.limitLink {
+  color: #8b6741;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.limitChip {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(139, 103, 65, 0.07);
+  border: 1px solid rgba(139, 103, 65, 0.16);
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+}
+
 @keyframes pageSettle {
   from {
     opacity: 0;

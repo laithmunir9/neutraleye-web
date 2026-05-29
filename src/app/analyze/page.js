@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import InputPanel from "@/components/InputPanel/InputPanel";
+import Link from "next/link";
 import { analyzeText, analyzeUrl, ApiError } from "@/lib/api";
 import { saveAnalysis } from "@/lib/storage";
 import { resolveAnalysis } from "@/lib/supabase/analyses";
 import { useAuth } from "@/lib/supabase/AuthProvider";
+import { useAnalysisLimit } from "@/lib/supabase/useAnalysisLimit";
 import styles from "./page.module.css";
 
 const STAGES = ["Reading", "Checking framing", "Reviewing tone", "Writing analysis"];
@@ -146,6 +148,7 @@ function getUrlQualityError(value) {
 function AnalyzePageContent() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { remaining, limited, ready: limitReady, increment } = useAnalysisLimit();
   const [mode, setMode] = useState("text");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
@@ -197,9 +200,10 @@ function AnalyzePageContent() {
 
   const canAnalyze = useMemo(() => {
     if (loading) return false;
+    if (limited) return false;
     if (mode === "url") return Boolean(url.trim());
     return text.trim().length >= 200;
-  }, [mode, text, url, loading]);
+  }, [mode, text, url, loading, limited]);
 
   function handleModeChange(nextMode) {
     setMode(nextMode);
@@ -223,6 +227,10 @@ function AnalyzePageContent() {
   }
 
   const handleAnalyze = useCallback(async () => {
+    if (limited) {
+      setErrorState({ title: "Daily limit reached", message: "You've used all 10 free analyses for today. Come back tomorrow or upgrade to Pro for unlimited access." });
+      return;
+    }
     setErrorState(null);
     setLoading(true);
     if (mode === "url") {
@@ -270,6 +278,7 @@ function AnalyzePageContent() {
       }
 
       saveAnalysis(response, user);
+      increment();
       setResult(response);
       setHasAnalysis(true);
       setErrorState(null);
@@ -361,7 +370,7 @@ function AnalyzePageContent() {
     } finally {
       setLoading(false);
     }
-  }, [mode, text, url]);
+  }, [mode, text, url, limited, increment]);
 
   function handleExample() {
     const sampleText =
@@ -385,6 +394,22 @@ function AnalyzePageContent() {
           title="Analyze an Article"
           subtitle="Paste article text or a URL to check how tone, framing, and omission may be influencing the reader."
         />
+
+        {limitReady && limited && (
+          <div className={styles.limitBanner}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            You've used all 10 free analyses for today.{" "}
+            <Link href="/pricing" className={styles.limitLink}>Upgrade to Pro</Link>
+            {" "}for unlimited access.
+          </div>
+        )}
+        {limitReady && !limited && remaining <= 3 && (
+          <div className={styles.limitChip}>
+            {remaining} {remaining === 1 ? "analysis" : "analyses"} remaining today
+          </div>
+        )}
 
         <section className={styles.grid}>
           <div className={styles.inputColumn}>
