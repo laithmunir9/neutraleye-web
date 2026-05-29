@@ -239,15 +239,15 @@ function buildHumanResult(json) {
     const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n");
     parts.push(`**Examples of Bias**\n${exLines}`);
   }
-  if (sources.length) {
-    const srcLines = sources.map((s) => {
-      const title = String(s.title || "").trim();
-      const url = String(s.url || "").trim();
-      const outlet = String(s.outlet || "").trim();
-      return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
-    }).join("\n");
-    parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
-  }
+  const srcLines = sources.length
+    ? sources.map((s) => {
+        const title = String(s.title || "").trim();
+        const url = String(s.url || "").trim();
+        const outlet = String(s.outlet || "").trim();
+        return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
+      }).join("\n")
+    : "- No specific sources flagged — consider cross-checking with Reuters, AP News, or BBC.";
+  parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
   if (recs.length) parts.push(`**Recommendations**\n${recs.map((r) => `- ${r}`).join("\n")}`);
   if (Number.isFinite(confidence)) parts.push(`**Analysis Confidence**\n${confidence.toFixed(2)}`);
   return parts.join("\n\n");
