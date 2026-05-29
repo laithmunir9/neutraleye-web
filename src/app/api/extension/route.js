@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import * as cheerio from "cheerio";
+import { createServerClient } from "@supabase/ssr";
+import { randomUUID } from "crypto";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -23,13 +25,88 @@ const rateLimitStore = new Map();
 // extension ID is known. Lock this down to your specific extension ID once
 // it's published: e.g. "chrome-extension://abcdefghijklmnopqrstuvwxyz123456"
 
+const DAILY_LIMIT = 10;
+
+function makeSupabase() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  );
+}
+
+async function resolveAuthUser(request) {
+  const authHeader = request.headers.get("authorization") || "";
+  if (!authHeader.startsWith("Bearer ")) return null;
+  const token = authHeader.slice(7);
+  try {
+    const supabase = makeSupabase();
+    const { data: { user } } = await supabase.auth.getUser(token);
+    return user || null;
+  } catch {
+    return null;
+  }
+}
+
+async function checkUserDailyLimit(userId) {
+  const supabase = makeSupabase();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await supabase
+    .from("daily_usage")
+    .select("count")
+    .eq("user_id", userId)
+    .eq("usage_date", today)
+    .maybeSingle();
+  return (data?.count ?? 0) >= DAILY_LIMIT;
+}
+
+async function incrementUserDailyUsage(userId) {
+  const supabase = makeSupabase();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: existing } = await supabase
+    .from("daily_usage")
+    .select("count")
+    .eq("user_id", userId)
+    .eq("usage_date", today)
+    .maybeSingle();
+  if (existing) {
+    await supabase.from("daily_usage").update({ count: existing.count + 1 }).eq("user_id", userId).eq("usage_date", today);
+  } else {
+    await supabase.from("daily_usage").insert({ user_id: userId, usage_date: today, count: 1 });
+  }
+}
+
+async function saveAnalysisToCloud(userId, parsedJson, inputUrl, headline) {
+  if (!parsedJson) return;
+  const supabase = makeSupabase();
+  const drivers = [...new Set((parsedJson.biased_phrases || []).map((p) => String(p.why || "")).filter(Boolean))];
+  await supabase.from("analyses").insert({
+    id: randomUUID(),
+    user_id: userId,
+    created_at: new Date().toISOString(),
+    input_type: inputUrl ? "url" : "text",
+    url: inputUrl || null,
+    title: headline || null,
+    direction: parsedJson.direction || "unknown",
+    direction_label: parsedJson.direction || "unknown",
+    confidence: parsedJson.analysis_confidence ?? 0,
+    score: parsedJson.analysis_confidence ?? 0,
+    summary: parsedJson.summary || "",
+    drivers,
+    examples: (parsedJson.biased_phrases || []).map((p) => ({ quote: p.quote, why: p.why })),
+    sources: parsedJson.suggested_sources || [],
+    recommendations: parsedJson.recommendations || [],
+    request_meta: null,
+  });
+}
+
 function corsHeaders(request) {
   const origin = request.headers.get("origin") || "";
   const allowed = origin.startsWith("chrome-extension://") ? origin : "";
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, x-client, x-request-id",
+    "Access-Control-Allow-Headers": "Content-Type, x-client, x-request-id, Authorization",
   };
 }
 
@@ -268,12 +345,27 @@ export async function POST(request) {
   const ip = getClientIp(request);
   const headers = corsHeaders(request);
 
-  const retryAfter = checkRateLimit(ip);
-  if (retryAfter !== null) {
-    return Response.json(
-      { error: "Too many requests. Please retry shortly." },
-      { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
-    );
+  // Resolve authenticated user from Bearer token (if present)
+  const authUser = await resolveAuthUser(request);
+
+  // Per-user daily limit for authenticated requests
+  if (authUser) {
+    const overLimit = await checkUserDailyLimit(authUser.id);
+    if (overLimit) {
+      return Response.json(
+        { error: "Daily limit reached. Come back tomorrow or upgrade to Pro." },
+        { status: 429, headers }
+      );
+    }
+  } else {
+    // IP rate limit for anonymous requests
+    const retryAfter = checkRateLimit(ip);
+    if (retryAfter !== null) {
+      return Response.json(
+        { error: "Too many requests. Please retry shortly." },
+        { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+      );
+    }
   }
 
   let body;
@@ -283,7 +375,7 @@ export async function POST(request) {
     return Response.json({ error: "Request body must be valid JSON." }, { status: 400, headers });
   }
 
-  let { text, url } = body;
+  let { text, url, headline } = body;
 
   const clientHeader = String(request.headers.get("x-client") || "").toLowerCase();
   const isWebClient = clientHeader === "web";
@@ -341,7 +433,15 @@ export async function POST(request) {
     const humanResult = buildHumanResult(parsedJson) || aiResponse;
     inMemoryCache.set(cacheKey, humanResult);
 
-    return Response.json({ result: humanResult }, { headers });
+    // Save to cloud history and track usage for authenticated users
+    if (authUser) {
+      await Promise.all([
+        saveAnalysisToCloud(authUser.id, parsedJson, hasUrl ? url : null, headline || null),
+        incrementUserDailyUsage(authUser.id),
+      ]);
+    }
+
+    return Response.json({ result: humanResult, saved: Boolean(authUser) }, { headers });
   } catch (error) {
     console.error("Extension analysis error:", String(error?.message || error));
     return Response.json({ error: "Error checking bias." }, { status: 500, headers });
