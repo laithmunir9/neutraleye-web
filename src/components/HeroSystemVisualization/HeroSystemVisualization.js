@@ -1,127 +1,256 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./HeroSystemVisualization.module.css";
 
-const NODES = [
+const SCENES = [
   {
-    key: "input",
-    x: 82,
-    y: 318,
-    className: "nodeInput",
-    labelX: 98,
-    labelY: 332,
-    title: "Article input"
+    id: "a",
+    url: "reuters.com/world/europe",
+    direction: "Center-left",
+    dirColor: "#4a7c59",
+    confidence: 72,
+    signals: [
+      { label: "Tone", on: true },
+      { label: "Framing", on: true },
+      { label: "Attribution", on: false },
+      { label: "Sources", on: true },
+      { label: "Omission", on: false },
+    ],
+    quote: "…language frames the subsidy as a lifeline for struggling families…",
+    badge: "Loaded phrasing",
+    sources: ["Financial Times", "Bloomberg", "The Economist"],
   },
   {
-    key: "extract",
-    x: 196,
-    y: 264,
-    className: "nodeExtract",
-    labelX: 214,
-    labelY: 281,
-    title: "Text extracted"
+    id: "b",
+    url: "foxnews.com/politics",
+    direction: "Right-leaning",
+    dirColor: "#b94040",
+    confidence: 88,
+    signals: [
+      { label: "Tone", on: true },
+      { label: "Framing", on: true },
+      { label: "Attribution", on: true },
+      { label: "Sources", on: false },
+      { label: "Omission", on: true },
+    ],
+    quote: "…describes the situation as a 'crisis' while limiting opposition voices…",
+    badge: "Framing bias",
+    sources: ["AP News", "Reuters", "Politico"],
   },
   {
-    key: "signals",
-    x: 324,
-    y: 204,
-    className: "nodeSignals",
-    primary: true,
-    labelX: 338,
-    labelY: 194,
-    title: "Signals checked"
+    id: "c",
+    url: "theguardian.com/us-news",
+    direction: "Left-leaning",
+    dirColor: "#3a72a8",
+    confidence: 64,
+    signals: [
+      { label: "Tone", on: true },
+      { label: "Framing", on: false },
+      { label: "Attribution", on: true },
+      { label: "Sources", on: false },
+      { label: "Omission", on: true },
+    ],
+    quote: "…omits economic counterarguments while elevating activist perspectives…",
+    badge: "Source imbalance",
+    sources: ["Wall Street Journal", "Axios", "NPR"],
   },
-  {
-    key: "evidence",
-    x: 448,
-    y: 246,
-    className: "nodeEvidence",
-    labelX: 462,
-    labelY: 258,
-    title: "Evidence linked"
-  },
-  {
-    key: "output",
-    x: 562,
-    y: 148,
-    className: "nodeOutput",
-    labelX: 558,
-    labelY: 128,
-    title: "Structured output",
-    align: "end"
-  }
 ];
 
-const PATHS = [
-  { key: "input-extract", d: "M82 318 C116 304 156 286 196 264", className: "pathOne" },
-  { key: "extract-signals", d: "M196 264 C236 244 278 222 324 204", className: "pathTwo" },
-  { key: "signals-evidence", d: "M324 204 C364 214 404 230 448 246", className: "pathThree" },
-  { key: "evidence-output", d: "M448 246 C482 224 524 182 562 148", className: "pathFour" }
-];
+// Phases: scanning → revealed → done → (next scene)
+const PHASE_MS = { scanning: 1700, revealed: 2400, done: 3800 };
+
+const ease = [0.22, 1, 0.36, 1];
 
 export default function HeroSystemVisualization() {
-  const [paused, setPaused] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState("scanning");
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("revealed"), PHASE_MS.scanning);
+    const t2 = setTimeout(() => setPhase("done"), PHASE_MS.scanning + PHASE_MS.revealed);
+    const t3 = setTimeout(() => {
+      setPhase("scanning");
+      setIdx((i) => (i + 1) % SCENES.length);
+    }, PHASE_MS.scanning + PHASE_MS.revealed + PHASE_MS.done);
+    return () => [t1, t2, t3].forEach(clearTimeout);
+  }, [idx]);
+
+  const scene = SCENES[idx];
 
   return (
-    <section className={styles.system} aria-label="NeutralEye article analysis system visualization">
-      <div className={`${styles.surface} ${paused ? styles.paused : ""}`}>
-        <button
-          className={styles.playToggle}
-          type="button"
-          aria-pressed={paused}
-          aria-label={paused ? "Play graph animation" : "Pause graph animation"}
-          onClick={() => setPaused((current) => !current)}
-        >
-          {paused ? (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
-            </svg>
-          )}
-        </button>
+    <section className={styles.wrap} aria-label="NeutralEye live analysis preview">
+      <div className={styles.surface}>
 
-        <div className={styles.field} aria-hidden="true" />
+        {/* Dot grid */}
+        <div className={styles.dotGrid} aria-hidden="true" />
 
-        <svg className={styles.map} viewBox="0 0 640 430" role="img" aria-hidden="true">
-          <defs>
-            <linearGradient id="neutraleye-live-path" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(32, 27, 22, 0.18)" />
-              <stop offset="100%" stopColor="rgba(139, 103, 65, 0.42)" />
-            </linearGradient>
-          </defs>
-
-          {PATHS.map((path) => (
-            <g key={path.key}>
-              <path className={styles.pathBase} d={path.d} />
-              <path
-                className={`${styles.pathActive} ${styles[path.className]}`}
-                d={path.d}
-                pathLength="1"
-              />
-            </g>
+        {/* Back card — activity feed */}
+        <div className={styles.backCard} aria-hidden="true">
+          <div className={styles.backCardHeader}>
+            <span className={styles.liveIndicator} />
+            <span>Analysis queue</span>
+          </div>
+          {["wsj.com/economy", "bbc.co.uk/news", "nytimes.com"].map((u, i) => (
+            <div key={u} className={styles.queueRow} style={{ animationDelay: `${i * 0.3}s` }}>
+              <span className={styles.queueDot} />
+              <span className={styles.queueUrl}>{u}</span>
+              <span className={styles.queueTag}>Done</span>
+            </div>
           ))}
+        </div>
 
-          {NODES.map((node) => (
-            <g
-              key={node.key}
-              className={`${styles.nodeGroup} ${styles[node.className]} ${node.primary ? styles.nodePrimary : ""}`}
-            >
-              <circle className={styles.node} cx={node.x} cy={node.y} r="7" />
-              <text
-                className={styles.nodeLabel}
-                x={node.labelX}
-                y={node.labelY}
-                textAnchor={node.align ?? "start"}
-              >
-                {node.title}
-              </text>
-            </g>
+        {/* Main card */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={scene.id}
+            className={styles.card}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.38, ease }}
+          >
+            {/* Header */}
+            <div className={styles.cardHead}>
+              <div className={styles.urlChip}>
+                <span className={styles.urlDot} />
+                <span>{scene.url}</span>
+              </div>
+              {phase === "scanning" ? (
+                <motion.span
+                  className={styles.statusScanning}
+                  animate={{ opacity: [1, 0.45, 1] }}
+                  transition={{ duration: 0.9, repeat: Infinity }}
+                >
+                  Analyzing…
+                </motion.span>
+              ) : (
+                <span className={styles.statusDone}>Complete</span>
+              )}
+            </div>
+
+            {/* Progress bar during scan */}
+            {phase === "scanning" && (
+              <div className={styles.progressTrack}>
+                <motion.div
+                  className={styles.progressBar}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+              </div>
+            )}
+
+            {/* Result row: direction + confidence */}
+            <AnimatePresence>
+              {phase !== "scanning" && (
+                <motion.div
+                  className={styles.resultRow}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease }}
+                >
+                  <span
+                    className={styles.dirBadge}
+                    style={{
+                      color: scene.dirColor,
+                      background: `${scene.dirColor}18`,
+                      borderColor: `${scene.dirColor}40`,
+                    }}
+                  >
+                    {scene.direction}
+                  </span>
+                  <div className={styles.confRow}>
+                    <span className={styles.confLabel}>Confidence</span>
+                    <div className={styles.confTrack}>
+                      <motion.div
+                        className={styles.confFill}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${scene.confidence}%` }}
+                        transition={{ duration: 0.65, ease: "easeOut", delay: 0.1 }}
+                        style={{ background: scene.dirColor }}
+                      />
+                    </div>
+                    <span className={styles.confPct}>{scene.confidence}%</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Signal chips */}
+            <div className={styles.signalRow}>
+              {scene.signals.map((sig, i) => (
+                <motion.span
+                  key={sig.label}
+                  className={`${styles.signal} ${sig.on && phase !== "scanning" ? styles.signalOn : ""}`}
+                  animate={
+                    sig.on && phase !== "scanning"
+                      ? { opacity: 1, scale: 1 }
+                      : { opacity: 0.32, scale: 0.97 }
+                  }
+                  transition={{ delay: i * 0.08, duration: 0.25 }}
+                >
+                  <span className={styles.signalDot} />
+                  {sig.label}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Evidence quote */}
+            <AnimatePresence>
+              {phase === "done" && (
+                <motion.div
+                  className={styles.evidence}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, delay: 0.1, ease }}
+                >
+                  <p className={styles.evidenceQuote}>"{scene.quote}"</p>
+                  <span className={styles.evidenceBadge}>{scene.badge}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Sources */}
+            <AnimatePresence>
+              {phase === "done" && (
+                <motion.div
+                  className={styles.sources}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.25 }}
+                >
+                  <span className={styles.sourcesLabel}>Read alongside</span>
+                  <div className={styles.sourceChips}>
+                    {scene.sources.map((s, i) => (
+                      <motion.span
+                        key={s}
+                        className={styles.sourceChip}
+                        initial={{ opacity: 0, x: -4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + i * 0.08, ease }}
+                      >
+                        {s}
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Scene dots */}
+        <div className={styles.dots} aria-hidden="true">
+          {SCENES.map((s, i) => (
+            <span key={s.id} className={`${styles.dot} ${i === idx ? styles.dotActive : ""}`} />
           ))}
-        </svg>
+        </div>
+
       </div>
     </section>
   );

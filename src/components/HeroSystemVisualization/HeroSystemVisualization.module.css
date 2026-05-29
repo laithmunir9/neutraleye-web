@@ -1,449 +1,440 @@
-.system {
+.wrap {
   height: 100%;
   min-width: 0;
 }
 
 .surface {
   position: relative;
-  min-height: clamp(22rem, 34vw, 26rem);
+  min-height: clamp(22rem, 34vw, 28rem);
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgba(93, 75, 53, 0.08);
+  border: 1px solid rgba(93, 75, 53, 0.09);
   border-radius: var(--radius-md);
-  background:
-    radial-gradient(circle at 68% 42%, rgba(32, 27, 22, 0.07) 1px, transparent 1.45px),
-    linear-gradient(90deg, rgba(248, 244, 238, 0.98), rgba(248, 244, 238, 0.58) 34%, rgba(248, 244, 238, 0.84) 100%),
-    radial-gradient(circle at 66% 48%, rgba(255, 252, 247, 0.12), rgba(255, 252, 247, 0.86) 62%, rgba(255, 252, 247, 0.98) 100%);
-  background-size: 1.18rem 1.18rem, auto;
+  background: #f9f6f1;
   isolation: isolate;
 }
 
-.surface::before {
-  content: "";
+/* Dot grid */
+.dotGrid {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
-    radial-gradient(circle at 62% 46%, transparent 0 27%, rgba(255, 252, 247, 0.22) 45%, rgba(255, 252, 247, 0.92) 78%),
-    linear-gradient(90deg, rgba(255, 252, 247, 0.98), rgba(255, 252, 247, 0.08) 48%, rgba(255, 252, 247, 0.66));
   pointer-events: none;
+  background-image: radial-gradient(circle, rgba(32, 27, 22, 0.13) 1px, transparent 1.5px);
+  background-size: 1.2rem 1.2rem;
+  mask-image: radial-gradient(ellipse 80% 70% at 55% 45%, rgba(0,0,0,0.55) 0%, transparent 100%);
+  animation: breathe 9s ease-in-out infinite;
 }
 
-.playToggle {
+/* Back card */
+.backCard {
   position: absolute;
-  right: 1.2rem;
-  bottom: 1.2rem;
-  z-index: 6;
-  display: inline-grid;
-  place-items: center;
-  width: 2.45rem;
-  height: 2.45rem;
-  border: 1px solid rgba(93, 75, 53, 0.13);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 252, 247, 0.78);
-  color: var(--secondary-text);
-  padding: 0;
-  pointer-events: auto;
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-.playToggle:hover {
-  border-color: rgba(93, 75, 53, 0.22);
-  background: rgba(255, 252, 247, 0.94);
-  color: var(--text);
-  transform: translateY(-1px);
-}
-
-.playToggle svg {
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor;
-}
-
-.field {
-  position: absolute;
-  inset: 2.6rem 1.6rem 3.6rem;
+  top: 1.2rem;
+  right: 0.8rem;
+  width: 11.5rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 252, 247, 0.62);
+  border: 1px solid rgba(93, 75, 53, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 12px rgba(32, 27, 22, 0.05);
+  backdrop-filter: blur(8px);
   z-index: 1;
-  opacity: 0.74;
-  background-image: radial-gradient(circle, rgba(32, 27, 22, 0.16) 1px, transparent 1.65px);
-  background-size: 1.15rem 1.15rem;
-  mask-image: radial-gradient(circle at 56% 46%, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.36) 48%, transparent 78%);
-  animation: fieldBreathe 8.8s ease-in-out infinite;
+  opacity: 0.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.map {
-  position: absolute;
-  inset: 2.15rem 1.6rem 3.35rem;
-  z-index: 2;
-  width: auto;
-  height: auto;
-  overflow: visible;
-}
-
-.pathBase,
-.pathActive {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.pathBase {
-  stroke: rgba(32, 27, 22, 0.14);
-  stroke-width: 0;
-  opacity: 0;
-}
-
-.pathActive {
-  stroke: url("#neutraleye-live-path");
-  stroke-width: 3.5;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  animation-duration: 8.2s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-.pathOne {
-  animation-name: pathRevealOne;
-}
-
-.pathTwo {
-  animation-name: pathRevealTwo;
-}
-
-.pathThree {
-  animation-name: pathRevealThree;
-}
-
-.pathFour {
-  animation-name: pathRevealFour;
-}
-
-.nodeGroup {
-  opacity: 0;
-  transform: translateY(8px);
-  transform-box: fill-box;
-  transform-origin: center;
-  will-change: transform, opacity;
-  animation-duration: 8.2s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-.node {
-  fill: #2d2823;
-  filter: drop-shadow(0 8px 10px rgba(40, 29, 19, 0.14));
-}
-
-.nodeLabel {
-  fill: rgba(61, 52, 42, 0.88);
+.backCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-strong);
 }
 
-.nodeInput {
-  fill: #4c4339;
-  animation-name: pointRevealOne;
+.liveIndicator {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4a7c59;
+  flex-shrink: 0;
+  animation: pulse 2.2s ease-in-out infinite;
 }
 
-.nodeExtract {
-  fill: #725b43;
-  animation-name: pointRevealTwo;
+.queueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  animation: slideInRight 0.45s ease both;
 }
 
-.nodeSignals {
-  fill: #8b6741;
-  animation-name: pointRevealThree;
+.queueDot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(139, 103, 65, 0.3);
+  flex-shrink: 0;
 }
 
-.nodeEvidence {
-  fill: #596451;
-  animation-name: pointRevealFour;
+.queueUrl {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--secondary-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.nodeOutput {
-  fill: #2f3d3b;
-  animation-name: pointRevealFive;
+.queueTag {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4a7c59;
+  flex-shrink: 0;
 }
 
-.nodePrimary {
-  filter: drop-shadow(0 8px 12px rgba(139, 103, 65, 0.22));
+/* Main analysis card */
+.card {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 6rem;
+  z-index: 2;
+  background: rgba(255, 252, 247, 0.97);
+  border: 1px solid rgba(93, 75, 53, 0.11);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  box-shadow:
+    0 8px 28px rgba(32, 27, 22, 0.07),
+    0 2px 6px rgba(32, 27, 22, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
-.paused .field,
-.paused .pathActive,
-.paused .nodeGroup {
-  animation-play-state: paused;
+/* Card header */
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-@keyframes pointRevealOne {
-  0%,
-  1% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  7%,
-  76% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.urlChip {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.22rem 0.58rem;
+  background: rgba(139, 103, 65, 0.07);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  color: var(--secondary-text);
+  min-width: 0;
+  overflow: hidden;
 }
 
-@keyframes pointRevealTwo {
-  0%,
-  14% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  20%,
-  76% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.urlDot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #8b6741;
+  flex-shrink: 0;
 }
 
-@keyframes pointRevealThree {
-  0%,
-  27% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  33%,
-  76% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.statusScanning {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8b6741;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-@keyframes pointRevealFour {
-  0%,
-  40% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  46%,
-  76% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.statusDone {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #4a7c59;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-@keyframes pointRevealFive {
-  0%,
-  53% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  59%,
-  76% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+/* Progress bar */
+.progressTrack {
+  height: 2px;
+  background: rgba(139, 103, 65, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-@keyframes pathRevealOne {
-  0%,
-  4% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
-
-  14%,
-  76% {
-    opacity: 0.72;
-    stroke-dashoffset: 0;
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
+.progressBar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(139, 103, 65, 0.45), #8b6741);
+  border-radius: 999px;
 }
 
-@keyframes pathRevealTwo {
-  0%,
-  17% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
-
-  27%,
-  76% {
-    opacity: 0.72;
-    stroke-dashoffset: 0;
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
+/* Result row */
+.resultRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
 }
 
-@keyframes pathRevealThree {
-  0%,
-  30% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
-
-  40%,
-  76% {
-    opacity: 0.72;
-    stroke-dashoffset: 0;
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
+.dirBadge {
+  padding: 0.28rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-@keyframes pathRevealFour {
-  0%,
-  43% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
-
-  53%,
-  76% {
-    opacity: 0.72;
-    stroke-dashoffset: 0;
-  }
-
-  84%,
-  100% {
-    opacity: 0;
-    stroke-dashoffset: 1;
-  }
+.confRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
 }
 
-@keyframes fieldBreathe {
-  0%,
-  100% {
-    opacity: 0.48;
-    transform: scale(0.995);
-  }
-
-  50% {
-    opacity: 0.76;
-    transform: scale(1.01);
-  }
+.confLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
+.confTrack {
+  flex: 1;
+  height: 4px;
+  background: rgba(93, 75, 53, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: 2rem;
+}
+
+.confFill {
+  height: 100%;
+  border-radius: 999px;
+  opacity: 0.82;
+}
+
+.confPct {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Signal chips */
+.signalRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.22rem 0.52rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 75, 53, 0.13);
+  background: rgba(139, 103, 65, 0.04);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(61, 52, 42, 0.42);
+  transition: border-color 220ms, background 220ms, color 220ms;
+}
+
+.signalOn {
+  border-color: rgba(139, 103, 65, 0.32);
+  background: rgba(139, 103, 65, 0.09);
+  color: #8b6741;
+}
+
+.signalDot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Evidence block */
+.evidence {
+  padding: 0.65rem 0.8rem;
+  border-left: 2.5px solid rgba(139, 103, 65, 0.38);
+  background: rgba(139, 103, 65, 0.04);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.evidenceQuote {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.55;
+  font-style: italic;
+}
+
+.evidenceBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.17rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(139, 103, 65, 0.11);
+  color: #8b6741;
+  font-family: var(--font-mono);
+  font-size: 0.59rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Sources */
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sourcesLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.sourceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.sourceChip {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 75, 53, 0.13);
+  background: rgba(255, 252, 247, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--secondary-text);
+}
+
+/* Scene dots */
+.dots {
+  position: absolute;
+  bottom: 0.85rem;
+  right: 0.9rem;
+  display: flex;
+  gap: 0.38rem;
+  z-index: 5;
+}
+
+.dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(139, 103, 65, 0.22);
+  transition: background 300ms, transform 300ms;
+}
+
+.dotActive {
+  background: #8b6741;
+  transform: scale(1.35);
+}
+
+/* Animations */
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.998); }
+  50% { opacity: 0.8; transform: scale(1.005); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .field,
-  .pathActive,
-  .nodeGroup {
+  .dotGrid,
+  .liveIndicator {
     animation: none;
   }
 
-  .pathActive,
-  .nodeGroup {
+  .dotGrid {
+    opacity: 0.6;
+  }
+
+  .liveIndicator {
     opacity: 1;
-  }
-
-  .pathActive {
-    stroke-dashoffset: 0;
-  }
-
-  .nodeGroup {
-    transform: translateY(0);
   }
 }
 
+/* Responsive */
 @media (max-width: 980px) {
   .surface {
     min-height: 30rem;
     border-radius: var(--radius-lg);
   }
 
-  .field {
-    inset: 3rem 1.4rem 4.2rem;
+  .backCard {
+    display: none;
   }
 
-  .map {
-    inset: 2.55rem 1.2rem 3.9rem;
-    width: auto;
-  }
-
-  .nodeLabel {
-    font-size: 14px;
+  .card {
+    right: 1rem;
   }
 }
 
 @media (max-width: 640px) {
   .surface {
-    min-height: 25rem;
+    min-height: 26rem;
   }
 
-  .playToggle {
-    right: 1rem;
-    bottom: 1rem;
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-
-  .field {
-    inset: 3rem 0.5rem 3.8rem;
-  }
-
-  .map {
-    inset: 2.7rem 0.4rem 3.4rem;
-    width: auto;
-    height: auto;
-  }
-
-  .node {
-    r: 6px;
-  }
-
-  .nodeLabel {
-    font-size: 12px;
+  .card {
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    padding: 0.85rem 0.9rem;
+    gap: 0.6rem;
   }
 }
