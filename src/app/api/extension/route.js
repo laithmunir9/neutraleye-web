@@ -6,7 +6,7 @@ export const maxDuration = 60;
 
 let _openai = null;
 function getOpenAI() {
-  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_EXTENSION_API_KEY });
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_EXTENSION_API_KEY || process.env.OPENAI_API_KEY });
   return _openai;
 }
 
