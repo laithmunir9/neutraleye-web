@@ -83,7 +83,7 @@ export default function PricingPage() {
       <main className={styles.main}>
 
         <div className={styles.header}>
-          <h1 className={styles.title}>Read the news<br />without the spin</h1>
+          <h1 className={styles.title}>Read the news without the spin</h1>
           <p className={styles.subtitle}>
             NeutralEye spots bias so you can focus on the story, not the slant.
           </p>

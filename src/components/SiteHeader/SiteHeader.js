@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { EXTENSION_URL } from "@/lib/content";
 import { useAuth } from "@/lib/supabase/AuthProvider";
@@ -27,6 +28,9 @@ function userAvatar(user) {
 export default function SiteHeader({ compact = false, defaultDark = false }) {
   const [isDark, setIsDark] = useState(defaultDark);
   const { user, loading, supabase } = useAuth();
+  const pathname = usePathname();
+  const isPro = user?.user_metadata?.plan === "pro";
+  const showUpgradeCta = pathname !== "/pricing" && !isPro;
 
   useEffect(() => {
     function updateTheme() {
@@ -75,7 +79,9 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
       </nav>
 
       <div className={styles.headerActions}>
-        <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Pro</Link>
+        {showUpgradeCta && (
+          <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Pro</Link>
+        )}
 
         {!loading && !user && (
           <DropdownMenu.Root>
