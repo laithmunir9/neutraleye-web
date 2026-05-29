@@ -155,11 +155,25 @@
   justify-content: center;
   transition: background-color 160ms ease, transform 160ms ease;
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
 .avatarButton:hover {
   background: #6e4f2f;
   transform: scale(1.05);
+}
+
+.avatarButtonImg {
+  background: transparent;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
 
 .dropdownContent {

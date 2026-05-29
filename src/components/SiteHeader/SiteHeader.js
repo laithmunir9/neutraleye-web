@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { EXTENSION_URL } from "@/lib/content";
 import { useAuth } from "@/lib/supabase/AuthProvider";
@@ -18,6 +18,10 @@ const NAV_ITEMS = [
 function userInitial(user) {
   const name = user?.user_metadata?.full_name || user?.email || "";
   return name[0]?.toUpperCase() || "?";
+}
+
+function userAvatar(user) {
+  return user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 }
 
 export default function SiteHeader({ compact = false, defaultDark = false }) {
@@ -130,8 +134,17 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
         {!loading && user && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className={styles.avatarButton} aria-label="Account menu">
-                {userInitial(user)}
+              <button className={`${styles.avatarButton} ${userAvatar(user) ? styles.avatarButtonImg : ""}`} aria-label="Account menu">
+                {userAvatar(user) ? (
+                  <Image
+                    src={userAvatar(user)}
+                    alt=""
+                    width={36}
+                    height={36}
+                    className={styles.avatarImg}
+                    referrerPolicy="no-referrer"
+                  />
+                ) : userInitial(user)}
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
