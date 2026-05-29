@@ -1,366 +1,106 @@
-.wrap {
+.system {
   height: 100%;
   min-width: 0;
 }
 
 .surface {
   position: relative;
-  min-height: clamp(22rem, 34vw, 28rem);
+  min-height: clamp(22rem, 34vw, 26rem);
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgba(93, 75, 53, 0.09);
+  border: 1px solid rgba(93, 75, 53, 0.08);
   border-radius: var(--radius-md);
-  background: #f9f6f1;
+  background:
+    linear-gradient(90deg, rgba(248, 244, 238, 0.98), rgba(248, 244, 238, 0.58) 34%, rgba(248, 244, 238, 0.84) 100%),
+    radial-gradient(circle at 66% 48%, rgba(255, 252, 247, 0.12), rgba(255, 252, 247, 0.86) 62%, rgba(255, 252, 247, 0.98) 100%);
+  background-size: 1.18rem 1.18rem, auto;
   isolation: isolate;
 }
 
-/* Dot grid */
-.dotGrid {
+.surface::before {
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
+  background:
+    radial-gradient(circle at 62% 46%, transparent 0 27%, rgba(255, 252, 247, 0.22) 45%, rgba(255, 252, 247, 0.92) 78%),
+    linear-gradient(90deg, rgba(255, 252, 247, 0.98), rgba(255, 252, 247, 0.08) 48%, rgba(255, 252, 247, 0.66));
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(32, 27, 22, 0.13) 1px, transparent 1.5px);
-  background-size: 1.2rem 1.2rem;
-  mask-image: radial-gradient(ellipse 80% 70% at 55% 45%, rgba(0,0,0,0.55) 0%, transparent 100%);
-  animation: breathe 9s ease-in-out infinite;
 }
 
-/* Back card */
-.backCard {
+/* Dot grid */
+.field {
   position: absolute;
-  top: 1.2rem;
-  right: 0.8rem;
-  width: 11.5rem;
-  padding: 0.75rem 0.85rem;
-  background: rgba(255, 252, 247, 0.62);
-  border: 1px solid rgba(93, 75, 53, 0.1);
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 12px rgba(32, 27, 22, 0.05);
-  backdrop-filter: blur(8px);
+  inset: 2.6rem 1.6rem 3.6rem;
   z-index: 1;
-  opacity: 0.6;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  opacity: 0.72;
+  background-image: radial-gradient(circle, rgba(32, 27, 22, 0.18) 1px, transparent 1.65px);
+  background-size: 1.15rem 1.15rem;
+  mask-image: radial-gradient(circle at 56% 46%, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.36) 48%, transparent 78%);
+  animation: fieldBreathe 8.8s ease-in-out infinite;
 }
 
-.backCardHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent-strong);
-}
-
-.liveIndicator {
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #4a7c59;
-  flex-shrink: 0;
-  animation: pulse 2.2s ease-in-out infinite;
-}
-
-.queueRow {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  animation: slideInRight 0.45s ease both;
-}
-
-.queueDot {
-  display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(139, 103, 65, 0.3);
-  flex-shrink: 0;
-}
-
-.queueUrl {
-  flex: 1;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--secondary-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.queueTag {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #4a7c59;
-  flex-shrink: 0;
-}
-
-/* Main analysis card */
-.card {
+/* SVG map */
+.map {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  right: 6rem;
+  inset: 2.15rem 1.6rem 3.35rem;
   z-index: 2;
-  background: rgba(255, 252, 247, 0.97);
-  border: 1px solid rgba(93, 75, 53, 0.11);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.1rem;
-  box-shadow:
-    0 8px 28px rgba(32, 27, 22, 0.07),
-    0 2px 6px rgba(32, 27, 22, 0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
 }
 
-/* Card header */
-.cardHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+/* Edges */
+.edge {
+  fill: none;
+  stroke: rgba(32, 27, 22, 0.38);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation: edgeDraw 0.45s ease forwards;
 }
 
-.urlChip {
-  display: flex;
-  align-items: center;
-  gap: 0.38rem;
-  padding: 0.22rem 0.58rem;
-  background: rgba(139, 103, 65, 0.07);
-  border-radius: 999px;
+/* Nodes */
+.nodeGroup {
+  opacity: 0;
+  animation: nodeAppear 0.3s ease forwards;
+}
+
+.nodeGlow {
+  fill: rgba(139, 103, 65, 0.08);
+}
+
+.nodeRect {
+  fill: #201c18;
+}
+
+.nodeAccent {
+  fill: #8b6741;
+}
+
+.nodeLabel {
+  fill: rgba(32, 27, 22, 0.62);
   font-family: var(--font-mono);
-  font-size: 0.63rem;
-  color: var(--secondary-text);
-  min-width: 0;
-  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
-.urlDot {
-  display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #8b6741;
-  flex-shrink: 0;
-}
-
-.statusScanning {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
+.nodeLabelAccent {
+  fill: rgba(139, 103, 65, 0.88);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #8b6741;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.statusDone {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #4a7c59;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Progress bar */
-.progressTrack {
-  height: 2px;
-  background: rgba(139, 103, 65, 0.12);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(139, 103, 65, 0.45), #8b6741);
-  border-radius: 999px;
-}
-
-/* Result row */
-.resultRow {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.dirBadge {
-  padding: 0.28rem 0.68rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-family: var(--font-mono);
-  font-size: 0.63rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.confRow {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.confLabel {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
-
-.confTrack {
-  flex: 1;
-  height: 4px;
-  background: rgba(93, 75, 53, 0.1);
-  border-radius: 999px;
-  overflow: hidden;
-  min-width: 2rem;
-}
-
-.confFill {
-  height: 100%;
-  border-radius: 999px;
-  opacity: 0.82;
-}
-
-.confPct {
-  font-family: var(--font-mono);
-  font-size: 0.63rem;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-}
-
-/* Signal chips */
-.signalRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.signal {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  padding: 0.22rem 0.52rem;
-  border-radius: 999px;
-  border: 1px solid rgba(93, 75, 53, 0.13);
-  background: rgba(139, 103, 65, 0.04);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: rgba(61, 52, 42, 0.42);
-  transition: border-color 220ms, background 220ms, color 220ms;
-}
-
-.signalOn {
-  border-color: rgba(139, 103, 65, 0.32);
-  background: rgba(139, 103, 65, 0.09);
-  color: #8b6741;
-}
-
-.signalDot {
-  display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-/* Evidence block */
-.evidence {
-  padding: 0.65rem 0.8rem;
-  border-left: 2.5px solid rgba(139, 103, 65, 0.38);
-  background: rgba(139, 103, 65, 0.04);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.evidenceQuote {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--text);
-  line-height: 1.55;
-  font-style: italic;
-}
-
-.evidenceBadge {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 0.17rem 0.48rem;
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.11);
-  color: #8b6741;
-  font-family: var(--font-mono);
-  font-size: 0.59rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-/* Sources */
-.sources {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.sourcesLabel {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-
-.sourceChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.sourceChip {
-  padding: 0.22rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid rgba(93, 75, 53, 0.13);
-  background: rgba(255, 252, 247, 0.85);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--secondary-text);
 }
 
 /* Scene dots */
 .dots {
   position: absolute;
-  bottom: 0.85rem;
-  right: 0.9rem;
-  display: flex;
-  gap: 0.38rem;
+  bottom: 1rem;
+  right: 1.1rem;
   z-index: 5;
+  display: flex;
+  gap: 0.42rem;
 }
 
 .dot {
@@ -377,36 +117,27 @@
   transform: scale(1.35);
 }
 
-/* Animations */
-@keyframes breathe {
-  0%, 100% { opacity: 0.55; transform: scale(0.998); }
-  50% { opacity: 0.8; transform: scale(1.005); }
+/* Keyframes */
+@keyframes edgeDraw {
+  from { stroke-dashoffset: 1; opacity: 0; }
+  to   { stroke-dashoffset: 0; opacity: 1; }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+@keyframes nodeAppear {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(5px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes fieldBreathe {
+  0%, 100% { opacity: 0.48; transform: scale(0.995); }
+  50%       { opacity: 0.76; transform: scale(1.01);  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .dotGrid,
-  .liveIndicator {
-    animation: none;
-  }
-
-  .dotGrid {
-    opacity: 0.6;
-  }
-
-  .liveIndicator {
-    opacity: 1;
-  }
+  .field { animation: none; }
+  .edge  { animation: none; opacity: 1; stroke-dashoffset: 0; }
+  .nodeGroup { animation: none; opacity: 1; }
 }
 
 /* Responsive */
@@ -416,25 +147,36 @@
     border-radius: var(--radius-lg);
   }
 
-  .backCard {
-    display: none;
+  .field {
+    inset: 3rem 1.4rem 4.2rem;
   }
 
-  .card {
-    right: 1rem;
+  .map {
+    inset: 2.55rem 1.2rem 3.9rem;
+    width: auto;
+  }
+
+  .nodeLabel {
+    font-size: 12px;
   }
 }
 
 @media (max-width: 640px) {
   .surface {
-    min-height: 26rem;
+    min-height: 25rem;
   }
 
-  .card {
-    top: 0.75rem;
-    left: 0.75rem;
-    right: 0.75rem;
-    padding: 0.85rem 0.9rem;
-    gap: 0.6rem;
+  .field {
+    inset: 3rem 0.5rem 3.8rem;
+  }
+
+  .map {
+    inset: 2.7rem 0.4rem 3.4rem;
+    width: auto;
+    height: auto;
+  }
+
+  .nodeLabel {
+    font-size: 11px;
   }
 }
