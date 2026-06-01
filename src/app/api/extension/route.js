@@ -12,12 +12,31 @@ function getOpenAI() {
   return _openai;
 }
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 10;
+const AI_ANALYSIS_ENABLED = !["0", "false", "no", "off"].includes(
+  String(process.env.AI_ANALYSIS_ENABLED || "true").toLowerCase()
+);
+const KILL_SWITCH = ["1", "true", "yes", "on"].includes(
+  String(process.env.NEUTRALEYE_KILL_SWITCH || "").toLowerCase()
+);
+const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || 60_000);
+const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
 
 // In-memory stores — reset on cold start (acceptable for serverless)
 const inMemoryCache = new Map();
 const rateLimitStore = new Map();
+
+// ── Logging ────────────────────────────────────────────────────────────────
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function logEvent(level, event, meta = {}) {
+  const line = JSON.stringify({ timestamp: nowIso(), event, ...meta });
+  if (level === "error") { console.error(line); return; }
+  if (level === "warn") { console.warn(line); return; }
+  console.info(line);
+}
 
 // ── CORS ───────────────────────────────────────────────────────────────────
 // Chrome extensions send an Origin like chrome-extension://<id>
@@ -27,29 +46,33 @@ const rateLimitStore = new Map();
 
 const DAILY_LIMIT = 10;
 
-function makeSupabase() {
+function makeSupabase(accessToken = null) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    { cookies: { getAll: () => [], setAll: () => {} } }
+    {
+      cookies: { getAll: () => [], setAll: () => {} },
+      ...(accessToken ? { global: { headers: { Authorization: `Bearer ${accessToken}` } } } : {}),
+    }
   );
 }
 
-async function resolveAuthUser(request) {
+function parseToken(request) {
   const authHeader = request.headers.get("authorization") || "";
-  if (!authHeader.startsWith("Bearer ")) return null;
-  const token = authHeader.slice(7);
+  return authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+}
+
+async function resolveAuthUser(token) {
+  if (!token) return null;
   try {
-    const supabase = makeSupabase();
-    const { data: { user } } = await supabase.auth.getUser(token);
+    const { data: { user } } = await makeSupabase().auth.getUser(token);
     return user || null;
   } catch {
     return null;
   }
 }
 
-async function checkUserDailyLimit(userId) {
-  const supabase = makeSupabase();
+async function checkUserDailyLimit(supabase, userId) {
   const today = new Date().toISOString().slice(0, 10);
   const { data } = await supabase
     .from("daily_usage")
@@ -60,8 +83,7 @@ async function checkUserDailyLimit(userId) {
   return (data?.count ?? 0) >= DAILY_LIMIT;
 }
 
-async function incrementUserDailyUsage(userId) {
-  const supabase = makeSupabase();
+async function incrementUserDailyUsage(supabase, userId) {
   const today = new Date().toISOString().slice(0, 10);
   const { data: existing } = await supabase
     .from("daily_usage")
@@ -76,9 +98,8 @@ async function incrementUserDailyUsage(userId) {
   }
 }
 
-async function saveAnalysisToCloud(userId, parsedJson, inputUrl, headline) {
+async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headline) {
   if (!parsedJson) return;
-  const supabase = makeSupabase();
   const drivers = [...new Set((parsedJson.biased_phrases || []).map((p) => String(p.why || "")).filter(Boolean))];
   await supabase.from("analyses").insert({
     id: randomUUID(),
@@ -120,7 +141,7 @@ function getClientIp(request) {
   return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
 }
 
-function safeTrim(text, maxChars = 8000) {
+function safeTrim(text, maxChars = 25000) {
   if (!text) return "";
   return text.length > maxChars ? text.slice(0, maxChars) + "..." : text;
 }
@@ -209,7 +230,7 @@ async function extractArticleTextFromUrl(url) {
 
   let text = parts.join("\n\n");
   if (!text || text.length < 300) text = cleanWhitespace(root.text());
-  return safeTrim(cleanWhitespace(text), 8000);
+  return safeTrim(cleanWhitespace(text), 25000);
 }
 
 // ── OpenAI calls ───────────────────────────────────────────────────────────
@@ -249,7 +270,13 @@ BIAS TAXONOMY (use for the "why" field)
 
 ANALYSIS RULES
 - Only flag bias when clearly supported by the text. If evidence is weak or ambiguous, set bias_level to "none" or "uncertain" and set analysis_confidence below 0.4.
+- When flagging bias, include exact quoted excerpts only.
 - Scores above 0.85 should be rare and reserved for clear, repeated, text-explicit bias.
+
+SUGGESTED_SOURCES RULES
+- Only include specific article URLs you are reasonably confident exist and that directly cover the SAME main topic.
+- Do NOT provide homepage links or general topic pages.
+- If you cannot verify relevant specific articles, use an empty array for suggested_sources.
 
 OUTPUT
 Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outside the JSON.
@@ -264,7 +291,7 @@ Required schema:
     { "quote": "<exact excerpt>", "why": "framing|language|source|attribution" }
   ],
   "suggested_sources": [
-    { "title": "<article title>", "url": "<https://...>", "outlet": "<Outlet Name>" }
+    { "title": "Article title here", "url": "https://outlet.com/article-path", "outlet": "Outlet Name" }
   ],
   "recommendations": ["<procedural verification or reading suggestion>"],
   "explanation": "<1–3 sentence rationale>"
@@ -272,10 +299,10 @@ Required schema:
 
 Rules:
 - If bias_level is "none", biased_phrases must be an empty array.
-- Do NOT fabricate or guess URLs. If uncertain, omit the source entirely.
+- If you cannot confidently verify a source URL exists and covers this exact topic, suggested_sources must be an empty array.
 
 TEXT_FOR_ANALYSIS:
-"""${safeTrim(text, 8000)}"""`;
+"""${safeTrim(text, 25000)}"""`;
 
   const completion = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
@@ -320,15 +347,15 @@ function buildHumanResult(json) {
     : "No strong language or framing examples crossed the threshold in this pass.";
   parts.push(`**Examples of Bias**\n${exLines}`);
 
-  const srcLines = sources.length
-    ? sources.map((s) => {
-        const title = String(s.title || "").trim();
-        const url = String(s.url || "").trim();
-        const outlet = String(s.outlet || "").trim();
-        return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
-      }).join("\n")
-    : "- No specific comparison sources required. Cross-checking with Reuters or AP News is always useful.";
-  parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
+  if (sources.length) {
+    const srcLines = sources.map((s) => {
+      const title = String(s.title || "").trim();
+      const url = String(s.url || "").trim();
+      const outlet = String(s.outlet || "").trim();
+      return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
+    }).join("\n");
+    parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
+  }
 
   const recLines = recs.length
     ? recs.map((r) => `- ${r}`).join("\n")
@@ -342,28 +369,41 @@ function buildHumanResult(json) {
 // ── Route handler ──────────────────────────────────────────────────────────
 
 export async function POST(request) {
+  const requestId = request.headers.get("x-request-id") || randomUUID();
   const ip = getClientIp(request);
   const headers = corsHeaders(request);
 
-  // Resolve authenticated user from Bearer token (if present)
-  const authUser = await resolveAuthUser(request);
+  if (!AI_ANALYSIS_ENABLED || KILL_SWITCH) {
+    logEvent("warn", "analysis.unavailable", { requestId, ip });
+    return Response.json(
+      { error: "Analysis is temporarily unavailable.", code: "AI_DISABLED" },
+      { status: 503, headers }
+    );
+  }
 
-  // Per-user daily limit for authenticated requests
+  // IP rate limit applied to all requests (authenticated and anonymous)
+  const retryAfter = checkRateLimit(ip);
+  if (retryAfter !== null) {
+    logEvent("warn", "rate_limit.exceeded", { requestId, ip, retryAfter });
+    return Response.json(
+      { error: "Too many requests. Please retry shortly.", code: "RATE_LIMITED" },
+      { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+    );
+  }
+
+  // Resolve authenticated user from Bearer token (if present)
+  const token = parseToken(request);
+  const authUser = await resolveAuthUser(token);
+  const authedSupabase = authUser ? makeSupabase(token) : null;
+
+  // Per-user daily limit for authenticated requests (on top of IP limit)
   if (authUser) {
-    const overLimit = await checkUserDailyLimit(authUser.id);
+    const overLimit = await checkUserDailyLimit(authedSupabase, authUser.id);
     if (overLimit) {
+      logEvent("warn", "daily_limit.exceeded", { requestId, userId: authUser.id });
       return Response.json(
-        { error: "Daily limit reached. Come back tomorrow or upgrade to Pro." },
-        { status: 429, headers }
-      );
-    }
-  } else {
-    // IP rate limit for anonymous requests
-    const retryAfter = checkRateLimit(ip);
-    if (retryAfter !== null) {
-      return Response.json(
-        { error: "Too many requests. Please retry shortly." },
-        { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+        { error: "Daily limit reached. Come back tomorrow or upgrade to Pro.", code: "DAILY_LIMIT_REACHED" },
+        { status: 429, headers: { ...headers, "Retry-After": "86400" } }
       );
     }
   }
@@ -436,14 +476,19 @@ export async function POST(request) {
     // Save to cloud history and track usage for authenticated users
     if (authUser) {
       await Promise.all([
-        saveAnalysisToCloud(authUser.id, parsedJson, hasUrl ? url : null, headline || null),
-        incrementUserDailyUsage(authUser.id),
+        saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null),
+        incrementUserDailyUsage(authedSupabase, authUser.id),
       ]);
     }
 
     return Response.json({ result: humanResult, saved: Boolean(authUser) }, { headers });
   } catch (error) {
-    console.error("Extension analysis error:", String(error?.message || error));
-    return Response.json({ error: "Error checking bias." }, { status: 500, headers });
+    logEvent("error", "analysis.failure", {
+      requestId,
+      ip,
+      errorCode: error?.code || "INTERNAL_ERROR",
+      message: String(error?.message || error),
+    });
+    return Response.json({ error: "Error checking bias.", code: "INTERNAL_ERROR" }, { status: 500, headers });
   }
 }

@@ -250,7 +250,7 @@ Required schema:
     { "quote": "<exact excerpt>", "why": "framing|language|source|attribution" }
   ],
   "suggested_sources": [
-    { "title": "<article title>", "url": "<https://...>", "outlet": "<Outlet Name>" }
+    { "title": "Article title here", "url": "https://outlet.com/article-path", "outlet": "Outlet Name" }
   ],
   "recommendations": ["<procedural verification or reading suggestion>"],
   "explanation": "<1–3 sentence rationale>"
@@ -258,7 +258,7 @@ Required schema:
 
 Rules:
 - If bias_level is "none", biased_phrases must be an empty array.
-- Do NOT fabricate or guess URLs. If uncertain, omit the source entirely.
+- If you cannot confidently verify a source URL exists and covers this exact topic, suggested_sources must be an empty array.
 
 TEXT_FOR_ANALYSIS:
 """${safeTrim(text, MAX_ANALYSIS_TEXT_LENGTH)}"""`;
