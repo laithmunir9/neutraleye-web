@@ -67,6 +67,7 @@ const PRO_FEATURES = [
   "Everything in Free, plus:",
   "Unlimited analyses",
   "Cloud history — synced across devices",
+  "Compare Analyses — side-by-side bias comparison",
   "Shared daily limit across extension & website",
   "Priority processing",
   "Early access to new features",

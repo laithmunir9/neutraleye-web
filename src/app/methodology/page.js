@@ -91,7 +91,7 @@ export default function MethodologyPage() {
         </section>
 
         <ScrollReveal>
-          <section className={styles.section}>
+          <section className={`${styles.section} ${styles.firstSection}`}>
             <div className={styles.cardRow}>
               {methodologyCards.map((card) => (
                 <article key={card.title} className={styles.featureCard}>

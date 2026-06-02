@@ -253,7 +253,16 @@ Text:
   return completion.choices[0].message.content.trim().toLowerCase();
 }
 
-async function generateBiasAnalysis(text) {
+function extractDomain(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+async function generateBiasAnalysis(text, sourceUrl = null) {
+  const sourceDomain = sourceUrl ? extractDomain(sourceUrl) : null;
   const prompt = `You are an impartial, evidence-first media analyst. Analyze the article text below for bias.
 
 SCOPE & CONTEXT
@@ -276,7 +285,7 @@ ANALYSIS RULES
 SUGGESTED_SOURCES RULES
 - Only include specific article URLs you are reasonably confident exist and that directly cover the SAME main topic.
 - Do NOT provide homepage links or general topic pages.
-- If you cannot verify relevant specific articles, use an empty array for suggested_sources.
+- If you cannot verify relevant specific articles, use an empty array for suggested_sources.${sourceDomain ? `\n- Do NOT suggest ${sourceDomain} as a source — the article being analyzed is already from that outlet.` : ""}
 
 OUTPUT
 Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outside the JSON.
@@ -466,7 +475,7 @@ export async function POST(request) {
       return Response.json({ result: message }, { headers });
     }
 
-    const aiResponse = await generateBiasAnalysis(text);
+    const aiResponse = await generateBiasAnalysis(text, hasUrl ? url : null);
     let parsedJson = null;
     try { parsedJson = JSON.parse(aiResponse); } catch { parsedJson = null; }
 

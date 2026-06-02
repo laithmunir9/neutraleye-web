@@ -21,6 +21,7 @@ function AuthForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/analyze";
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
   const authError = searchParams.get("error");
+  const resetSuccess = searchParams.get("reset") === "success";
 
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
@@ -28,14 +29,17 @@ function AuthForm() {
   const [error, setError] = useState(authError === "auth_failed" ? "Authentication failed. Please try again." : "");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
 
   function switchMode(next) {
     setMode(next);
     setError("");
     setEmail("");
     setPassword("");
+    setForgotSent(false);
   }
 
   async function handleEmailAuth(e) {
@@ -67,6 +71,22 @@ function AuthForm() {
         router.push(callbackUrl);
         router.refresh();
       }
+    }
+  }
+
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setForgotSent(true);
     }
   }
 
@@ -107,6 +127,77 @@ function AuthForm() {
     );
   }
 
+  if (isForgot && forgotSent) {
+    return (
+      <MarketingShell>
+        <main className={styles.main}>
+          <div className={styles.card}>
+            <div className={styles.confirmBox}>
+              <div className={styles.confirmIcon} aria-hidden="true">✉</div>
+              <h1 className={styles.title}>Check your email</h1>
+              <p className={styles.confirmText}>
+                If <strong>{email}</strong> has an account, we sent a password reset link. Check your inbox and follow the instructions.
+              </p>
+              <button
+                type="button"
+                className={styles.switchLink}
+                onClick={() => switchMode("signin")}
+              >
+                Back to sign in
+              </button>
+            </div>
+          </div>
+        </main>
+      </MarketingShell>
+    );
+  }
+
+  if (isForgot) {
+    return (
+      <MarketingShell>
+        <main className={styles.main}>
+          <div className={styles.card}>
+            <div className={styles.heading}>
+              <h1 className={styles.title}>Reset password</h1>
+              <p className={styles.subtitle}>Enter your email and we&apos;ll send you a reset link.</p>
+            </div>
+
+            {error && <p className={styles.errorBanner}>{error}</p>}
+
+            <form onSubmit={handleForgotPassword} className={styles.form}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className={styles.input}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                />
+              </div>
+              <button type="submit" className={styles.submitBtn} disabled={loading}>
+                {loading ? "Sending…" : "Send reset link"}
+              </button>
+            </form>
+
+            <p className={styles.switchPrompt}>
+              <button
+                type="button"
+                className={styles.switchLink}
+                onClick={() => switchMode("signin")}
+              >
+                Back to sign in
+              </button>
+            </p>
+          </div>
+        </main>
+      </MarketingShell>
+    );
+  }
+
   return (
     <MarketingShell>
       <main className={styles.main}>
@@ -117,6 +208,10 @@ function AuthForm() {
               {isSignup ? "Save and sync your analysis history across devices." : "Welcome back to NeutralEye."}
             </p>
           </div>
+
+          {resetSuccess && !error && (
+            <p className={styles.successBanner}>Password updated. You can now sign in.</p>
+          )}
 
           {error && <p className={styles.errorBanner}>{error}</p>}
 
@@ -135,7 +230,18 @@ function AuthForm() {
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label} htmlFor="password">Password</label>
+              <div className={styles.labelRow}>
+                <label className={styles.label} htmlFor="password">Password</label>
+                {!isSignup && (
+                  <button
+                    type="button"
+                    className={styles.forgotLink}
+                    onClick={() => switchMode("forgot")}
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
               <input
                 id="password"
                 type="password"

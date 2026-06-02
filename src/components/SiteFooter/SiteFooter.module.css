@@ -9,9 +9,8 @@
 
 .footerInner {
   display: grid;
-  grid-template-columns: minmax(16rem, 1fr) auto auto;
-  column-gap: 3.25rem;
-  row-gap: 2rem;
+  grid-template-columns: minmax(16rem, 1fr) auto auto auto;
+  gap: 2rem 3.25rem;
   align-items: start;
   width: 100%;
   margin: 0;
@@ -74,9 +73,6 @@
   align-content: start;
 }
 
-.footerSection:first-of-type {
-  justify-self: end;
-}
 
 .footerHeading {
   margin: 0;
@@ -99,6 +95,7 @@
   font-size: 0.89rem;
   font-weight: 430;
   letter-spacing: 0;
+  white-space: nowrap;
   transition:
     color 160ms ease,
     font-weight 160ms ease;
@@ -129,14 +126,6 @@
     align-items: flex-start;
     padding-left: 1rem;
     padding-right: 1rem;
-  }
-
-  .footerProductLinks {
-    justify-content: flex-start;
-  }
-
-  .footerLegal {
-    justify-self: start;
   }
 
   .footerMeta {

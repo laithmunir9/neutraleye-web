@@ -9,79 +9,78 @@ Read this before touching any code.
 
 NeutralEye is an AI-powered media bias checker. Users paste article text or submit a URL and receive a structured bias analysis: direction, confidence score, bias drivers, example quotes, and source recommendations.
 
-The project consists of two repositories:
+There is no separate backend server. All backend logic lives as Next.js API Routes inside this repo, deployed on Vercel.
 
-- **neutraleye-web** — Next.js frontend, hosted on Vercel
-- **neutraleye-web-backend** — Node.js/Express backend, hosted on Render
+**Companion repo:** `neutraleye-extension` — Chrome extension frontend that calls this repo's API routes.
 
-**Status:** In active development. Running on localhost only. Not yet published.
+**Production domain (not yet live):** `tryneutraleye.com` — update Supabase Auth URL config once connected.
 
 ---
 
-## Repositories & Infrastructure
+## Infrastructure
 
-| Service     | Repo / Location                        | Notes                              |
-|-------------|----------------------------------------|------------------------------------|
-| Frontend    | `neutraleye-web` → Vercel              | Next.js 16, React 19               |
-| Backend     | `neutraleye-web-backend` → Render      | Express, ESM, single `server.js`   |
-| Database    | Supabase                               | Not yet set up — fresh setup planned |
-| Payments    | Stripe                                 | Not yet set up                     |
-| Security    | Cloudflare                             | Planned                            |
-| Monitoring  | Sentry                                 | Planned                            |
-| Domain      | tryneutraleye.com (or similar `.com`)  | To be purchased when ready         |
+| Service     | Location                          | Notes                                            |
+|-------------|-----------------------------------|--------------------------------------------------|
+| Frontend    | `neutraleye-web` → Vercel         | Next.js 16, React 19                             |
+| API Routes  | `src/app/api/` → Vercel           | All backend logic lives here, no separate server |
+| Database    | Supabase                          | Auth + analyses + daily_usage tables, RLS active |
+| Payments    | Stripe                            | Not yet set up                                   |
+| Security    | Cloudflare                        | Planned                                          |
+| Monitoring  | Sentry                            | Planned                                          |
 
 ---
 
 ## Tech Stack
 
-### Frontend (`neutraleye-web`)
 - **Framework:** Next.js 16 (App Router), React 19
-- **Language:** JavaScript (`.js`) with some TypeScript (`.tsx`) for UI components
-- **Styling:** Tailwind CSS v4, CSS Modules (per-component `.module.css`)
-- **Fonts:** Geist Sans + Geist Mono (via `geist` package), applied in `layout.js`
+- **Language:** JavaScript (`.js`) for pages/API routes; TypeScript (`.tsx`) for shadcn/ui components
+- **Styling:** Tailwind CSS v4, CSS Modules (`.module.css`) per component
+- **Fonts:** Geist Sans + Geist Mono via `geist` package, applied in `layout.js`
 - **UI Components:** shadcn/ui (`src/components/ui/`) + Radix UI primitives
 - **Animation:** Framer Motion
 - **Theme:** `next-themes` via `ThemeProvider`
+- **AI:** OpenAI SDK (`openai`) — `gpt-4o` for analysis, `gpt-4o-mini` for article detection
+- **Scraping:** `cheerio` for URL article extraction
+- **Database:** `@supabase/ssr` + `@supabase/supabase-js`
 - **Testing:** Jest + React Testing Library
 - **Linting:** ESLint (Next.js config)
-
-### Backend (`neutraleye-web-backend`)
-- **Runtime:** Node.js with ESM (`"type": "module"`)
-- **Framework:** Express 4
-- **AI:** OpenAI SDK v5 (`openai` package) — key stored in `OPENAI_API_KEY`
-- **Scraping:** `cheerio` + `node-fetch` for URL article extraction
-- **Config:** `dotenv`
-- **Entry point:** `server.js` (single file — all routes, middleware, and logic)
 
 ---
 
 ## Project Structure
 
-### Frontend
-
 ```
 src/
-  app/                      # Next.js App Router pages
+  app/
     page.js                 # Home / landing page
     analyze/page.js         # Core bias checker tool
-    compare/page.js         # Article comparison (in progress)
-    history/page.js         # User analysis history (requires Supabase auth)
-    settings/page.js        # User settings
+    pricing/page.js         # Pricing / upgrade to Pro
+    history/page.js         # User analysis history (Supabase-backed)
     methodology/page.js     # How NeutralEye works
+    login/page.js           # Login + signup (email + Google OAuth) + forgot password flow
+    reset-password/page.js  # Password reset — handles Supabase recovery redirect
     blog/                   # Blog with dynamic [slug] routing
-    system/page.js          # Internal system/debug page
+    system/page.js          # System/about page (has dark hero section)
+    compare/page.js         # Compare Analyses — Pro-gated with blur overlay
+    settings/page.js        # User settings
     extension-privacy/      # Extension privacy policy
-    privacy/                # Privacy policy
+    privacy/                # Website privacy policy
     terms/                  # Terms of service
     layout.js               # Root layout — fonts, ThemeProvider, metadata
     globals.css             # Global styles
+
+    api/
+      analyze/route.js      # Web bias analysis — text + URL modes
+      extension/route.js    # Extension bias analysis — text only
+      extension-auth/route.js # Extension login (email/password → Supabase)
+      usage/route.js        # Daily usage check + increment
 
   components/
     AppShell/               # App-mode layout wrapper
     MarketingShell/         # Marketing/landing layout wrapper
     HeaderBar/              # App header
-    SiteHeader/             # Marketing site header
-    SiteFooter/             # Marketing site footer
+    SiteHeader/             # Marketing site header (scroll-aware dark/light theme)
+    SiteFooter/             # Marketing site footer (Explore / Plans / Legal columns)
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
     ResultCard/             # Bias result display card
@@ -90,95 +89,114 @@ src/
     DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display
     HistoryTable/           # Analysis history list
-    AnalyzerCta/            # CTA component
-    HeroSystemVisualization/ # Animated hero graphic
-    BiasDetectionFlowGraphic/ # Flow diagram graphic
+    AnalyzerCta/            # CTA button used across marketing pages
+    HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
 
   lib/
-    api.js                  # All frontend → backend API calls
-    score.js                # Score/confidence normalization utilities
+    api.js                  # Frontend → API route calls
+    score.js                # Score/confidence normalization
     storage.js              # Local storage helpers
-    content.js              # Content/blog helpers
+    content.js              # Blog helpers
     types.js                # Shared type definitions
     utils.ts                # shadcn cn() utility
-```
-
-### Backend
-
-```
-neutraleye-web-backend/
-  server.js       # Everything: Express app, middleware, routes, AI pipeline
-  .env            # Environment variables (never commit)
-  package.json    # ESM, Express, OpenAI, cheerio, node-fetch
+    supabase/
+      client.js             # Browser Supabase client
+      server.js             # Server Supabase client (cookie-based)
+      analyses.js           # analyses table read/write
+      AuthProvider.js       # Auth context provider
+      useAnalysisLimit.js   # Daily usage limit hook
+      useProAccess.js       # Pro plan gate — always false until Stripe is wired up
 ```
 
 ---
 
-## API Routes (Backend)
+## API Routes
 
-All routes are `POST` unless noted.
+### `POST /api/analyze` — Web bias analysis
+- Accepts `text` or `url` (URL mode requires `x-client: web` header)
+- Rate limit: 5 req/min per IP (env-configurable via `RATE_LIMIT_WINDOW_MS` / `RATE_LIMIT_MAX`)
+- Returns structured JSON: `{ directionLabel, score, confidence, drivers, summary, examples, sources, recommendations, result, json, extractedText }`
+- In-memory cache keyed by text hash or URL
+- Kill switch: `NEUTRALEYE_KILL_SWITCH=true` → 503
+- Source domain exclusion: when a URL is submitted, the source domain is injected into the prompt so the AI never suggests the same outlet as the article being analyzed
 
-| Route           | Purpose                                          |
-|-----------------|--------------------------------------------------|
-| `GET /health`   | Health check — returns status and config flags   |
-| `POST /analyze-text` | Analyze pasted article text                |
-| `POST /analyze-url`  | Fetch URL, extract article text, analyze    |
-| `POST /check-bias`   | Unified route — routes to text or URL handler based on payload |
+### `POST /api/extension` — Extension bias analysis
+- Accepts `text` (plain), `url`, `headline` from extension popup
+- Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — applies to ALL requests including authenticated
+- Additional daily limit for authenticated users: 10/day via Supabase `daily_usage` table
+- Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
+- Returns `{ result: "<markdown>", saved: boolean }`
+- CORS: allows any `chrome-extension://` origin (lock to specific ID once published)
+- Source domain exclusion: same as `/api/analyze` — url is passed through to exclude the source outlet from suggestions
 
-**Request headers:**
-- `x-client: web` — required for URL mode; identifies web client vs extension
-- `x-request-id` — optional UUID for request tracing
+### `POST /api/extension-auth` — Extension login
+- Accepts `{ email, password }` → Supabase `signInWithPassword()`
+- Returns `{ accessToken, refreshToken, email, expiresAt }`
+- Sign up is website-only; this endpoint is login only
 
-**Rate limiting:** In-memory, per IP. Default: 5 requests per 60 seconds. Configurable via env vars.
-
-**Caching:** In-memory `Map` cache keyed by URL or first 500 chars of text. Cleared on server restart.
-
----
-
-## Frontend → Backend Communication (`src/lib/api.js`)
-
-The frontend resolves the backend base URL from `NEXT_PUBLIC_NEUTRALEYE_API_URL`.
-
-Key exports:
-- `analyzeText(text)` → `POST /analyze-text`
-- `analyzeUrl(url)` → `POST /analyze-url`
-- `analyzeInput({ text, url })` → `POST /check-bias` (preferred unified method)
-
-All responses are normalized through `normalizeResponse()` which handles legacy markdown format, JSON structured responses, and missing fields gracefully.
-
-**Error handling:** `ApiError` class carries `status`, `code`, `requestId`, `endpoint`, `details`.
+### `GET /api/usage` — Check daily usage (authenticated)
+### `POST /api/usage` — Increment daily usage (authenticated)
 
 ---
 
-## Environment Variables
+## Supabase
 
-### Frontend (`.env.local`)
-```
-NEXT_PUBLIC_NEUTRALEYE_API_URL=http://localhost:3001
-```
+**Tables:**
+- `analyses` — user analysis history (`id`, `user_id`, `created_at`, `input_type`, `url`, `title`, `direction`, `direction_label`, `confidence`, `score`, `summary`, `drivers`, `examples`, `sources`, `recommendations`, `request_meta`)
+- `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
 
-### Backend (`.env`)
+**Auth:** Email + password, Google OAuth. Sign up on website only; extension supports sign in only.
+
+**Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
+
+**RLS:** Enabled on both tables. Policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`). Migration SQL is at `supabase/migrations/20260601000000_rls_policies.sql`.
+
+**Client keys:** Publishable key only — no service role key. RLS must be correctly configured in Supabase dashboard.
+
+**Important:** The extension API route passes the Bearer token as a global `Authorization` header when creating the Supabase client, so `auth.uid()` resolves correctly for RLS. Do not call `makeSupabase()` without the token for authenticated writes.
+
+---
+
+## Pro Plan Gating
+
+Pro features are gated via `useProAccess` (`src/lib/supabase/useProAccess.js`). Currently `isPro` is hardcoded to `false` — no one has Pro access until Stripe is wired up.
+
+**Currently gated features:**
+- **Compare Analyses** (`/compare`) — shows a blur overlay with a Pro gate card and link to `/pricing`
+
+**When Stripe is ready:** Update `useProAccess.js` to check `user.app_metadata.plan === 'pro'`. No other files need changing.
+
+---
+
+## Environment Variables (`.env.local`)
+
 ```
-PORT=3001
-OPENAI_API_KEY=sk-...
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+
+OPENAI_WEBSITE_API_KEY=      # Used by /api/analyze (falls back to OPENAI_API_KEY)
+OPENAI_EXTENSION_API_KEY=    # Used by /api/extension (falls back to OPENAI_API_KEY)
+OPENAI_API_KEY=              # Fallback for both routes
+
 AI_ANALYSIS_ENABLED=true
 NEUTRALEYE_KILL_SWITCH=false
+
+# Web analyze rate limit
 RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX=5
-MIN_TEXT_LENGTH=200
-MIN_EXTRACTED_TEXT_LENGTH=300
-MAX_ANALYSIS_TEXT_LENGTH=100000
-MAX_EXTRACTED_TEXT_LENGTH=100000
+
+# Extension rate limit (falls back to web vars if not set)
+EXT_RATE_LIMIT_WINDOW_MS=60000
+EXT_RATE_LIMIT_MAX=5
 ```
 
-> **Note:** The OpenAI API key will be rotated / switched to a different provider in the future. Keep AI provider calls isolated and easy to swap.
+**Note:** Vercel env vars marked Sensitive cannot be pulled via `vercel env pull`. Add `OPENAI_WEBSITE_API_KEY` and `OPENAI_EXTENSION_API_KEY` to `.env.local` manually by creating new keys in the OpenAI dashboard, then updating both `.env.local` and Vercel.
 
 ---
 
 ## Dev Commands
 
-### Frontend
 ```bash
 npm run dev       # Start dev server (localhost:3000)
 npm run build     # Production build
@@ -187,66 +205,28 @@ npm run lint      # ESLint
 npm run test      # Jest tests
 ```
 
-### Backend
-```bash
-npm start         # node server.js (production)
-node server.js    # Direct run (development)
-```
-
-Backend auto-increments port if the configured port is already in use.
-
 ---
 
-## Git Workflow
+## Code Style & Conventions
 
-**Always create a new branch before making significant changes.**
-
-- Never commit directly to `main`
-- Branch naming: `feature/`, `fix/`, `chore/` prefixes
-- Claude Code should create a new branch at the start of any substantial task
-- Keep `main` as a clean, stable baseline at all times
-
----
-
-## Roadmap & Planned Features
-
-These are not yet built. Do not implement prematurely, but do not make architectural decisions that conflict with them.
-
-### Auth & User Data (Supabase)
-- User login/signup (email + OAuth)
-- Per-user analysis history stored in Supabase
-- Row-Level Security (RLS) policies — all DB queries must be written with RLS in mind
-- History page (`/history`) is a stub waiting for Supabase integration
-
-### Payments (Stripe)
-- Pro tier with premium features (specifics TBD)
-- Stripe integration on both frontend and backend
-
-### Infrastructure
-- Cloudflare for DDoS protection and CDN
-- Sentry for error monitoring and alerting
-
-### Prompt & Extraction Quality
-- Fine-tune the article extraction logic (`extractArticleTextFromUrl` in `server.js`) to strip:
-  - Ads and ad containers
-  - Reader comments sections
-  - Pull quotes that duplicate body text
-  - Navigation, footers, sidebar widgets
-  - Any non-article text that pollutes analysis
-- Fine-tune the OpenAI bias analysis prompt for cleaner, more consistent structured output
-
-### Design & Tooling
-- Claude's design MCP plugin for component generation
-- Explore 21st.dev for additional component inspiration
+- **JS vs TS:** App pages, API routes, and components use `.js`. shadcn/ui components use `.tsx`. Follow the pattern of the file you're editing.
+- **CSS:** CSS Modules (`.module.css`) for all non-ui components. Tailwind utility classes for `src/components/ui/` components.
+- **Component structure:** Each component lives in its own folder: `ComponentName/ComponentName.js` + `ComponentName.module.css`
+- **Imports:** Use `@/` alias for `src/` imports
+- **Logging:** Always use `logEvent(level, event, meta)` in API routes — never raw `console.log`
+- **No secrets in code:** All keys and URLs via environment variables only
+- **Prompt changes:** Both `/api/analyze` and `/api/extension` share the same prompt structure — keep them in sync when editing either. Both also share the source-domain exclusion logic.
 
 ---
 
 ## Design System
 
-- **Aesthetic:** Inspired by Variance.com — lively, animated, not sterile
-- **Components:** shadcn/ui + Radix UI primitives (in `src/components/ui/`)
+- **Aesthetic:** Warm, editorial, not sterile — warm browns (`#8b6741`), off-whites (`#f8f4ee`), serif display font
+- **Primary colour:** `#8b6741` (hover: `#6e4f2f`)
+- **Upgrade to Pro button:** Dark near-black (`rgba(22,20,18,0.88)`) — flips to white when header scrolls over a dark section (`data-header-theme='dark'`). Not brand brown.
+- **Components:** shadcn/ui + Radix UI primitives (`src/components/ui/`)
 - **Animations:** Framer Motion
-- **Fonts:** Geist Sans (body), Geist Mono (code/data)
+- **Fonts:** Geist Sans (body), Geist Mono (code/data), serif display via CSS variable
 - **Theming:** Dark/light mode via `next-themes` + `ThemeProvider`
 - **Consistency:** Visual style must match the NeutralEye browser extension
 
@@ -256,20 +236,19 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 ## Known Issues
 
-- **Zoom / responsive scaling bugs** — There are unresolved zoom and viewport scaling issues across pages. Do not introduce new layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
+- **Zoom / responsive scaling bugs** — Unresolved zoom and viewport scaling issues across pages. Do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
+- **Extension CORS** — Currently allows any `chrome-extension://` origin. Lock to specific extension ID once published to the Chrome Web Store.
 
 ---
 
-## Code Style & Conventions
+## Roadmap
 
-- **JS vs TS:** App pages and components use `.js`. shadcn/ui components use `.tsx`. Follow the pattern of the file you're editing.
-- **CSS:** CSS Modules (`.module.css`) for all non-ui components. Tailwind utility classes for `src/components/ui/` components.
-- **Component structure:** Each component lives in its own folder: `ComponentName/ComponentName.js` + `ComponentName.module.css`
-- **Imports:** Use `@/` alias for `src/` imports (configured in `tsconfig.json`)
-- **Logging (backend):** Always use `logEvent(level, event, meta)` — never raw `console.log`
-- **Errors (backend):** Always use `sendError(res, status, message, code, details)` — never `res.json({ error })` directly
-- **API responses:** All backend responses go through `normalizeAiResult()` and are returned as structured JSON — never raw markdown
-- **No secrets in code:** All keys and URLs via environment variables only
+- **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up
+- **Cloudflare** — DDoS protection and CDN
+- **Sentry** — Error monitoring and alerting
+- **Persistent rate limiting** — Replace in-memory rate limit store with Redis to survive cold starts
+- **Extension CORS lockdown** — Restrict to specific extension ID post-publish
+- **Domain** — `tryneutraleye.com` (not yet purchased); update Supabase Auth URL config and legal contact email once live
 
 ---
 
@@ -281,11 +260,4 @@ src/lib/__tests__/resolveApiBase.test.js
 src/app/analyze/__tests__/page.test.js
 ```
 
-Run with `npm run test`. Add tests for any new utility functions in `src/lib/`.
-
----
-
-## Playwright MCP
-
-The `.playwright-mcp/` directory contains session logs from browser automation testing.
-Do not delete it. Do not commit its contents (should be in `.gitignore`).
+Run with `npm run test`.

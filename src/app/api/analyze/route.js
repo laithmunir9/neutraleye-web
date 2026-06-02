@@ -211,8 +211,17 @@ Text:
   }
 }
 
-async function generateBiasAnalysis(text, requestId) {
+function extractDomain(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+async function generateBiasAnalysis(text, requestId, sourceUrl = null) {
   logEvent("info", "openai.call.start", { requestId, operation: "generateBiasAnalysis" });
+  const sourceDomain = sourceUrl ? extractDomain(sourceUrl) : null;
   const prompt = `You are an impartial, evidence-first media analyst. Analyze the article text below for bias.
 
 SCOPE & CONTEXT
@@ -235,7 +244,7 @@ ANALYSIS RULES
 SUGGESTED_SOURCES RULES
 - Only include specific article URLs you are reasonably confident exist and that directly cover the SAME main topic.
 - Do NOT provide homepage links or general topic pages.
-- If you cannot verify relevant specific articles, use an empty array for suggested_sources.
+- If you cannot verify relevant specific articles, use an empty array for suggested_sources.${sourceDomain ? `\n- Do NOT suggest ${sourceDomain} as a source — the article being analyzed is already from that outlet.` : ""}
 
 OUTPUT
 Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outside the JSON.
@@ -482,7 +491,7 @@ function parseAiResponse(aiResponse) {
 
 // ── Analysis pipeline ──────────────────────────────────────────────────────
 
-async function runAnalysisPipeline(text, requestId) {
+async function runAnalysisPipeline(text, requestId, sourceUrl = null) {
   const verdict = await detectIfArticle(text, requestId);
   if (verdict !== "article") {
     const error = new Error("Submitted content does not look like a readable article.");
@@ -490,7 +499,7 @@ async function runAnalysisPipeline(text, requestId) {
     error.code = "ARTICLE_VALIDATION_FAILED";
     throw error;
   }
-  const aiResponse = await generateBiasAnalysis(text, requestId);
+  const aiResponse = await generateBiasAnalysis(text, requestId, sourceUrl);
   const parsed = parseAiResponse(aiResponse);
   const normalized = normalizeAiResult(parsed);
   return {
@@ -612,7 +621,7 @@ export async function POST(request) {
         return errResponse(422, "Could not extract enough readable article text from that URL.", "URL_EXTRACTION_TOO_SHORT");
       }
 
-      const result = await runAnalysisPipeline(extracted, requestId);
+      const result = await runAnalysisPipeline(extracted, requestId, url);
       inMemoryCache.set(key, result);
       return Response.json(result);
     }

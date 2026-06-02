@@ -119,10 +119,173 @@
   color: var(--text);
 }
 
+/* Pro gate */
+
+.gateWrapper {
+  position: relative;
+  display: grid;
+  gap: clamp(1.4rem, 2.2vw, var(--space-5));
+}
+
+.gateGhost {
+  display: grid;
+  gap: clamp(1.4rem, 2.2vw, var(--space-5));
+  filter: blur(4px);
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ghostCard {
+  background: var(--surface-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  min-height: 7rem;
+}
+
+.ghostRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.ghostSelect {
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: rgba(139, 103, 65, 0.1);
+  border: 1px solid var(--border);
+}
+
+.ghostOverview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ghostBlock {
+  height: 4rem;
+  border-radius: var(--radius-md);
+  background: rgba(139, 103, 65, 0.07);
+  border: 1px solid var(--border);
+}
+
+.ghostGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.ghostGrid .ghostCard {
+  min-height: 10rem;
+}
+
+.gateOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 1rem;
+}
+
+.gateCard {
+  background: var(--surface-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(32, 27, 22, 0.1), 0 2px 8px rgba(32, 27, 22, 0.06);
+  padding: 2.5rem 2rem;
+  max-width: 21rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: center;
+}
+
+.gateIconWrap {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: rgba(139, 103, 65, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-strong);
+  margin-bottom: 0.15rem;
+}
+
+.gateBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.gateTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0.2rem 0 0;
+  letter-spacing: -0.015em;
+}
+
+.gateDesc {
+  font-size: 0.875rem;
+  color: var(--secondary-text);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.gateBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.gateBtn:hover {
+  opacity: 0.88;
+}
+
+.gateSecondary {
+  font-size: 0.83rem;
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.gateSecondary:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 920px) {
   .controls,
   .grid,
-  .overview {
+  .overview,
+  .ghostRow,
+  .ghostOverview,
+  .ghostGrid {
     grid-template-columns: 1fr;
   }
 }

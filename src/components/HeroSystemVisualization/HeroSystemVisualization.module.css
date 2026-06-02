@@ -86,11 +86,16 @@
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0;
+  paint-order: stroke fill;
+  stroke: #f8f4ee;
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
 
 .nodeLabelAccent {
   fill: rgba(139, 103, 65, 0.88);
   font-weight: 700;
+  stroke: #f8f4ee;
 }
 
 /* Scene dots */

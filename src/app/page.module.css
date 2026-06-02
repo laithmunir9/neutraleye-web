@@ -88,6 +88,22 @@
   gap: 0.8rem;
 }
 
+.heroBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: 0.74rem 1.4rem;
+  border-radius: var(--radius-md);
+  background: #8b6741;
+  color: #f8f4ee;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 150ms ease;
+}
+
+.heroBtn:hover { background: #6e4f2f; }
+
 .primaryAction,
 .secondaryAction,
 .inlineLink {

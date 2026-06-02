@@ -508,11 +508,13 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
-                  {hasAnalysis && isNoBiasResult(result)
-                    ? "No specific comparison sources were required to clarify a strong directional pattern. A second source may still be useful for high-stakes topics."
-                    : "Suggested sources will appear here when the analysis has comparison ideas."}
-                </p>
+                <ul className={styles.simpleList}>
+                  <li className={styles.placeholderText}>
+                    {hasAnalysis && isNoBiasResult(result)
+                      ? "No specific comparison sources were required to clarify a strong directional pattern. A second source may still be useful for high-stakes topics."
+                      : "Suggested sources will appear here when the analysis has comparison ideas."}
+                  </li>
+                </ul>
               )}
             </section>
 

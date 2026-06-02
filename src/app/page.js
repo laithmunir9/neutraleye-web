@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { MagicCard } from "@/components/ui/magic-card";
 import styles from "./page.module.css";
 
@@ -79,16 +78,8 @@ export default function Home() {
               </motion.p>
             </div>
             <motion.div className={styles.actions} variants={heroItem}>
-              <Link href="/analyze">
-                <ShimmerButton
-                  background="#8b6741"
-                  shimmerColor="rgba(255, 244, 230, 0.65)"
-                  borderRadius="8px"
-                  shimmerDuration="2.5s"
-                  className="text-[0.9rem] font-medium px-[1.1rem] py-[0.74rem] min-h-[2.75rem]"
-                >
-                  Open Analyzer
-                </ShimmerButton>
+              <Link href="/analyze" className={styles.heroBtn}>
+                Open Analyzer
               </Link>
             </motion.div>
           </motion.div>

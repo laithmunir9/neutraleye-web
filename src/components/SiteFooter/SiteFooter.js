@@ -9,6 +9,10 @@ const FOOTER_PRODUCT_LINKS = [
   { href: "/methodology", label: "Methodology" }
 ];
 
+const FOOTER_PLANS_LINKS = [
+  { href: "/pricing", label: "Pricing" },
+];
+
 const FOOTER_LEGAL_LINKS = [
   { href: "/privacy", label: "Website Privacy" },
   { href: "/extension-privacy", label: "Extension Privacy" },
@@ -46,7 +50,16 @@ export default function SiteFooter({ compact = false }) {
           </nav>
         </div>
 
-        <div className={`${styles.footerSection} ${styles.footerLegal}`}>
+        <div className={styles.footerSection}>
+          <p className={styles.footerHeading}>Plans</p>
+          <nav className={styles.footerProductLinks} aria-label="Footer plans">
+            {FOOTER_PLANS_LINKS.map((link) => (
+              <FooterLink key={link.label} {...link} />
+            ))}
+          </nav>
+        </div>
+
+        <div className={styles.footerSection}>
           <p className={styles.footerHeading}>Legal</p>
           <nav className={styles.footerLegalLinks} aria-label="Footer legal">
             {FOOTER_LEGAL_LINKS.map((link) => (
