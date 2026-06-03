@@ -23,9 +23,10 @@
   margin: 0;
   color: var(--text);
   font-family: var(--font-display);
-  font-size: clamp(3.2rem, 7vw, 5.6rem);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
   letter-spacing: 0;
-  line-height: 0.94;
+  line-height: 1.05;
+  white-space: nowrap;
 }
 
 .hero p,
@@ -109,7 +110,8 @@
   }
 
   .hero h1 {
-    font-size: clamp(2.85rem, 14vw, 3.5rem);
-    line-height: 0.98;
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
+    line-height: 1.05;
+    white-space: normal;
   }
 }
