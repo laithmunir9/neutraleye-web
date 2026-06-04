@@ -9,8 +9,7 @@ import styles from "./page.module.css";
 const KEY = "neutraleye.settings.v1";
 
 const DEFAULTS = {
-  reduceMotion: false,
-  showDiagnostics: true
+  reduceMotion: false
 };
 
 function readSettings() {
@@ -47,18 +46,7 @@ export default function SettingsPage() {
             <div className={styles.group}>
               <label className={styles.row}>
                 <span>
-                  <strong>Show request diagnostics</strong>
-                  <small>Show request ids, status codes, and endpoint details on the Analyze page.</small>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={settings.showDiagnostics}
-                  onChange={(event) => updateSetting("showDiagnostics", event.target.checked)}
-                />
-              </label>
-              <label className={styles.row}>
-                <span>
-                  <strong>Reduce loading motion</strong>
+                  <strong>Reduce motion</strong>
                   <small>Use a calmer loading experience while NeutralEye reads and analyzes an article.</small>
                 </span>
                 <input
@@ -70,10 +58,9 @@ export default function SettingsPage() {
             </div>
             <p className={styles.text}>{savedAt ? `Saved at ${savedAt}` : "Changes are saved automatically."}</p>
           </ResultCard>
-          <ResultCard title="Workspace notes">
+          <ResultCard title="About settings">
             <div className={styles.noteBlock}>
-              <p>These preferences apply only to this browser and only to the website workspace.</p>
-              <p>Diagnostics are helpful when checking extraction failures, rate limits, or backend availability.</p>
+              <p>These preferences apply only to this browser. They are not synced to your account.</p>
             </div>
           </ResultCard>
         </section>

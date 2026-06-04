@@ -9,16 +9,16 @@ const heroRailY = [193, 238, 282, 327];
 
 const principleCards = [
   {
-    title: "Readable signals",
-    body: "Tone, framing, sourcing, and omission stay visible as named patterns instead of collapsing into one opaque score."
+    title: "One pipeline",
+    body: "Article intake, content extraction, signal review, and evidence packaging run as a single sequence — not independent steps stitched together after the fact."
   },
   {
-    title: "Attached evidence",
-    body: "Outputs point back to quoted language, attribution choices, and source balance so the result can be inspected."
+    title: "Structured output",
+    body: "Every result is assembled in the same schema: direction, confidence, summary, examples, sources, and recommendations — making results comparable across runs."
   },
   {
-    title: "Separate confidence",
-    body: "Analysis confidence describes signal consistency, not whether the article itself is true."
+    title: "No black box",
+    body: "The system returns what it found and where it found it. Quoted language and sourcing patterns are included so the output can be checked against the original text."
   }
 ];
 
@@ -248,9 +248,9 @@ export default function SystemPage() {
               ))}
             </svg>
             <div className={styles.heroCopy}>
-              <h1>NeutralEye AI analysis</h1>
+              <h1>How NeutralEye works</h1>
               <p className={styles.lead}>
-                Signals stay named, evidence stays attached, and readers keep control of the result.
+                Article text goes in. A structured bias analysis — direction, evidence, confidence, and next reads — comes out.
               </p>
               <div className={styles.heroActions}>
                 <a className={styles.heroButton} href="/analyze">
@@ -292,8 +292,8 @@ export default function SystemPage() {
         <ScrollReveal>
           <section className={styles.section}>
             <div className={styles.sectionIntro}>
-              <h2>Where it helps</h2>
-              <p>Built for readers who want clearer judgment, slower interpretation, and better comparison habits.</p>
+              <h2>Where it fits</h2>
+              <p>NeutralEye slots into reading workflows where a fast, structured second opinion helps before sharing, citing, or reacting.</p>
             </div>
 
             <div className={styles.useCaseGrid}>
@@ -309,7 +309,7 @@ export default function SystemPage() {
 
         <ScrollReveal>
           <section className={styles.cta}>
-            <AnalyzerCta />
+            <AnalyzerCta heading="Put the pipeline to work" label="Open Analyzer" />
           </section>
         </ScrollReveal>
       </main>

@@ -78,7 +78,7 @@
   justify-content: center;
   min-height: 2.1rem;
   max-width: 12.75rem;
-  border: 1px solid rgba(93, 75, 53, 0.12);
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: rgba(255, 252, 247, 0.68);
   color: var(--secondary-text);
@@ -117,7 +117,7 @@
   display: flex;
   gap: 0.35rem;
   padding: 0.24rem;
-  border: 1px solid rgba(93, 75, 53, 0.11);
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: rgba(239, 231, 220, 0.72);
 }
@@ -178,7 +178,7 @@
 
 .textarea:hover,
 .input:hover {
-  border-color: rgba(93, 75, 53, 0.2);
+  border-color: var(--border-strong);
   background: rgba(255, 252, 247, 0.76);
 }
 
@@ -239,7 +239,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 1.8rem;
-  border: 1px solid rgba(93, 75, 53, 0.1);
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: rgba(255, 252, 247, 0.56);
   padding: 0.38rem 0.6rem;

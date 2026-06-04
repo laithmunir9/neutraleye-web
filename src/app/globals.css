@@ -33,6 +33,11 @@
   --warning-bg: #f4ecd6;
   --error-bg: #f7e5e2;
   --error-text: #8a443c;
+  --error-border: rgba(138, 67, 60, 0.24);
+  --status-ok: #8acb9d;
+  --status-ok-glow: rgba(138, 203, 157, 0.18);
+  --status-ok-bg: rgba(138, 203, 157, 0.15);
+  --status-ok-text: #2d6a4f;
   --background: #f7f4ef;
   --foreground: #201b16;
   --card: #fffcf7;

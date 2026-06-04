@@ -96,17 +96,17 @@
   font-size: 0.9rem;
   font-weight: 600;
   font-family: var(--font-sans);
-  color: var(--primary-foreground);
-  background: var(--primary);
+  color: #f8f4ee;
+  background: #8b6741;
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: background 150ms ease;
   margin-top: 0.15rem;
 }
 
 .submitBtn:hover:not(:disabled) {
-  opacity: 0.88;
+  background: #6e4f2f;
 }
 
 .submitBtn:disabled {

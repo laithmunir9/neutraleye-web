@@ -5,8 +5,8 @@ import styles from "./page.module.css";
 
 const methodologyCards = [
   {
-    title: "Signals stay visible",
-    body: "Tone, framing, sourcing, and omission are reviewed as named writing patterns rather than collapsed into one opaque score.",
+    title: "Signals are named",
+    body: "Tone, framing, sourcing, and omission are reviewed as distinct writing patterns — not merged into a single opaque score you have to take on faith.",
     points: [
       "Tone checks for emotional loading and overstated certainty.",
       "Framing checks what the article centers, backgrounds, or repeatedly emphasizes.",
@@ -14,19 +14,19 @@ const methodologyCards = [
     ]
   },
   {
-    title: "Evidence stays attached",
-    body: "Outputs point back to quoted language, source balance, and narrative choices so the result can be inspected rather than simply accepted.",
+    title: "Evidence travels with the result",
+    body: "Every output includes the quoted language, source balance, and narrative choices that shaped it — so you can inspect the reasoning, not just accept the conclusion.",
     points: [
-      "Quoted examples remain part of the explanation.",
+      "Quoted examples are included in the explanation.",
       "Attribution clarity and source mix are reviewed together.",
-      "Recommended next reads are used to add context, not close the inquiry."
+      "Recommended next reads add context rather than close the inquiry."
     ]
   },
   {
-    title: "Confidence stays separate",
-    body: "Analysis confidence reflects how consistently the same signals repeat across the text, not whether the article is factually true.",
+    title: "Confidence is kept separate",
+    body: "The confidence score reflects how consistently signals repeat across the text — not a claim about whether the article is factually true.",
     points: [
-      "High confidence usually means the same signal pattern repeats.",
+      "High confidence usually means the same signal pattern repeats across the piece.",
       "Low confidence can mean the writing is mixed, short, or ambiguous.",
       "Confidence does not certify that a viewpoint is true or false."
     ]
@@ -85,8 +85,8 @@ export default function MethodologyPage() {
         <section className={styles.hero}>
           <h1>Methodology</h1>
           <p className={styles.lead}>
-            How NeutralEye reads an article through tone, framing, sourcing, and omission while keeping the result
-            inspectable, structured, and restrained.
+            How to read a NeutralEye result — what the signals mean, how to use the evidence, and where the analysis
+            has limits worth keeping in mind.
           </p>
         </section>
 
@@ -111,6 +111,7 @@ export default function MethodologyPage() {
         <ScrollReveal>
           <section className={styles.section}>
             <div className={styles.sectionIntro}>
+              <p className={styles.eyebrow}>Reading the result</p>
               <h2>Judgment comes first</h2>
               <p>
                 NeutralEye works best when the result is read as an analytical aid: summary first, evidence second, and
@@ -149,6 +150,7 @@ export default function MethodologyPage() {
         <ScrollReveal>
           <section className={styles.section}>
             <div className={styles.sectionIntro}>
+              <p className={styles.eyebrow}>Output design</p>
               <h2>Results stay readable</h2>
               <p>
                 The output is designed to make readers inspect the article more carefully, not to turn the analysis into a
@@ -169,7 +171,7 @@ export default function MethodologyPage() {
 
         <ScrollReveal>
           <section className={styles.ctaSection}>
-            <AnalyzerCta />
+            <AnalyzerCta heading="Try it on a real article" label="Open Analyzer" />
           </section>
         </ScrollReveal>
       </main>

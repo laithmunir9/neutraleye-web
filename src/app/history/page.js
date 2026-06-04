@@ -76,17 +76,17 @@ export default function HistoryPage() {
     }
   }
 
-  const storageLabel = user ? "Supabase" : "Browser-local";
+  const storageLabel = user ? "Cloud" : "This device";
   const storageSupport = user
-    ? "History is synced to your account and available across devices."
-    : "Saved history stays on this device unless you remove it.";
+    ? "History is synced to your account and available on any device."
+    : "History is saved in this browser only. Sign in to sync across devices.";
 
   return (
     <AppShell>
       <div className={styles.root}>
         <HeaderBar
           title="Analysis History"
-          subtitle="Review past article checks, revisit the output, and compare how different stories were framed."
+          subtitle="Review past article checks and revisit the full output for any saved analysis."
         />
         <section className={styles.stats}>
             <ResultCard title="Saved runs">
@@ -99,7 +99,7 @@ export default function HistoryPage() {
               </p>
               <p className={styles.support}>Most recent time an article was reviewed in this workspace.</p>
             </ResultCard>
-            <ResultCard title="Storage model">
+            <ResultCard title="Sync status">
               <p className={styles.metricSmall}>{storageLabel}</p>
               <p className={styles.support}>{storageSupport}</p>
             </ResultCard>

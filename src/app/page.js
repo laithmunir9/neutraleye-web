@@ -11,10 +11,10 @@ import styles from "./page.module.css";
 const EASE = [0.22, 1, 0.36, 1];
 
 const trustMarkers = [
-  { label: "Method visible", detail: "Signals stay named instead of collapsing into one opaque score." },
-  { label: "Evidence attached", detail: "Quoted language, sourcing patterns, and framing choices stay visible in the output." },
-  { label: "Confidence separated", detail: "Confidence describes signal consistency, not whether the article itself is true." },
-  { label: "Reader controlled", detail: "Readers can inspect the result, compare context, and decide what to read next." },
+  { label: "Method visible", detail: "Each signal is labeled individually — tone, framing, sourcing, omission — not collapsed into one opaque score." },
+  { label: "Evidence included", detail: "Quoted language, sourcing patterns, and framing choices are included in the output so the result can be checked." },
+  { label: "Confidence separated", detail: "Confidence describes how consistently signals repeat, not whether the article itself is true." },
+  { label: "Reader in control", detail: "Inspect the result, compare context, and decide what to read next — the analysis is a prompt, not a verdict." },
 ];
 
 const SIGNALS = ["Tone", "Framing", "Attribution", "Sources", "Omission"];
@@ -70,7 +70,10 @@ export default function Home() {
             animate="show"
           >
             <div className={styles.copy}>
-              <motion.p className={styles.eyebrow} variants={heroItem}>Overview</motion.p>
+              <motion.p className={styles.eyebrow} variants={heroItem}>
+              <span className={styles.eyebrowDot} aria-hidden="true" />
+              Media bias analysis
+            </motion.p>
               <motion.h1 variants={heroItem}>See how an article moves the reader</motion.h1>
               <motion.p className={styles.lead} variants={heroItem}>
                 NeutralEye reads tone, framing, sourcing, and omission, then returns quoted evidence and context for

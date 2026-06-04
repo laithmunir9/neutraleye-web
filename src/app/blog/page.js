@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
@@ -16,23 +17,27 @@ export default function BlogPage() {
           </p>
         </header>
 
-        <ScrollReveal>
-          <section className={styles.grid}>
-            {BLOG_POSTS.map((post, index) => (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
+        <section className={styles.grid}>
+          {[...BLOG_POSTS].sort((a, b) => new Date(b.date) - new Date(a.date)).map((post, index) => (
+            <ScrollReveal key={post.slug} delay={index * 0.08}>
+              <Link href={`/blog/${post.slug}`} className={styles.card}>
                 <div className={`${styles.media} ${styles[`media${(index % 4) + 1}`]}`} aria-hidden>
-                  <span>NeutralEye</span>
+                  {post.showBrandTitle && (
+                    <span className={styles.mediaBrand}>
+                      <Image src="/neutraleye-logo.png" alt="" width={28} height={28} className={styles.mediaBrandLogo} />
+                      <span className={styles.mediaTitle}>NeutralEye</span>
+                    </span>
+                  )}
                 </div>
                 <div className={styles.metaRow}>
-                  <span>{post.category}</span>
-                  <span>{post.date}</span>
+                  <span className={styles.metaCategory}>{post.category}</span>
+                  <span className={styles.metaDate}>{post.date}</span>
                 </div>
                 <h2>{post.title}</h2>
-                <p>{post.excerpt}</p>
               </Link>
-            ))}
-          </section>
-        </ScrollReveal>
+            </ScrollReveal>
+          ))}
+        </section>
       </main>
     </MarketingShell>
   );

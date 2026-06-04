@@ -5,8 +5,8 @@ import styles from "./SiteFooter.module.css";
 const FOOTER_PRODUCT_LINKS = [
   { href: "/analyze", label: "Analyze" },
   { href: "/system", label: "System" },
+  { href: "/methodology", label: "Methodology" },
   { href: "/blog", label: "Blog" },
-  { href: "/methodology", label: "Methodology" }
 ];
 
 const FOOTER_PLANS_LINKS = [
