@@ -56,7 +56,7 @@ function resultTitle(result, hasAnalysis) {
 }
 
 function resultHelperText(result, hasAnalysis) {
-  if (!hasAnalysis) return "Run an analysis to see tone, framing, and omissions.";
+  if (!hasAnalysis) return "Run an analysis to see tone, framing, and omission.";
   if (isNoBiasResult(result)) return "Please feel free to continue reading.";
   return "Overall finding based on the article's tone, framing, sourcing, and attribution.";
 }
@@ -392,7 +392,7 @@ function AnalyzePageContent() {
       <div className={styles.root}>
         <HeaderBar
           title="Analyze an Article"
-          subtitle="Paste article text or a URL to check how tone, framing, and omission may be influencing the reader."
+          subtitle="Paste article text or a URL. NeutralEye checks tone, framing, and omission and returns what it finds."
         />
 
         {limitReady && limited && (

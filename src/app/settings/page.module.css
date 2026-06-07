@@ -46,22 +46,63 @@
   line-height: 1.5;
 }
 
-.row input {
-  width: 18px;
-  height: 18px;
+/* Toggle switch */
+.toggleLabel {
+  display: inline-flex;
+  flex-shrink: 0;
+  cursor: pointer;
   margin-top: 2px;
-  accent-color: var(--accent-strong);
 }
 
-.noteBlock {
-  display: grid;
-  gap: 14px;
+.toggleInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
-.noteBlock p {
+.toggleTrack {
+  display: flex;
+  align-items: center;
+  width: 2.6rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: rgba(93, 75, 53, 0.2);
+  padding: 0.18rem;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.toggleInput:checked ~ .toggleTrack {
+  background: #8b6741;
+  box-shadow: 0 0 0 1px rgba(139, 103, 65, 0.28);
+}
+
+.toggleInput:focus-visible ~ .toggleTrack {
+  outline: 2px solid rgba(139, 103, 65, 0.5);
+  outline-offset: 2px;
+}
+
+.toggleThumb {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  transition: transform 180ms ease;
+}
+
+.toggleInput:checked ~ .toggleTrack .toggleThumb {
+  transform: translateX(1.2rem);
+}
+
+.settingsNote {
   margin: 0;
-  color: var(--secondary-text);
-  line-height: 1.7;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 @media (max-width: 920px) {

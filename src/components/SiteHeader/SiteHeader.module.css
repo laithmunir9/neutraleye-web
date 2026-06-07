@@ -102,8 +102,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1rem;
-  border-radius: var(--radius-md);
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
   background: rgba(22, 20, 18, 0.88);
   color: #f8f4ee;
   font-size: 0.88rem;
@@ -176,6 +176,134 @@
   display: block;
 }
 
+/* ── Nav group dropdowns ── */
+.navGroup {
+  position: relative;
+}
+
+.navGroupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(32, 27, 22, 0.56);
+  font-size: 0.9rem;
+  font-weight: 430;
+  font-family: inherit;
+  line-height: 1;
+  transition: color 160ms ease, font-weight 160ms ease;
+}
+
+.navGroupBtn:hover,
+.navGroup:hover .navGroupBtn,
+.navGroup:focus-within .navGroupBtn {
+  color: var(--text);
+  font-weight: 540;
+}
+
+.navChevron {
+  opacity: 0.5;
+  transition: transform 200ms ease, opacity 200ms ease;
+  margin-top: 1px;
+}
+
+.navGroup:hover .navChevron,
+.navGroup:focus-within .navChevron {
+  transform: rotate(180deg);
+  opacity: 0.8;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  z-index: 50;
+  /* padding-top bridges the gap so hover stays active as cursor moves down */
+  padding-top: 0.75rem;
+}
+
+.navGroup:hover .dropdown,
+.navGroup:focus-within .dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdownInner {
+  min-width: 15rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(93, 75, 53, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(253, 250, 245, 0.98);
+  box-shadow:
+    0 0 0 1px rgba(93, 75, 53, 0.05),
+    0 4px 6px rgba(32, 26, 17, 0.04),
+    0 12px 32px rgba(32, 26, 17, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.55rem;
+  text-decoration: none;
+  transition: background 140ms ease;
+}
+
+.dropdownItem:hover {
+  background: rgba(139, 103, 65, 0.07);
+}
+
+.dropdownIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.45rem;
+  background: rgba(139, 103, 65, 0.08);
+  color: #8b6741;
+  flex-shrink: 0;
+}
+
+.dropdownText {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.dropdownLabel {
+  color: rgba(32, 27, 22, 0.9);
+  font-size: 0.855rem;
+  font-weight: 550;
+  line-height: 1.2;
+}
+
+.dropdownDesc {
+  color: rgba(32, 27, 22, 0.45);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+/* dark mode for nav group button */
+.dark .navGroupBtn {
+  color: rgba(236, 230, 221, 0.62);
+}
+
+.dark .navGroup:hover .navGroupBtn,
+.dark .navGroup:focus-within .navGroupBtn {
+  color: rgba(255, 252, 247, 0.96);
+}
+
+/* Radix account dropdown — renamed to avoid clash */
 .dropdownContent {
   background: var(--surface-strong);
   border: 1px solid var(--border-strong);
@@ -192,7 +320,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.dropdownItem {
+.dropdownMenuItem {
   display: block;
   padding: 0.55rem 0.8rem;
   border-radius: var(--radius-sm);
@@ -203,8 +331,8 @@
   user-select: none;
 }
 
-.dropdownItem:hover,
-.dropdownItem:focus {
+.dropdownMenuItem:hover,
+.dropdownMenuItem:focus {
   background: var(--panel);
 }
 
@@ -214,7 +342,7 @@
   margin: 0.3rem 0;
 }
 
-.dropdownItemInner {
+.dropdownMenuItemInner {
   display: flex;
   align-items: center;
   gap: 0.55rem;

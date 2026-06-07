@@ -3,140 +3,174 @@ import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "./page.module.css";
 
-const methodologyCards = [
+const directionItems = [
   {
-    title: "Signals stay visible",
-    body: "Tone, framing, sourcing, and omission are reviewed as named writing patterns rather than collapsed into one opaque score.",
-    points: [
-      "Tone checks for emotional loading and overstated certainty.",
-      "Framing checks what the article centers, backgrounds, or repeatedly emphasizes.",
-      "Omission checks whether missing context could materially change the read."
-    ]
+    label: "Left-leaning",
+    body: "Signals — tone, framing, sourcing, and omission — consistently pointed in a direction associated with left-of-center interpretation. This describes the pattern found in the text, not a judgment about the subject matter.",
   },
   {
-    title: "Evidence stays attached",
-    body: "Outputs point back to quoted language, source balance, and narrative choices so the result can be inspected rather than simply accepted.",
-    points: [
-      "Quoted examples remain part of the explanation.",
-      "Attribution clarity and source mix are reviewed together.",
-      "Recommended next reads are used to add context, not close the inquiry."
-    ]
+    label: "Center",
+    body: "Signals were balanced, contradictory, or too sparse for a clear directional pattern. A center result does not certify fairness — it means the analysis did not detect a dominant lean.",
   },
   {
-    title: "Confidence stays separate",
-    body: "Analysis confidence reflects how consistently the same signals repeat across the text, not whether the article is factually true.",
-    points: [
-      "High confidence usually means the same signal pattern repeats.",
-      "Low confidence can mean the writing is mixed, short, or ambiguous.",
-      "Confidence does not certify that a viewpoint is true or false."
-    ]
-  }
+    label: "Right-leaning",
+    body: "Signals consistently pointed in a direction associated with right-of-center interpretation. Same rules apply: the label describes what was found in this specific text, not the outlet or author overall.",
+  },
 ];
 
-const resultReadingCards = [
+const confidenceItems = [
+  {
+    label: "High confidence",
+    body: "The same signal pattern repeated consistently across most of the article — tone, framing, and sourcing all pointed the same way. A well-written opinion column can score high confidence because its structure is deliberately consistent.",
+  },
+  {
+    label: "Low confidence",
+    body: "Signals were mixed, thin, or contradictory. This can mean the article is genuinely balanced — but it can also mean the text was too short, the writing was inconsistent, or the story was still developing when it was filed.",
+  },
+];
+
+const readingSteps = [
   {
     title: "Start with the summary",
-    body: "Read the top-level explanation first, then use the supporting sections to see what language and sourcing patterns shaped the result."
+    body: "Read the top-level explanation first, then use the supporting sections to see what language and sourcing patterns shaped the result.",
   },
   {
     title: "Use examples as evidence",
-    body: "Examples of bias are meant to show the exact phrases or structures that triggered concern, not to act as isolated proof by themselves."
+    body: "Quoted examples show the exact phrases or structures that triggered concern — not isolated proof by themselves. Check them against the article.",
   },
   {
-    title: "Treat recommendations as context prompts",
-    body: "When the system suggests more reading, it is pointing to missing comparison context rather than claiming the question is settled."
-  }
+    title: "Treat recommendations as prompts",
+    body: "When the system suggests more reading, it's flagging a gap in context — not declaring the question settled.",
+  },
 ];
 
-const auditRows = [
+const limitationRows = [
   {
-    title: "Messy Input",
-    detail: "Very short passages, failed extraction, navigation text, or blocked pages can weaken the read."
+    title: "Messy input",
+    detail: "Very short passages, failed extraction, navigation text, or blocked pages can weaken the read significantly.",
   },
   {
-    title: "Rhetorical Edge Cases",
-    detail: "Satire, irony, or unusual style can resemble bias signals even when the intent is different."
+    title: "Rhetorical edge cases",
+    detail: "Satire, irony, or unusual writing style can resemble bias signals even when the intent is clearly different.",
   },
   {
-    title: "Scope of the Result",
-    detail: "The result reflects patterns in the submitted text, not a universal judgment on the outlet, author, or topic."
+    title: "Scope of the result",
+    detail: "The result reflects patterns in this submitted text — not a universal judgment on the outlet, author, or topic.",
   },
   {
-    title: "Reader Judgment",
-    detail: "NeutralEye works best when it helps a reader slow down, inspect the evidence, and compare context before concluding."
-  }
-];
-
-const outputCards = [
-  {
-    title: "Examples of bias",
-    body: "Quoted language and framing examples are surfaced so readers can inspect the rationale behind the result."
+    title: "Reader judgment",
+    detail: "The analysis is one data point. It works best as a prompt to slow down and inspect — not as a substitute for forming your own view.",
   },
-  {
-    title: "Suggested sources",
-    body: "Comparison ideas and next-reading prompts help the reader widen context when the article feels one-sided or incomplete."
-  }
 ];
 
 export default function MethodologyPage() {
   return (
     <MarketingShell>
       <main className={styles.page}>
+
+        {/* ── Hero ── */}
         <section className={styles.hero}>
-          <h1>Methodology</h1>
+          <h1>How to read the analysis</h1>
           <p className={styles.lead}>
-            How NeutralEye reads an article through tone, framing, sourcing, and omission while keeping the result
-            inspectable, structured, and restrained.
+            A guide to interpreting what NeutralEye found — what the direction label means, how to
+            weigh the confidence score, and where the analysis has limits worth keeping in mind.
           </p>
         </section>
 
+        {/* ── Direction ── */}
         <ScrollReveal>
           <section className={`${styles.section} ${styles.firstSection}`}>
-            <div className={styles.cardRow}>
-              {methodologyCards.map((card) => (
-                <article key={card.title} className={styles.featureCard}>
-                  <h3>{card.title}</h3>
-                  <p>{card.body}</p>
-                  <ul>
-                    {card.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
-        </ScrollReveal>
-
-        <ScrollReveal>
-          <section className={styles.section}>
             <div className={styles.sectionIntro}>
-              <h2>Judgment comes first</h2>
+              <p className={styles.eyebrow}>Direction label</p>
+              <h2>What the label means</h2>
               <p>
-                NeutralEye works best when the result is read as an analytical aid: summary first, evidence second, and
-                wider context whenever the story feels incomplete.
+                The direction label describes the dominant pattern of signals found in the text — not
+                a political verdict on the subject, outlet, or author. The same outlet can receive
+                different labels across different articles.
               </p>
             </div>
 
+            <div className={styles.spectrumWrap}>
+              <div className={styles.spectrumTrack}>
+                <div className={styles.spectrumFill} />
+                <span className={styles.spectrumMark} style={{ left: "0%" }} />
+                <span className={styles.spectrumMark} style={{ left: "50%" }} />
+                <span className={styles.spectrumMark} style={{ left: "100%" }} />
+              </div>
+              <div className={styles.spectrumLabels}>
+                <span>Left-leaning</span>
+                <span>Center</span>
+                <span>Right-leaning</span>
+              </div>
+            </div>
+
             <div className={styles.cardRow}>
-              {resultReadingCards.map((card) => (
-                <article key={card.title} className={styles.readingCard}>
-                  <h3>{card.title}</h3>
-                  <p>{card.body}</p>
+              {directionItems.map((item) => (
+                <article key={item.label} className={styles.defCard}>
+                  <h3>{item.label}</h3>
+                  <p>{item.body}</p>
                 </article>
               ))}
             </div>
           </section>
         </ScrollReveal>
 
+        {/* ── Confidence ── */}
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.sectionIntro}>
+              <p className={styles.eyebrow}>Confidence score</p>
+              <h2>Signal consistency, not truth</h2>
+              <p>
+                Confidence measures how clearly and consistently bias signals appeared across the
+                submitted text — not whether the article is factually accurate or the journalist
+                intended to mislead.
+              </p>
+            </div>
+            <div className={styles.twoCol}>
+              {confidenceItems.map((item) => (
+                <article key={item.label} className={styles.defCard}>
+                  <h3>{item.label}</h3>
+                  <p>{item.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* ── Reading the result ── */}
+        <ScrollReveal>
+          <section className={styles.section}>
+            <div className={styles.sectionIntro}>
+              <p className={styles.eyebrow}>How to use it</p>
+              <h2>Judgment comes first</h2>
+              <p>
+                NeutralEye works best when the result is read as an analytical aid — summary first,
+                evidence second, wider context whenever the story feels incomplete.
+              </p>
+            </div>
+            <div className={styles.stepsCol}>
+              {readingSteps.map((step, i) => (
+                <article key={step.title} className={styles.stepRow}>
+                  <span className={styles.stepIndex}>{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* ── Limitations ── */}
         <ScrollReveal>
           <section className={`${styles.section} ${styles.auditSection}`}>
             <div className={styles.auditHeading}>
-              <h2>Where care matters</h2>
+              <h2>Where the analysis has limits</h2>
             </div>
-
             <div className={styles.auditList}>
-              {auditRows.map((row) => (
+              {limitationRows.map((row) => (
                 <article key={row.title} className={styles.auditRow}>
                   <h3>{row.title}</h3>
                   <p>{row.detail}</p>
@@ -146,32 +180,13 @@ export default function MethodologyPage() {
           </section>
         </ScrollReveal>
 
-        <ScrollReveal>
-          <section className={styles.section}>
-            <div className={styles.sectionIntro}>
-              <h2>Results stay readable</h2>
-              <p>
-                The output is designed to make readers inspect the article more carefully, not to turn the analysis into a
-                black box verdict.
-              </p>
-            </div>
-
-            <div className={styles.outputRow}>
-              {outputCards.map((card) => (
-                <article key={card.title} className={styles.outputCard}>
-                  <h3>{card.title}</h3>
-                  <p>{card.body}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        </ScrollReveal>
-
+        {/* ── CTA ── */}
         <ScrollReveal>
           <section className={styles.ctaSection}>
-            <AnalyzerCta />
+            <AnalyzerCta heading="Try it on a real article" label="Open Analyzer" />
           </section>
         </ScrollReveal>
+
       </main>
     </MarketingShell>
   );

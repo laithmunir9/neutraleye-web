@@ -161,20 +161,52 @@ export default function ComparePage() {
 
         {!isPro ? (
           <div className={styles.gateWrapper}>
-            <div className={styles.gateGhost} aria-hidden="true">
-              <div className={styles.ghostCard}>
-                <div className={styles.ghostRow}>
-                  <div className={styles.ghostSelect} />
-                  <div className={styles.ghostSelect} />
+            <div className={styles.previewShell} aria-hidden="true">
+              <div className={styles.previewBadge}>Preview</div>
+              <div className={styles.previewSelector}>
+                <div className={styles.previewSelect}>
+                  <span className={styles.previewSelectLabel}>Left</span>
+                  <div className={styles.previewSelectBox}>Climate bill coverage — AP News</div>
                 </div>
-                <div className={styles.ghostOverview}>
-                  <div className={styles.ghostBlock} />
-                  <div className={styles.ghostBlock} />
+                <div className={styles.previewDivider} aria-hidden="true">vs</div>
+                <div className={styles.previewSelect}>
+                  <span className={styles.previewSelectLabel}>Right</span>
+                  <div className={styles.previewSelectBox}>Climate bill coverage — Fox News</div>
                 </div>
               </div>
-              <div className={styles.ghostGrid}>
-                <div className={styles.ghostCard} />
-                <div className={styles.ghostCard} />
+              <div className={styles.previewSummaryRow}>
+                <div className={styles.previewSummaryCard}>
+                  <span className={styles.previewSummaryLabel}>Comparison summary</span>
+                  <p className={styles.previewSummaryText}>The left analysis reads as center-left, while the right reads as right-leaning. The confidence differs by 18 percentage points. The main difference is how each frames the economic impact of the legislation.</p>
+                </div>
+                <div className={styles.previewStatCard}>
+                  <span className={styles.previewSummaryLabel}>Confidence gap</span>
+                  <strong className={styles.previewStatValue}>18%</strong>
+                </div>
+              </div>
+              <div className={styles.previewGrid}>
+                <div className={styles.previewPanel}>
+                  <div className={styles.previewPanelLabel}>Left analysis</div>
+                  <div className={styles.previewPanelDirection}>Center-left framing.</div>
+                  <div className={styles.previewPanelMeta}>Confidence: 61%</div>
+                  <p className={styles.previewPanelSummary}>The piece foregrounds economic opportunity and environmental urgency. Sources lean toward policy proponents; critics are quoted briefly in paragraph nine.</p>
+                  <div className={styles.previewDrivers}>
+                    <span>Tone: measured</span>
+                    <span>Sourcing: imbalanced</span>
+                    <span>Omission: moderate</span>
+                  </div>
+                </div>
+                <div className={styles.previewPanel}>
+                  <div className={styles.previewPanelLabel}>Right analysis</div>
+                  <div className={`${styles.previewPanelDirection} ${styles.previewPanelDirectionRight}`}>Right-leaning framing.</div>
+                  <div className={styles.previewPanelMeta}>Confidence: 79%</div>
+                  <p className={styles.previewPanelSummary}>The piece foregrounds regulatory cost and energy sector impact. Language around opposition is given more explanatory depth; proponent quotes are shorter and less contextualised.</p>
+                  <div className={styles.previewDrivers}>
+                    <span>Tone: loaded</span>
+                    <span>Sourcing: industry-heavy</span>
+                    <span>Omission: high</span>
+                  </div>
+                </div>
               </div>
             </div>
             <ProGate user={user} />

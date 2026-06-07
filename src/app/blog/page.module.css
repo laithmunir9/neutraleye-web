@@ -1,7 +1,7 @@
 .page {
-  max-width: 74rem;
+  max-width: 92rem;
   margin: 0 auto;
-  padding: clamp(4rem, 8vw, 6.4rem) 2rem 6rem;
+  padding: clamp(4rem, 8vw, 6.4rem) clamp(1.5rem, 4vw, 3.5rem) 6rem;
 }
 
 .header {
@@ -36,14 +36,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(3rem, 6vw, 5rem) clamp(1.7rem, 3vw, 2.4rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 4vw, 3rem) clamp(1rem, 1.5vw, 1.4rem);
   margin-top: clamp(2.6rem, 5vw, 4rem);
 }
 
 .card {
   display: grid;
-  gap: 0.78rem;
+  gap: 0.8rem;
   min-width: 0;
 }
 
@@ -51,15 +51,16 @@
   color: var(--accent-strong);
 }
 
+/* ── Thumbnail ── */
 .media {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: clamp(12.8rem, 23vw, 16rem);
-  margin-bottom: 0.25rem;
+  min-height: clamp(13rem, 24vw, 19rem);
+  margin-bottom: 0.5rem;
   overflow: hidden;
   border-radius: var(--radius-md);
-  background: #e9e3d9;
+  background: #14120f;
 }
 
 .media::before,
@@ -67,118 +68,137 @@
   content: "";
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
-.media::before {
-  opacity: 0.42;
-  background-image:
-    linear-gradient(rgba(32, 27, 22, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(32, 27, 22, 0.08) 1px, transparent 1px);
-  background-size: 1.1rem 1.1rem;
-  mask-image: radial-gradient(circle at 50% 48%, black, transparent 74%);
-}
-
-.media::after {
-  opacity: 0.62;
-  background:
-    radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(32, 27, 22, 0.1) 18.4% 18.9%, transparent 19.4%),
-    repeating-linear-gradient(90deg, transparent 0 1rem, rgba(32, 27, 22, 0.08) 1rem 1.04rem);
-}
-
-.media span {
-  position: relative;
-  z-index: 1;
-  color: rgba(32, 27, 22, 0.76);
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  line-height: 1;
-}
-
+/* media1 — dot field */
 .media1 {
-  background:
-    linear-gradient(135deg, rgba(37, 36, 33, 0.96), rgba(28, 29, 27, 0.94)),
-    #22231f;
+  background: linear-gradient(150deg, #1e1b16, #0f0e0b);
 }
 
 .media1::before {
-  opacity: 0.36;
-  background-image: radial-gradient(circle, rgba(255, 252, 247, 0.3) 1px, transparent 1.35px);
-  background-size: 0.68rem 0.68rem;
+  background-image: radial-gradient(circle, rgba(255, 252, 247, 0.22) 1px, transparent 1.3px);
+  background-size: 0.72rem 0.72rem;
+  opacity: 0.55;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 80%);
 }
 
-.media1::after {
-  opacity: 0.5;
-  background:
-    linear-gradient(90deg, transparent 0 35%, rgba(255, 252, 247, 0.12) 35% 35.8%, transparent 35.8% 100%),
-    repeating-linear-gradient(90deg, transparent 0 1.3rem, rgba(255, 252, 247, 0.08) 1.3rem 1.36rem);
-  transform: skewX(-11deg) scaleX(1.25);
-}
-
-.media1 span {
-  color: rgba(255, 252, 247, 0.9);
-}
-
+/* media2 — concentric wave rings */
 .media2 {
-  background:
-    linear-gradient(180deg, rgba(237, 232, 224, 0.96), rgba(216, 222, 211, 0.9)),
-    #e4e4dd;
+  background: linear-gradient(160deg, #111310, #0a0c0a);
+}
+
+.media2::before {
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0,
+    transparent 1.1rem,
+    rgba(255, 252, 247, 0.07) 1.1rem,
+    rgba(255, 252, 247, 0.07) 1.17rem
+  );
 }
 
 .media2::after {
-  background:
-    linear-gradient(90deg, transparent 0 28%, rgba(58, 80, 64, 0.13) 28% 28.8%, transparent 28.8%),
-    repeating-radial-gradient(circle at center, rgba(58, 80, 64, 0.18) 0 1px, transparent 1px 0.78rem);
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 252, 247, 0.04) 0%, transparent 65%);
 }
 
+/* media3 — halftone dot grid */
 .media3 {
-  background:
-    linear-gradient(135deg, rgba(248, 244, 238, 0.98), rgba(228, 218, 204, 0.9)),
-    #eee7dc;
+  background: linear-gradient(135deg, #111110, #0d0c0b);
 }
 
 .media3::before {
-  opacity: 0.7;
-  background-image: repeating-linear-gradient(90deg, rgba(32, 27, 22, 0.22) 0 1px, transparent 1px 0.56rem);
-  mask-image: linear-gradient(90deg, black, transparent 85%);
+  background-image: radial-gradient(circle, rgba(255, 252, 247, 0.3) 1px, transparent 1.2px);
+  background-size: 0.6rem 0.6rem;
+  opacity: 0.4;
 }
 
+.media3::after {
+  background: radial-gradient(ellipse at 50% 50%, rgba(139, 103, 65, 0.1) 0%, transparent 60%);
+}
+
+/* media4 — teal grid mesh */
+.media4 {
+  background: linear-gradient(150deg, #0d1210, #090c0b);
+}
+
+.media4::before {
+  background-image:
+    linear-gradient(rgba(180, 220, 200, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 220, 200, 0.07) 1px, transparent 1px);
+  background-size: 1.4rem 1.4rem;
+}
+
+.media4::after {
+  background: radial-gradient(ellipse at 50% 50%, rgba(100, 180, 140, 0.07) 0%, transparent 60%);
+}
+
+/* ── Brand overlay (logo + name) ── */
+.mediaBrand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: none;
+}
+
+.mediaBrandLogo {
+  width: clamp(1.7rem, 3vw, 2.3rem);
+  height: clamp(1.7rem, 3vw, 2.3rem);
+  object-fit: contain;
+  flex-shrink: 0;
+  opacity: 0.88;
+}
+
+.mediaTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.6vw, 2.8rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(255, 252, 247, 0.88);
+}
+
+/* ── Meta row ── */
 .metaRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  color: rgba(32, 27, 22, 0.52);
-  font-size: 0.8rem;
+  gap: 0.4rem 0.55rem;
+  font-size: 0.83rem;
   line-height: 1.3;
 }
 
-.metaRow span + span::before {
-  content: "";
-  display: inline-block;
-  width: 0.18rem;
-  height: 0.18rem;
-  margin: 0 0.55rem 0.12rem 0.1rem;
-  border-radius: 999px;
-  background: currentColor;
+.metaCategory {
+  color: rgba(32, 27, 22, 0.75);
+  font-weight: 500;
+}
+
+.metaDate {
+  color: rgba(32, 27, 22, 0.45);
+  font-weight: 400;
 }
 
 .card h2 {
-  max-width: 22ch;
-  font-size: clamp(1.7rem, 2.8vw, 2.35rem);
-  line-height: 1.16;
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  line-height: 1.25;
+  max-width: 28ch;
 }
 
-.card p {
-  max-width: 42rem;
-  margin: 0;
-  color: rgba(32, 27, 22, 0.66);
-  font-size: 0.98rem;
-  line-height: 1.7;
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 600px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .media {
+    min-height: 14rem;
   }
 }
 
@@ -190,9 +210,5 @@
   .header {
     justify-items: start;
     text-align: left;
-  }
-
-  .media {
-    min-height: 13rem;
   }
 }

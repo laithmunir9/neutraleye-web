@@ -6,6 +6,7 @@ export const BLOG_POSTS = [
     slug: "what-is-media-bias",
     category: "Media bias",
     date: "April 23, 2026",
+    showBrandTitle: true,
     readTime: "5 min read",
     title: "What is media bias?",
     excerpt: "A practical guide to wording, framing, sourcing, and omission that goes beyond source labels.",
@@ -75,9 +76,83 @@ export const BLOG_POSTS = [
     ]
   },
   {
+    slug: "what-confidence-scores-actually-measure",
+    category: "Analysis",
+    date: "May 6, 2026",
+    showBrandTitle: true,
+    readTime: "5 min read",
+    title: "What confidence scores actually measure",
+    excerpt: "A high confidence score does not mean an article is dishonest. It means the signals are consistent.",
+    intro:
+      "Confidence in NeutralEye does not describe how certain we are about a political judgment. It describes how clearly and consistently bias signals appear across the submitted text.",
+    sections: [
+      {
+        title: "Confidence is about signal consistency, not truth",
+        paragraphs: [
+          "When NeutralEye returns a confidence score of 0.82, it means that tone, framing, sourcing, and attribution signals pointed in the same direction across most of the article. The signals were consistent and clear.",
+          "It does not mean the article is wrong, dishonest, or that the underlying facts are disputed. A well-written opinion column can score high confidence because its rhetorical structure is deliberately consistent. A breaking news report with mixed sources may score low confidence because the picture is still developing.",
+          "Understanding this distinction matters. Confidence measures pattern strength, not moral failure."
+        ]
+      },
+      {
+        title: "Low confidence has more than one cause",
+        paragraphs: [
+          "A low confidence score often gets misread as a good sign — as if the article passed inspection. But low confidence can mean several different things.",
+          "It can mean the article is genuinely balanced and the signals genuinely cancel out. It can also mean the text was too short for a reliable read, the writing mixed tones inconsistently, or the article covered a fast-moving story where sourcing was necessarily thin.",
+          "In those cases, low confidence is a flag for caution, not a clean bill of health. The right response is the same as with high confidence: read the evidence, check a second source, and decide what weight the analysis deserves given the context."
+        ]
+      },
+      {
+        title: "How to use confidence alongside the result",
+        paragraphs: [
+          "The most useful way to read confidence is in combination with the direction label and the evidence section, not in isolation.",
+          "A high-confidence left-leaning result with multiple quoted examples of loaded phrasing is a stronger finding than a high-confidence label with no supporting evidence. The confidence score compresses a lot of information into a single number. The examples and summary are where the reasoning lives.",
+          "Think of confidence as a volume dial, not a pass/fail gate. It tells you how strongly the signal was present. What you do with that signal is still a judgment call — and NeutralEye is designed to keep that judgment with the reader."
+        ]
+      }
+    ]
+  },
+  {
+    slug: "source-balance-and-why-it-matters",
+    category: "Media literacy",
+    date: "April 30, 2026",
+    readTime: "6 min read",
+    title: "Source balance and why it matters",
+    excerpt: "Counting sources tells you very little. Who they are, what they're allowed to say, and what they're not asked tells you more.",
+    intro:
+      "An article with six sources is not automatically balanced. Source balance is about distribution, diversity, and the terms on which each source is allowed to speak.",
+    sections: [
+      {
+        title: "The number of sources is the wrong metric",
+        paragraphs: [
+          "A story can quote six sources and still present a single viewpoint if all six work in the same institution, share the same professional interest, or are drawn from one end of an expert spectrum.",
+          "Source balance starts with asking who is being heard. Are the quoted experts independent of the institutions and outcomes described? Are the people most directly affected given space to speak, or are they referenced only in aggregate statistics?",
+          "One well-chosen source from the other side of a policy debate can do more for reader understanding than five confirmatory quotes, even if the confirmatory quotes are technically accurate."
+        ]
+      },
+      {
+        title: "Attribution terms shape perceived credibility",
+        paragraphs: [
+          "Equal time is not always equal treatment. The terms on which a source is introduced — their title, their affiliation, the length of their quote — all shape how seriously readers take what follows.",
+          "A think tank researcher introduced with full institutional context reads differently from an unnamed official or an anonymous source. Both may be telling the truth. But the reader's ability to evaluate the claim is very different in each case.",
+          "NeutralEye flags attribution patterns partly because they reveal the implicit hierarchy of the story — whose voice carries authority, and whose carries doubt."
+        ]
+      },
+      {
+        title: "Missing voices are part of balance too",
+        paragraphs: [
+          "Some of the most significant sourcing problems are not about who is quoted badly, but about who is not quoted at all.",
+          "A policy story that interviews legislators and think tank analysts but not the communities the policy will affect is technically sourced. But the absence of a critical perspective is itself a framing choice, even if unintentional.",
+          "This is why NeutralEye separates omission from tone. Tone analysis looks at what is said. Omission analysis asks what is structurally missing. Both matter, and a good reading habit keeps both in view."
+        ]
+      }
+    ]
+  },
+  {
     slug: "how-framing-shapes-the-news",
     category: "Framing",
     date: "April 11, 2026",
+    showBrandTitle: true,
     readTime: "4 min read",
     title: "How framing shapes the news",
     excerpt: "Why overlapping facts can still push readers toward very different conclusions.",

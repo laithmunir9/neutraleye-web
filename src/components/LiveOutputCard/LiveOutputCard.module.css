@@ -43,16 +43,16 @@
 }
 
 .ready {
-  background: rgba(80, 160, 100, 0.12);
-  color: #3d7a52;
+  background: var(--status-ok-bg);
+  color: var(--status-ok-text);
 }
 
 .metric {
   display: grid;
   gap: 0.45rem;
   padding: 1.1rem 0;
-  border-top: 1px solid rgba(93, 75, 53, 0.1);
-  border-bottom: 1px solid rgba(93, 75, 53, 0.1);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .metricLabel {
@@ -83,7 +83,7 @@
   gap: 0.75rem;
   min-height: 2.5rem;
   padding: 0.72rem 0.8rem;
-  border: 1px solid rgba(93, 75, 53, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.66);
 }
