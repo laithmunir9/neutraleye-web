@@ -3,8 +3,10 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import { SignInPage, SignUpPage, CheckEmailPage } from "@/components/ui/sign-in";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./page.module.css";
+
 
 const GOOGLE_ICON = (
   <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -104,26 +106,10 @@ function AuthForm() {
 
   if (confirmed) {
     return (
-      <MarketingShell>
-        <main className={styles.main}>
-          <div className={styles.card}>
-            <div className={styles.confirmBox}>
-              <div className={styles.confirmIcon} aria-hidden="true">✉</div>
-              <h1 className={styles.title}>Check your email</h1>
-              <p className={styles.confirmText}>
-                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account and start saving analyses.
-              </p>
-              <button
-                type="button"
-                className={styles.switchLink}
-                onClick={() => { setConfirmed(false); switchMode("signin"); }}
-              >
-                Back to sign in
-              </button>
-            </div>
-          </div>
-        </main>
-      </MarketingShell>
+      <CheckEmailPage
+        email={email}
+        onBack={() => { setConfirmed(false); switchMode("signin"); }}
+      />
     );
   }
 
@@ -198,89 +184,74 @@ function AuthForm() {
     );
   }
 
+  // Sign-up mode — new SignUpPage UI
+  async function handleSignUp(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signUp({
+      email: String(formData.get("email") || ""),
+      password: String(formData.get("password") || ""),
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+      },
+    });
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+    } else {
+      setConfirmed(true);
+    }
+  }
+
+  if (isSignup) {
+    return (
+      <SignUpPage
+        description={error ? <span style={{ color: "#8a443c", fontSize: "0.85rem" }}>{error}</span> : undefined}
+        onSignUp={handleSignUp}
+        onGoogleSignIn={handleGoogleAuth}
+        onSignIn={() => switchMode("signin")}
+      />
+    );
+  }
+
+  // Sign-in mode — new SignInPage UI
+  async function handleSignIn(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: String(formData.get("email") || ""),
+      password: String(formData.get("password") || ""),
+    });
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+    } else {
+      router.push(callbackUrl);
+      router.refresh();
+    }
+  }
+
   return (
-    <MarketingShell>
-      <main className={styles.main}>
-        <div className={styles.card}>
-          <div className={styles.heading}>
-            <h1 className={styles.title}>{isSignup ? "Create account" : "Sign in"}</h1>
-            <p className={styles.subtitle}>
-              {isSignup ? "Save and sync your analysis history across devices." : "Welcome back to NeutralEye."}
-            </p>
-          </div>
-
-          {resetSuccess && !error && (
-            <p className={styles.successBanner}>Password updated. You can now sign in.</p>
-          )}
-
-          {error && <p className={styles.errorBanner}>{error}</p>}
-
-          <form onSubmit={handleEmailAuth} className={styles.form}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                className={styles.input}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-            </div>
-            <div className={styles.field}>
-              <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="password">Password</label>
-                {!isSignup && (
-                  <button
-                    type="button"
-                    className={styles.forgotLink}
-                    onClick={() => switchMode("forgot")}
-                  >
-                    Forgot password?
-                  </button>
-                )}
-              </div>
-              <input
-                id="password"
-                type="password"
-                autoComplete={isSignup ? "new-password" : "current-password"}
-                required
-                minLength={isSignup ? 8 : undefined}
-                className={styles.input}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={isSignup ? "At least 8 characters" : "••••••••"}
-              />
-            </div>
-            <button type="submit" className={styles.submitBtn} disabled={loading}>
-              {loading
-                ? (isSignup ? "Creating account…" : "Signing in…")
-                : (isSignup ? "Create account" : "Sign in")}
-            </button>
-          </form>
-
-          <div className={styles.divider}><span>or</span></div>
-
-          <button type="button" className={styles.googleBtn} onClick={handleGoogleAuth}>
-            {GOOGLE_ICON}
-            Continue with Google
-          </button>
-
-          <p className={styles.switchPrompt}>
-            {isSignup ? "Already have an account? " : "Don't have an account? "}
-            <button
-              type="button"
-              className={styles.switchLink}
-              onClick={() => switchMode(isSignup ? "signin" : "signup")}
-            >
-              {isSignup ? "Sign in" : "Sign up"}
-            </button>
-          </p>
-        </div>
-      </main>
-    </MarketingShell>
+    <SignInPage
+      title={resetSuccess && !error ? "Password updated." : undefined}
+      description={
+        error
+          ? <span style={{ color: "#8a443c", fontSize: "0.85rem" }}>{error}</span>
+          : resetSuccess && !error
+          ? "You can now sign in with your new password."
+          : undefined
+      }
+      onSignIn={handleSignIn}
+      onGoogleSignIn={handleGoogleAuth}
+      onResetPassword={() => switchMode("forgot")}
+      onCreateAccount={() => switchMode("signup")}
+    />
   );
 }
 

@@ -16,63 +16,41 @@
   display: grid;
   justify-items: center;
   gap: 0.8rem;
-  min-height: auto;
   text-align: center;
   padding-bottom: clamp(0.5rem, 1.2vw, 0.9rem);
 }
 
-.hero h1,
-.sectionIntro h2,
-.auditHeading h2 {
+.hero h1 {
   margin: 0;
   color: var(--text);
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0;
-}
-
-.hero h1 {
-  max-width: none;
   font-size: clamp(3rem, 5vw, 4.5rem);
   line-height: 0.98;
 }
 
-.lead,
-.sectionIntro p,
-.featureCard p,
-.featureCard li,
-.readingCard p,
-.auditRow p,
-.outputCard p {
+.lead {
   margin: 0;
+  max-width: 43rem;
   color: var(--secondary-text);
   font-size: 0.98rem;
   line-height: 1.7;
 }
 
-.lead {
-  max-width: 43rem;
-  line-height: 1.62;
-}
-
 .section {
   display: grid;
-  gap: 2rem;
+  gap: 2.4rem;
   padding-top: clamp(4rem, 7vw, 5.5rem);
 }
 
 .firstSection {
-  padding-top: 1.5rem !important;
-}
-
-.hero + .section {
-  padding-top: clamp(0.5rem, 1.2vw, 0.9rem);
+  padding-top: clamp(1.8rem, 3vw, 2.4rem);
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
   padding: 0.26rem 0.68rem;
   border: 1px solid rgba(139, 103, 65, 0.22);
   border-radius: 999px;
@@ -93,73 +71,209 @@
 }
 
 .sectionIntro h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
   max-width: 22ch;
-  font-size: clamp(2.45rem, 4.4vw, 3.55rem);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
   line-height: 1.02;
 }
 
 .sectionIntro p {
+  margin: 0;
   max-width: 39rem;
+  color: var(--secondary-text);
+  font-size: 0.98rem;
+  line-height: 1.7;
 }
 
-.cardRow,
-.outputRow {
+/* ── Direction spectrum ── */
+.spectrumWrap {
+  display: grid;
+  gap: 0.7rem;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.spectrumTrack {
+  position: relative;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(185, 78, 78, 0.72) 0%,
+    rgba(185, 78, 78, 0.28) 30%,
+    rgba(139, 103, 65, 0.18) 50%,
+    rgba(72, 110, 172, 0.28) 70%,
+    rgba(72, 110, 172, 0.72) 100%
+  );
+  box-shadow: 0 0 12px rgba(139, 103, 65, 0.1);
+}
+
+/* Tick marks at left, center, right */
+.spectrumMark {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 12px;
+  border-radius: 1px;
+  background: rgba(93, 75, 53, 0.35);
+}
+
+.spectrumLabels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  color: var(--secondary-text);
+  font-size: 0.71rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.spectrumLabels span:nth-child(1) { text-align: left; }
+.spectrumLabels span:nth-child(2) { text-align: center; }
+.spectrumLabels span:nth-child(3) { text-align: right; }
+
+/* ── Cards ── */
+.cardRow {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
-.featureCard,
-.readingCard,
-.outputCard {
+.twoCol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.defCard {
   display: grid;
   align-content: start;
-  gap: 0.9rem;
-  min-height: 13rem;
-  padding: 1.25rem;
+  gap: 0.75rem;
+  padding: 1.35rem 1.25rem;
   border: 1px solid rgba(93, 75, 53, 0.14);
+  border-top-width: 2.5px;
   border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.7);
   box-shadow: var(--shadow);
 }
 
-.featureCard h3,
-.readingCard h3,
-.outputCard h3,
-.auditRow h3 {
+/* Left-leaning — warm red accent */
+.cardRow .defCard:nth-child(1) {
+  border-top-color: rgba(185, 78, 78, 0.55);
+}
+
+/* Center — neutral brand accent */
+.cardRow .defCard:nth-child(2) {
+  border-top-color: rgba(139, 103, 65, 0.45);
+}
+
+/* Right-leaning — cool blue accent */
+.cardRow .defCard:nth-child(3) {
+  border-top-color: rgba(72, 110, 172, 0.55);
+}
+
+/* Confidence cards — high/low distinction */
+.twoCol .defCard:nth-child(1) {
+  border-top-color: rgba(82, 145, 106, 0.55);
+}
+
+.twoCol .defCard:nth-child(2) {
+  border-top-color: rgba(175, 140, 72, 0.5);
+}
+
+.defCard h3 {
   margin: 0;
   color: var(--text);
   font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.3;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-.featureCard ul {
-  display: grid;
-  gap: 0.55rem;
+.defCard p {
   margin: 0;
-  padding-left: 1rem;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+  line-height: 1.68;
 }
 
-.featureCard li {
-  padding-left: 0.1rem;
+/* ── Reading steps (numbered) ── */
+.stepsCol {
+  display: grid;
+  gap: 0;
 }
 
-.readingCard {
-  min-height: 11.75rem;
+.stepRow {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 0 1.2rem;
+  align-items: start;
+  padding: 1.4rem 0.6rem;
+  border-bottom: 1px solid rgba(93, 75, 53, 0.12);
+  border-radius: var(--radius-sm);
+  transition: background 200ms ease;
+  cursor: default;
 }
 
+.stepRow:hover {
+  background: rgba(139, 103, 65, 0.03);
+}
+
+.stepRow:first-child {
+  border-top: 1px solid rgba(93, 75, 53, 0.12);
+}
+
+.stepIndex {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: rgba(139, 103, 65, 0.38);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  padding-top: 0.1rem;
+  transition: color 200ms ease;
+}
+
+.stepRow:hover .stepIndex {
+  color: rgba(139, 103, 65, 0.62);
+}
+
+.stepRow h3 {
+  margin: 0 0 0.4rem;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stepRow p {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+  line-height: 1.68;
+}
+
+/* ── Limitations ── */
 .auditSection {
   width: 100%;
-  max-width: 98rem;
-  grid-template-columns: minmax(16rem, 25rem) minmax(0, 1fr);
+  max-width: 92rem;
+  grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
   align-items: start;
-  gap: clamp(4rem, 7vw, 7.5rem);
+  gap: clamp(4rem, 7vw, 7rem);
   padding-left: clamp(2rem, 5vw, 4.6rem);
   padding-right: clamp(2rem, 5vw, 4.6rem);
 }
 
 .auditHeading h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
   max-width: 11ch;
   font-size: clamp(2.65rem, 5vw, 4.4rem);
   line-height: 1.02;
@@ -168,81 +282,51 @@
 .auditList {
   display: grid;
   width: 100%;
-  justify-self: start;
 }
 
 .auditRow {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.45rem;
   padding: 1.05rem 0;
   border-bottom: 1px solid rgba(93, 75, 53, 0.14);
 }
 
-.auditRow:first-child {
-  padding-top: 0.1rem;
+.auditRow:first-child { padding-top: 0.1rem; }
+
+.auditRow h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 .auditRow p {
-  max-width: none;
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
   line-height: 1.64;
 }
 
-.outputRow {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.outputCard {
-  min-height: 10rem;
-}
-
+/* ── CTA ── */
 .ctaSection {
   padding-top: clamp(4rem, 7vw, 5.75rem);
   padding-bottom: clamp(4.8rem, 9vw, 7rem);
 }
 
+/* ── Responsive ── */
 @media (max-width: 980px) {
   .hero,
   .section,
-  .ctaSection {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+  .ctaSection { padding-left: 1rem; padding-right: 1rem; }
 
-  .cardRow,
-  .outputRow,
-  .auditSection {
-    grid-template-columns: 1fr;
-  }
-
-  .auditHeading h2 {
-    max-width: 11ch;
-  }
+  .cardRow { grid-template-columns: 1fr; }
+  .twoCol  { grid-template-columns: 1fr; }
+  .auditSection { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {
-  .page {
-    padding-top: 1.9rem;
-  }
-
-  .hero {
-    justify-items: start;
-    text-align: left;
-    min-height: auto;
-  }
-
-  .sectionIntro {
-    justify-items: start;
-    text-align: left;
-  }
-
-  .sectionIntro h2,
-  .hero h1 {
-    max-width: 100%;
-  }
-
-  .featureCard,
-  .readingCard,
-  .outputCard {
-    min-height: auto;
-  }
+  .page { padding-top: 1.9rem; }
+  .hero { justify-items: start; text-align: left; }
+  .sectionIntro { justify-items: start; text-align: left; }
 }

@@ -55,14 +55,21 @@ src/
     page.js                 # Home / landing page
     analyze/page.js         # Core bias checker tool
     pricing/page.js         # Pricing / upgrade to Pro
-    history/page.js         # User analysis history (Supabase-backed)
-    methodology/page.js     # How NeutralEye works
-    login/page.js           # Login + signup (email + Google OAuth) + forgot password flow
+    history/page.js         # User analysis history (Supabase-backed) — shows a locked gate when saveHistory setting is disabled in localStorage
+    how-it-works/page.js    # How NeutralEye works — canonical page, dark hero + SVG pipeline diagram + 3 feature rows
+    overview/page.js        # Redirects to /how-it-works
+    system/page.js          # Redirects to /how-it-works
+    methodology/page.js     # Post-result reading guide — NOT a signal explainer (that belongs in Overview)
+    extension/page.js       # Chrome extension marketing page — hero uses inline ExtensionMockup JSX (fictional article + NeutralEye popup overlay), no screenshot file
+    faq/page.js             # Two-column FAQ with <details>/<summary> accordions and sticky nav
+    about/page.js           # Founder story / mission — essay format with drop cap, no cards
+    changelog/page.js       # Vertical timeline of releases with New/Improved/Fixed type tags
+    support/page.js         # Contact form using mailto: construction — requires "use client"
+    login/page.js           # Auth page — sign-in and sign-up modes use SignInPage/SignUpPage from src/components/ui/sign-in.tsx (split layout); forgot-password and confirmation states use existing CSS-module forms wrapped in MarketingShell
     reset-password/page.js  # Password reset — handles Supabase recovery redirect
-    blog/                   # Blog with dynamic [slug] routing
-    system/page.js          # System/about page (has dark hero section)
+    blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort
     compare/page.js         # Compare Analyses — Pro-gated with blur overlay
-    settings/page.js        # User settings
+    settings/page.js        # User settings — Display (reduce motion) + Privacy (save analysis history toggle, stored in localStorage key `neutraleye.settings.v1`)
     extension-privacy/      # Extension privacy policy
     privacy/                # Website privacy policy
     terms/                  # Terms of service
@@ -79,8 +86,8 @@ src/
     AppShell/               # App-mode layout wrapper
     MarketingShell/         # Marketing/landing layout wrapper
     HeaderBar/              # App header
-    SiteHeader/             # Marketing site header (scroll-aware dark/light theme)
-    SiteFooter/             # Marketing site footer (Explore / Plans / Legal columns)
+    SiteHeader/             # Grouped dropdown nav: Analyze (direct) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme
+    SiteFooter/             # 4 columns: Product / Learn / Company / Legal
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
     ResultCard/             # Bias result display card
@@ -89,15 +96,16 @@ src/
     DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display
     HistoryTable/           # Analysis history list
-    AnalyzerCta/            # CTA button used across marketing pages
+    AnalyzerCta/            # CTA heading + button — no card/box background (stripped this session)
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
+      sign-in.tsx           # Exports SignInPage + SignUpPage — split layout (warm beige left form / dark right analysis panel); used by login/page.js for signin and signup modes
 
   lib/
     api.js                  # Frontend → API route calls
     score.js                # Score/confidence normalization
     storage.js              # Local storage helpers
-    content.js              # Blog helpers
+    content.js              # BLOG_POSTS array + EXTENSION_URL. Add showBrandTitle: true to a post for logo overlay on blog card. Blog list sorts at render time — do not rely on array order.
     types.js                # Shared type definitions
     utils.ts                # shadcn cn() utility
     supabase/
@@ -232,12 +240,18 @@ npm run test      # Jest tests
 
 When building new UI, prefer extending existing components in `src/components/ui/` before creating new ones.
 
+- **Section width:** Hero, steps, principles, and CTA sections use `max-width: 92rem`. Feature rows (left/right split with visuals) use `max-width: 72rem` for a more compact, readable layout. Do not widen feature sections back to 92rem.
+- **Page identity rule:** Home (emotional sell) → How It Works `/how-it-works` (technical pipeline) → Methodology (reading guide). These three pages must not repeat each other's content. `/overview` redirects to `/how-it-works`.
+- **Dark hero pages:** Add `data-header-theme="dark"` on the hero section + pass `darkHeader` prop to `MarketingShell`. Used on Overview and Extension pages.
+- **CSS hover dropdowns:** Bridge the gap between trigger and panel with `padding-top` on the dropdown div — never use `top: calc(100% + gap)`. A gap breaks `:hover` continuity.
+
 ---
 
 ## Known Issues
 
 - **Zoom / responsive scaling bugs** — Unresolved zoom and viewport scaling issues across pages. Do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **Extension CORS** — Currently allows any `chrome-extension://` origin. Lock to specific extension ID once published to the Chrome Web Store.
+- **Support contact email** — `/support/page.js` uses `sadeerm@hotmail.com`. Update to a `tryneutraleye.com` address once the domain is live.
 
 ---
 
@@ -248,7 +262,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 - **Sentry** — Error monitoring and alerting
 - **Persistent rate limiting** — Replace in-memory rate limit store with Redis to survive cold starts
 - **Extension CORS lockdown** — Restrict to specific extension ID post-publish
-- **Domain** — `tryneutraleye.com` (not yet purchased); update Supabase Auth URL config and legal contact email once live
+- **Domain** — `tryneutraleye.com` (not yet purchased); once live: update Supabase Auth URL config, support page contact email, and legal contact email
 
 ---
 

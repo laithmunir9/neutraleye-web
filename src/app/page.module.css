@@ -79,6 +79,21 @@
   width: fit-content;
 }
 
+.featureEyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.26rem 0.68rem;
+  border: 1px solid rgba(139, 103, 65, 0.22);
+  border-radius: 999px;
+  background: rgba(139, 103, 65, 0.06);
+  color: #6e4f2f;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
 .eyebrowDot {
   position: relative;
   width: 6px;
@@ -203,80 +218,147 @@
   color: var(--text);
 }
 
-/* ── Trust principles ── */
-
-.trust {
-  position: relative;
-  z-index: 1;
+/* ── Analysis trace section ── */
+.traceSection {
+  padding: clamp(5rem, 9vw, 7rem) var(--section-pad-x);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  max-width: 72rem;
-  margin: clamp(0.35rem, 1vw, 0.75rem) auto 0;
-  padding: 0 var(--section-pad-x);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  counter-reset: trust-counter;
+  gap: clamp(3rem, 5vw, 4.5rem);
 }
 
-.trustItem {
+.traceIntro {
   display: grid;
-  align-content: start;
-  gap: 0.5rem;
-  min-height: 10rem;
-  padding: 1.4rem 1.2rem 1.6rem;
-  border-left: 1px solid var(--border);
-  counter-increment: trust-counter;
-  position: relative;
-  overflow: hidden;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+  max-width: 44rem;
+  margin: 0 auto;
 }
 
-.trustItem::before {
-  content: "0" counter(trust-counter);
-  display: block;
-  font-family: var(--font-display);
-  font-size: 2.1rem;
-  font-weight: 400;
-  color: rgba(139, 103, 65, 0.18);
-  line-height: 1;
-  margin-bottom: 0.55rem;
-  letter-spacing: -0.02em;
-}
-
-.trustItem::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-strong), transparent);
-  opacity: 0;
-  transition: opacity 260ms ease;
-}
-
-.trustItem:hover::after {
-  opacity: 1;
-}
-
-.trustItem:first-child {
-  border-left: 0;
-}
-
-.trustItem span {
+.traceIntro h2 {
+  margin: 0;
   color: var(--text);
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: 0;
+  max-width: 22ch;
 }
 
-.trustItem p {
+.traceIntro p {
   margin: 0;
   color: var(--secondary-text);
-  max-width: 26ch;
-  font-size: 0.88rem;
-  line-height: 1.58;
+  font-size: 1rem;
+  line-height: 1.68;
+  max-width: 48ch;
+}
+
+.traceCard {
+  max-width: 48rem;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.traceRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgba(93, 75, 53, 0.1);
+  border-radius: var(--radius-md);
+  background: rgba(255, 252, 247, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.traceRowFinal {
+  border-color: rgba(139, 103, 65, 0.28);
+  background: rgba(139, 103, 65, 0.04);
+}
+
+.traceIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.traceIcon_setup {
+  background: rgba(93, 75, 53, 0.08);
+  color: rgba(93, 75, 53, 0.6);
+}
+
+.traceIcon_signal {
+  background: rgba(139, 103, 65, 0.1);
+  color: var(--accent-strong);
+}
+
+.traceIcon_result {
+  background: rgba(139, 103, 65, 0.18);
+  color: var(--accent-strong);
+}
+
+.traceBody {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.traceTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.traceTitleText {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.traceBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(139, 103, 65, 0.08);
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.59rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.traceDesc {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.81rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.traceMeta {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-align: right;
+  flex-shrink: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .traceMeta { display: none; }
+  .traceDesc { white-space: normal; }
 }
 
 /* ── Feature rows ── */
@@ -288,13 +370,13 @@
   gap: clamp(3rem, 6vw, 5rem);
   max-width: 72rem;
   margin: 0 auto;
-  padding: clamp(4.5rem, 8vw, 6.5rem) var(--section-pad-x) 0;
+  padding: clamp(4.5rem, 8vw, 6.5rem) 2rem 0;
 }
 
 .featureRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 5vw, 4rem);
+  gap: clamp(2.5rem, 6vw, 6rem);
   align-items: center;
 }
 
@@ -304,14 +386,14 @@
 }
 
 .featureText h2 {
-  max-width: 15ch;
-  font-size: clamp(1.85rem, 3.5vw, 2.75rem);
-  line-height: 1.08;
+  max-width: 18ch;
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  line-height: 1.06;
 }
 
 .featureText p:last-child {
   margin: 0;
-  max-width: 34ch;
+  max-width: 42ch;
   color: var(--secondary-text);
   font-size: 1rem;
   line-height: 1.65;
@@ -445,9 +527,9 @@
   display: grid;
   gap: clamp(1.75rem, 3vw, 2.4rem);
   justify-items: center;
-  max-width: 72rem;
+  max-width: 92rem;
   margin: 0 auto;
-  padding: clamp(4rem, 7vw, 6rem) var(--section-pad-x) 5rem;
+  padding: clamp(4rem, 7vw, 6rem) 2rem 5rem;
 }
 
 /* ── Motion ── */
@@ -477,20 +559,6 @@
   .heroText {
     max-width: 100%;
     padding-bottom: 0;
-  }
-
-  .trust {
-    grid-template-columns: 1fr;
-  }
-
-  .trustItem {
-    min-height: auto;
-    border-left: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .trustItem:first-child {
-    border-top: 0;
   }
 
   .featureRow {

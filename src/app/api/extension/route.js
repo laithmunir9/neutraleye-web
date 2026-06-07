@@ -20,6 +20,7 @@ const KILL_SWITCH = ["1", "true", "yes", "on"].includes(
 );
 const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
+const MAX_ANALYSIS_TEXT_LENGTH = Number(process.env.MAX_ANALYSIS_TEXT_LENGTH || 100_000);
 
 // In-memory stores — reset on cold start (acceptable for serverless)
 const inMemoryCache = new Map();
@@ -243,7 +244,7 @@ or "not article" (email, dashboard, homepage, chat, social feed, code, random te
 Respond with ONLY one word: "article" or "not article".
 
 Text:
-"""${safeTrim(text, 2000)}"""`;
+"""${safeTrim(text, Math.min(MAX_ANALYSIS_TEXT_LENGTH, 4000))}"""`;
 
   const completion = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
@@ -311,7 +312,7 @@ Rules:
 - If you cannot confidently verify a source URL exists and covers this exact topic, suggested_sources must be an empty array.
 
 TEXT_FOR_ANALYSIS:
-"""${safeTrim(text, 25000)}"""`;
+"""${safeTrim(text, MAX_ANALYSIS_TEXT_LENGTH)}"""`;
 
   const completion = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
@@ -328,33 +329,31 @@ TEXT_FOR_ANALYSIS:
 
 function buildHumanResult(json) {
   if (!json) return "";
-  const biasLevel = String(json.bias_level || "").trim().toLowerCase();
+  const biasLevel = String(json.bias_level || "").trim();
+  const direction = String(json.direction || "").trim();
+  const summary = String(json.summary || "").trim();
+  const explanation = String(json.explanation || "").trim();
+  const confidence = Number(json.analysis_confidence);
+  const phrases = Array.isArray(json.biased_phrases) ? json.biased_phrases : [];
+  const sources = Array.isArray(json.suggested_sources) ? json.suggested_sources : [];
+  const recs = Array.isArray(json.recommendations) ? json.recommendations : [];
 
   if (biasLevel === "none") {
     return "✅ No significant bias detected. Please feel free to continue reading.";
   }
 
-  const direction = String(json.direction || "").trim();
-  const summary = String(json.summary || "").trim();
-  const explanation = String(json.explanation || "").trim();
-  const phrases = Array.isArray(json.biased_phrases) ? json.biased_phrases : [];
-  const sources = Array.isArray(json.suggested_sources) ? json.suggested_sources : [];
-  const recs = Array.isArray(json.recommendations) ? json.recommendations : [];
-  const confidence = Number(json.analysis_confidence);
-
   const parts = [];
-  const levelLabel = `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} bias`;
+  const levelLabel = biasLevel ? `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} bias` : "Bias detected";
   const directionText = direction && direction !== "unknown" ? ` ${direction}` : "";
   parts.push(`**Bias Level**\n${levelLabel}${directionText}.`);
 
-  parts.push(`**Summary of Bias**\n${summary || "No summary returned."}`);
-
+  if (summary) parts.push(`**Summary of Bias**\n${summary}`);
   if (explanation && explanation !== summary) parts.push(explanation);
 
-  const exLines = phrases.length
-    ? phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n")
-    : "No strong language or framing examples crossed the threshold in this pass.";
-  parts.push(`**Examples of Bias**\n${exLines}`);
+  if (phrases.length) {
+    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n");
+    parts.push(`**Examples of Bias**\n${exLines}`);
+  }
 
   if (sources.length) {
     const srcLines = sources.map((s) => {
@@ -366,10 +365,7 @@ function buildHumanResult(json) {
     parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
   }
 
-  const recLines = recs.length
-    ? recs.map((r) => `- ${r}`).join("\n")
-    : "- Continue reading with normal judgment. For high-stakes topics, compare with one additional source.";
-  parts.push(`**Recommendations**\n${recLines}`);
+  if (recs.length) parts.push(`**Recommendations**\n${recs.map((r) => `- ${r}`).join("\n")}`);
 
   if (Number.isFinite(confidence)) parts.push(`**Analysis Confidence**\n${confidence.toFixed(2)}`);
   return parts.join("\n\n");

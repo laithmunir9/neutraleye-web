@@ -69,8 +69,6 @@ const PRO_FEATURES = [
   "Cloud history — synced across devices",
   "Compare Analyses — side-by-side bias comparison",
   "Shared daily limit across extension & website",
-  "Priority processing",
-  "Early access to new features",
 ];
 
 export const metadata = {
@@ -84,9 +82,9 @@ export default function PricingPage() {
       <main className={styles.main}>
 
         <div className={styles.header}>
-          <h1 className={styles.title}>Read the news without the spin</h1>
+          <h1 className={styles.title}>See how the story was built, not just what it says</h1>
           <p className={styles.subtitle}>
-            NeutralEye spots bias so you can focus on the story, not the slant.
+            NeutralEye checks tone, framing, and sourcing on any article — and returns what it finds, with the evidence behind it.
           </p>
         </div>
 
@@ -109,7 +107,7 @@ export default function PricingPage() {
             <div className={styles.cardInner}>
               <div className={styles.planName}>Free</div>
               <p className={styles.planDesc}>
-                Everything you need to start reading the news more critically.
+                Ten analyses a day. Full results — direction, evidence, and sources — every time.
               </p>
               <div className={styles.price}>
                 <span className={styles.priceAmount}>$0</span>
@@ -137,12 +135,7 @@ export default function PricingPage() {
 
           {/* Pro */}
           <div className={`${styles.card} ${styles.cardPro}`}>
-            <div className={styles.proBanner}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2l2.09 6.26L20 9.27l-5 4.87 1.18 6.88L12 17.77l-4.18 3.25L9 14.14 4 9.27l5.91-.01z"/>
-              </svg>
-              Most popular
-            </div>
+            <div className={styles.proBanner}>Most Popular</div>
             <div className={styles.cardInner}>
               <div className={`${styles.planName} ${styles.planNamePro}`}>Pro</div>
               <p className={styles.planDesc}>

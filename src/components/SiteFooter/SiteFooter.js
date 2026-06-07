@@ -2,26 +2,42 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./SiteFooter.module.css";
 
-const FOOTER_PRODUCT_LINKS = [
-  { href: "/analyze", label: "Analyze" },
-  { href: "/system", label: "System" },
-  { href: "/methodology", label: "Methodology" },
-  { href: "/blog", label: "Blog" },
-];
-
-const FOOTER_PLANS_LINKS = [
-  { href: "/pricing", label: "Pricing" },
+const FOOTER_COLS = [
+  {
+    heading: "Product",
+    label: "Footer product",
+    links: [
+      { href: "/analyze",   label: "Analyze" },
+      { href: "/extension", label: "Chrome Extension" },
+      { href: "/pricing",   label: "Pricing" },
+      { href: "/how-it-works", label: "How It Works" },
+    ],
+  },
+  {
+    heading: "Learn",
+    label: "Footer learn",
+    links: [
+      { href: "/methodology", label: "Methodology" },
+      { href: "/blog",        label: "Blog" },
+      { href: "/faq",         label: "FAQ" },
+    ],
+  },
+  {
+    heading: "Company",
+    label: "Footer company",
+    links: [
+      { href: "/about",     label: "About" },
+      { href: "/changelog", label: "Changelog" },
+      { href: "/support",   label: "Support" },
+    ],
+  },
 ];
 
 const FOOTER_LEGAL_LINKS = [
-  { href: "/privacy", label: "Website Privacy" },
+  { href: "/privacy",           label: "Website Privacy" },
   { href: "/extension-privacy", label: "Extension Privacy" },
-  { href: "/terms", label: "Terms & Conditions" }
+  { href: "/terms",             label: "Terms & Conditions" },
 ];
-
-function FooterLink({ href, label }) {
-  return <Link href={href}>{label}</Link>;
-}
 
 export default function SiteFooter({ compact = false }) {
   return (
@@ -41,29 +57,22 @@ export default function SiteFooter({ compact = false }) {
           </div>
         </div>
 
-        <div className={styles.footerSection}>
-          <p className={styles.footerHeading}>Explore</p>
-          <nav className={styles.footerProductLinks} aria-label="Footer product">
-            {FOOTER_PRODUCT_LINKS.map((link) => (
-              <FooterLink key={link.label} {...link} />
-            ))}
-          </nav>
-        </div>
-
-        <div className={styles.footerSection}>
-          <p className={styles.footerHeading}>Plans</p>
-          <nav className={styles.footerProductLinks} aria-label="Footer plans">
-            {FOOTER_PLANS_LINKS.map((link) => (
-              <FooterLink key={link.label} {...link} />
-            ))}
-          </nav>
-        </div>
+        {FOOTER_COLS.map((col) => (
+          <div key={col.heading} className={styles.footerSection}>
+            <p className={styles.footerHeading}>{col.heading}</p>
+            <nav className={styles.footerLinks} aria-label={col.label}>
+              {col.links.map((link) => (
+                <Link key={link.label} href={link.href}>{link.label}</Link>
+              ))}
+            </nav>
+          </div>
+        ))}
 
         <div className={styles.footerSection}>
           <p className={styles.footerHeading}>Legal</p>
-          <nav className={styles.footerLegalLinks} aria-label="Footer legal">
+          <nav className={styles.footerLinks} aria-label="Footer legal">
             {FOOTER_LEGAL_LINKS.map((link) => (
-              <FooterLink key={link.label} {...link} />
+              <Link key={link.label} href={link.href}>{link.label}</Link>
             ))}
           </nav>
         </div>

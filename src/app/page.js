@@ -10,14 +10,18 @@ import styles from "./page.module.css";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-const trustMarkers = [
-  { label: "Method visible", detail: "Each signal is labeled individually — tone, framing, sourcing, omission — not collapsed into one opaque score." },
-  { label: "Evidence included", detail: "Quoted language, sourcing patterns, and framing choices are included in the output so the result can be checked." },
-  { label: "Confidence separated", detail: "Confidence describes how consistently signals repeat, not whether the article itself is true." },
-  { label: "Reader in control", detail: "Inspect the result, compare context, and decide what to read next — the analysis is a prompt, not a verdict." },
-];
-
 const SIGNALS = ["Tone", "Framing", "Attribution", "Sources", "Omission"];
+
+const TRACE_STEPS = [
+  { type: "setup",  title: "Article submitted",        badge: "URL",        desc: "thenationalstandard.com/politics/senate-vote",           time: "14:22:01" },
+  { type: "setup",  title: "Content extracted",        badge: "2,847 words", desc: "Article confirmed — news report",                        time: "14:22:02" },
+  { type: "signal", title: "Tone analyzed",            badge: "Signal",     desc: "Loaded phrasing detected — 2 instances",                  time: "14:22:04" },
+  { type: "signal", title: "Framing checked",          badge: "Signal",     desc: "Selective emphasis on committee position",                 time: "14:22:06" },
+  { type: "signal", title: "Attribution reviewed",     badge: "Signal",     desc: "3 claims presented without clear sourcing",                time: "14:22:08" },
+  { type: "signal", title: "Source balance checked",   badge: "Signal",     desc: "Single-perspective sourcing throughout",                   time: "14:22:10" },
+  { type: "signal", title: "Omission scanned",         badge: "Signal",     desc: "Counter-context absent from body text",                    time: "14:22:12" },
+  { type: "result", title: "Result assembled",         badge: "Conclusion", desc: "Moderate bias toward Senate leadership · confidence 0.74", time: "14:22:13" },
+];
 
 const SOURCES = [
   { label: "Center-left daily", note: "Same story" },
@@ -88,18 +92,32 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Trust principles ── */}
-        <motion.section
-          className={styles.trust}
-          aria-label="NeutralEye trust principles"
-          {...reveal()}
-        >
-          {trustMarkers.map((marker) => (
-            <article className={styles.trustItem} key={marker.label}>
-              <span>{marker.label}</span>
-              <p>{marker.detail}</p>
-            </article>
-          ))}
+        {/* ── Analysis trace ── */}
+        <motion.section className={styles.traceSection} {...reveal()}>
+          <div className={styles.traceIntro}>
+            <p className={styles.featureEyebrow}>The analysis</p>
+            <h2>The same five checks, every article</h2>
+            <p>Tone, framing, attribution, source balance, and omission — reviewed together in a single pass. Every article gets the same sequence, and every result arrives with the specific evidence that produced it.</p>
+          </div>
+          <div className={styles.traceCard}>
+            {TRACE_STEPS.map((step) => (
+              <div key={step.title} className={`${styles.traceRow} ${step.type === "result" ? styles.traceRowFinal : ""}`}>
+                <div className={`${styles.traceIcon} ${styles[`traceIcon_${step.type}`]}`} aria-hidden="true">
+                  {step.type === "setup"  && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>}
+                  {step.type === "signal" && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>}
+                  {step.type === "result" && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                </div>
+                <div className={styles.traceBody}>
+                  <div className={styles.traceTitle}>
+                    <span className={styles.traceTitleText}>{step.title}</span>
+                    <span className={styles.traceBadge}>{step.badge}</span>
+                  </div>
+                  <p className={styles.traceDesc}>{step.desc}</p>
+                </div>
+                <time className={styles.traceMeta}>{step.time}</time>
+              </div>
+            ))}
+          </div>
         </motion.section>
 
         {/* ── Feature rows ── */}
@@ -127,16 +145,16 @@ export default function Home() {
               </MagicCard>
             </div>
             <div className={styles.featureText}>
-              <p className={styles.eyebrow}>How it works</p>
+              <p className={styles.featureEyebrow}>How it works</p>
               <h2>Five signals, one read</h2>
-              <p>Every article passes through tone, framing, attribution, source balance, and omitted counter-context together — not independently.</p>
+              <p>Every article passes through the same five checks in a single pass — tone, framing, attribution, source balance, and omission. The findings are tied together, not reported separately.</p>
             </div>
           </motion.div>
 
           {/* Row 2: Evidence — text left, visual right */}
           <motion.div className={`${styles.featureRow} ${styles.featureRowFlip}`} {...reveal()}>
             <div className={styles.featureText}>
-              <p className={styles.eyebrow}>What you get</p>
+              <p className={styles.featureEyebrow}>What you get</p>
               <h2>Quoted examples, not a verdict</h2>
               <p>Each signal includes the exact language that triggered it, so you can inspect the analysis against the article yourself.</p>
             </div>
@@ -186,9 +204,9 @@ export default function Home() {
               </MagicCard>
             </div>
             <div className={styles.featureText}>
-              <p className={styles.eyebrow}>What comes next</p>
+              <p className={styles.featureEyebrow}>What comes next</p>
               <h2>Sources to read alongside</h2>
-              <p>Every review ends with publications that cover the same story from a different vantage point, so you can read across the framing.</p>
+              <p>Every review ends with publications that cover the same story from a different vantage point, so you can place the original article in a wider frame.</p>
             </div>
           </motion.div>
 
