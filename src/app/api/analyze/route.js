@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import * as cheerio from "cheerio";
 import { randomUUID } from "crypto";
+import { checkRedisRateLimit } from "@/lib/ratelimit";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -520,17 +521,12 @@ async function runAnalysisPipeline(text, requestId, sourceUrl = null) {
 // ── Rate limiting ──────────────────────────────────────────────────────────
 
 function checkRateLimit(ip) {
-  const now = Date.now();
-  const bucket = rateLimitStore.get(ip);
-  if (!bucket || now > bucket.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return null;
-  }
-  bucket.count += 1;
-  if (bucket.count > RATE_LIMIT_MAX) {
-    return Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
-  }
-  return null;
+  return checkRedisRateLimit(ip, {
+    prefix: "ne:web",
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    fallbackStore: rateLimitStore,
+  });
 }
 
 // ── Route handler ──────────────────────────────────────────────────────────
@@ -544,7 +540,7 @@ export async function POST(request) {
     return errResponse(503, "Analysis is temporarily unavailable.", "AI_DISABLED");
   }
 
-  const retryAfter = checkRateLimit(ip);
+  const retryAfter = await checkRateLimit(ip);
   if (retryAfter !== null) {
     logEvent("warn", "rate_limit.exceeded", { requestId, ip, retryAfter });
     return Response.json(
