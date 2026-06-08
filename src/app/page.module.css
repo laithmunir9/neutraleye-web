@@ -163,6 +163,14 @@
 
 .heroBtn:hover { background: #6e4f2f; }
 
+.trustSignal {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.025em;
+}
+
 .primaryAction,
 .secondaryAction,
 .inlineLink {

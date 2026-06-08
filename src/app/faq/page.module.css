@@ -96,6 +96,13 @@
   background: rgba(139, 103, 65, 0.06);
 }
 
+.navLinkActive {
+  color: #8b6741;
+  font-weight: 500;
+  background: rgba(139, 103, 65, 0.07);
+  box-shadow: inset 2px 0 0 #8b6741;
+}
+
 .navFooter {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -281,6 +288,12 @@ details[open] .question {
     border: 1px solid var(--border);
     border-radius: 999px;
     font-size: 0.8rem;
+  }
+
+  .navLinkActive {
+    box-shadow: none;
+    border-color: rgba(139, 103, 65, 0.42);
+    background: rgba(139, 103, 65, 0.08);
   }
 
   .sections {

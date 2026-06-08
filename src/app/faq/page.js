@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import styles from "./page.module.css";
@@ -116,6 +119,26 @@ const SECTIONS = [
 ];
 
 export default function FaqPage() {
+  const [activeId, setActiveId] = useState(SECTIONS[0].id);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: "-15% 0px -70% 0px" }
+    );
+
+    SECTIONS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <MarketingShell>
       <main className={styles.page}>
@@ -138,7 +161,11 @@ export default function FaqPage() {
             <p className={styles.navHeading}>Topics</p>
             <nav>
               {SECTIONS.map((s) => (
-                <a key={s.id} href={`#${s.id}`} className={styles.navLink}>
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  className={`${styles.navLink}${activeId === s.id ? ` ${styles.navLinkActive}` : ""}`}
+                >
                   {s.label}
                 </a>
               ))}

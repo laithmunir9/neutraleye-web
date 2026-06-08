@@ -133,9 +133,9 @@
   text-transform: uppercase;
 }
 
-.spectrumLabels span:nth-child(1) { text-align: left; }
+.spectrumLabels span:nth-child(1) { justify-self: start; transform: translateX(-50%); }
 .spectrumLabels span:nth-child(2) { text-align: center; }
-.spectrumLabels span:nth-child(3) { text-align: right; }
+.spectrumLabels span:nth-child(3) { justify-self: end; transform: translateX(50%); }
 
 /* ── Cards ── */
 .cardRow {

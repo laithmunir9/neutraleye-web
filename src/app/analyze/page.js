@@ -97,6 +97,15 @@ function formatConfidenceScore(value) {
   return confidence.toFixed(2);
 }
 
+function confidenceLevel(value) {
+  const pct = Math.round((Number(value) || 0) * 100);
+  if (pct >= 80) return "High";
+  if (pct >= 60) return "Moderate–high";
+  if (pct >= 40) return "Moderate";
+  if (pct >= 20) return "Low–moderate";
+  return "Low";
+}
+
 function getTextQualityError(value) {
   const cleaned = String(value || "").trim().replace(/\s+/g, " ");
   if (!cleaned) return null;
@@ -529,11 +538,13 @@ function AnalyzePageContent() {
                   ))}
                 </ul>
               ) : (
-                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
-                  {hasAnalysis && isNoBiasResult(result)
-                    ? "No urgent follow-up steps were generated. For consequential topics, compare with one additional source and continue reading with normal judgment."
-                    : "Useful next reading steps will appear here."}
-                </p>
+                <ul className={styles.simpleList}>
+                  <li className={styles.placeholderText}>
+                    {hasAnalysis && isNoBiasResult(result)
+                      ? "No urgent follow-up steps were generated. For consequential topics, compare with one additional source and continue reading with normal judgment."
+                      : "Useful next reading steps will appear here."}
+                  </li>
+                </ul>
               )}
             </section>
 
@@ -543,12 +554,26 @@ function AnalyzePageContent() {
               </div>
               <div className={styles.confidenceScore}>
                 <strong>{hasAnalysis ? formatConfidenceScore(result.confidence) : "--"}</strong>
-                {!hasAnalysis ? (
+                {hasAnalysis ? (
+                  <div className={styles.confBar}>
+                    <div className={styles.confTrack}>
+                      <div
+                        className={styles.confFill}
+                        style={{ width: `${Math.round(result.confidence * 100)}%` }}
+                      />
+                    </div>
+                    <div className={styles.confScale}>
+                      <span className={styles.confScaleLabel}>Low</span>
+                      <span className={styles.confLevel}>{confidenceLevel(result.confidence)}</span>
+                      <span className={styles.confScaleLabel}>High</span>
+                    </div>
+                  </div>
+                ) : (
                   <p>
                     Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing,
                     and omission. It is not a claim of factual certainty.
                   </p>
-                ) : null}
+                )}
               </div>
             </section>
           </section>

@@ -89,6 +89,9 @@ export default function Home() {
                 Open Analyzer
               </Link>
             </motion.div>
+            <motion.p className={styles.trustSignal} variants={heroItem}>
+              No account required · Free to start
+            </motion.p>
           </motion.div>
         </section>
 

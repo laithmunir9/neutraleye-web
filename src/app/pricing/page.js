@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import WaitlistForm from "./WaitlistForm";
 import styles from "./page.module.css";
 
 const INCLUDED_FEATURES = [
@@ -149,6 +150,7 @@ export default function PricingPage() {
               <button className={styles.ctaPrimary} disabled>
                 Coming soon
               </button>
+              <WaitlistForm />
               <div className={styles.featuresSection}>
                 <p className={styles.featuresLabel}>Everything in Free, plus:</p>
                 <ul className={styles.features}>
