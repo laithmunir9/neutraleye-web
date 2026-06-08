@@ -19,14 +19,15 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 
 ## Infrastructure
 
-| Service     | Location                          | Notes                                            |
-|-------------|-----------------------------------|--------------------------------------------------|
-| Frontend    | `neutraleye-web` → Vercel         | Next.js 16, React 19                             |
-| API Routes  | `src/app/api/` → Vercel           | All backend logic lives here, no separate server |
-| Database    | Supabase                          | Auth + analyses + daily_usage tables, RLS active |
-| Payments    | Stripe                            | Not yet set up                                   |
-| Security    | Cloudflare                        | Planned                                          |
-| Monitoring  | Sentry                            | Planned                                          |
+| Service        | Location                          | Notes                                                        |
+|----------------|-----------------------------------|--------------------------------------------------------------|
+| Frontend       | `neutraleye-web` → Vercel         | Next.js 16, React 19                                         |
+| API Routes     | `src/app/api/` → Vercel           | All backend logic lives here, no separate server             |
+| Database       | Supabase                          | Auth + analyses + daily_usage tables, RLS active             |
+| Rate limiting  | Upstash Redis                     | Sliding window via `@upstash/ratelimit`; falls back to in-memory locally |
+| Payments       | Stripe                            | Not yet set up                                               |
+| Security       | Cloudflare                        | Planned                                                      |
+| Monitoring     | Sentry                            | Set up — frontend + backend verified                         |
 
 ---
 
@@ -42,6 +43,8 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 - **AI:** OpenAI SDK (`openai`) — `gpt-4o` for analysis, `gpt-4o-mini` for article detection
 - **Scraping:** `cheerio` for URL article extraction
 - **Database:** `@supabase/ssr` + `@supabase/supabase-js`
+- **Rate limiting:** `@upstash/ratelimit` + `@upstash/redis` — persistent sliding window, falls back to in-memory when env vars absent
+- **Error monitoring:** `@sentry/nextjs` — tracing + logs enabled, session replay disabled (privacy)
 - **Testing:** Jest + React Testing Library
 - **Linting:** ESLint (Next.js config)
 
@@ -106,6 +109,7 @@ src/
     score.js                # Score/confidence normalization
     storage.js              # Local storage helpers
     content.js              # BLOG_POSTS array + EXTENSION_URL. Add showBrandTitle: true to a post for logo overlay on blog card. Blog list sorts at render time — do not rely on array order.
+    ratelimit.js            # Upstash Redis rate limiter — getRatelimiter() + checkRedisRateLimit(). Falls back to in-memory store when UPSTASH_REDIS_REST_URL/TOKEN are absent (local dev).
     types.js                # Shared type definitions
     utils.ts                # shadcn cn() utility
     supabase/
@@ -123,7 +127,7 @@ src/
 
 ### `POST /api/analyze` — Web bias analysis
 - Accepts `text` or `url` (URL mode requires `x-client: web` header)
-- Rate limit: 5 req/min per IP (env-configurable via `RATE_LIMIT_WINDOW_MS` / `RATE_LIMIT_MAX`)
+- Rate limit: 5 req/min per IP (env-configurable via `RATE_LIMIT_WINDOW_MS` / `RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:web` key prefix)
 - Returns structured JSON: `{ directionLabel, score, confidence, drivers, summary, examples, sources, recommendations, result, json, extractedText }`
 - In-memory cache keyed by text hash or URL
 - Kill switch: `NEUTRALEYE_KILL_SWITCH=true` → 503
@@ -131,7 +135,7 @@ src/
 
 ### `POST /api/extension` — Extension bias analysis
 - Accepts `text` (plain), `url`, `headline` from extension popup
-- Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — applies to ALL requests including authenticated
+- Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:ext` key prefix), applies to ALL requests including authenticated
 - Additional daily limit for authenticated users: 10/day via Supabase `daily_usage` table
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
 - Returns `{ result: "<markdown>", saved: boolean }`
@@ -197,6 +201,13 @@ RATE_LIMIT_MAX=5
 # Extension rate limit (falls back to web vars if not set)
 EXT_RATE_LIMIT_WINDOW_MS=60000
 EXT_RATE_LIMIT_MAX=5
+
+# Upstash Redis — rate limiting (omit in local dev to fall back to in-memory)
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+
+# Sentry — error monitoring (set by Sentry wizard, also add to Vercel)
+SENTRY_AUTH_TOKEN=
 ```
 
 **Note:** Vercel env vars marked Sensitive cannot be pulled via `vercel env pull`. Add `OPENAI_WEBSITE_API_KEY` and `OPENAI_EXTENSION_API_KEY` to `.env.local` manually by creating new keys in the OpenAI dashboard, then updating both `.env.local` and Vercel.
@@ -251,7 +262,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Zoom / responsive scaling bugs** — Unresolved zoom and viewport scaling issues across pages. Do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **Extension CORS** — Currently allows any `chrome-extension://` origin. Lock to specific extension ID once published to the Chrome Web Store.
-- **Support contact email** — `/support/page.js` uses `sadeerm@hotmail.com`. Update to a `tryneutraleye.com` address once the domain is live.
+- **Support contact email** — `/support/page.js` uses `contact@tryneutraleye.com`. The inbox doesn't exist yet — create it once the domain is live.
 
 ---
 
@@ -259,8 +270,6 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up
 - **Cloudflare** — DDoS protection and CDN
-- **Sentry** — Error monitoring and alerting
-- **Persistent rate limiting** — Replace in-memory rate limit store with Redis to survive cold starts
 - **Extension CORS lockdown** — Restrict to specific extension ID post-publish
 - **Domain** — `tryneutraleye.com` (not yet purchased); once live: update Supabase Auth URL config, support page contact email, and legal contact email
 
