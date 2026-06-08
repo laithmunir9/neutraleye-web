@@ -109,12 +109,11 @@
 
 .confidenceScore {
   display: flex;
-  align-items: center;
-  gap: clamp(1rem, 2.5vw, 1.5rem);
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .confidenceScore strong {
-  min-width: 4.4rem;
   color: var(--text);
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 4vw, 3.1rem);
@@ -128,6 +127,47 @@
   color: var(--secondary-text);
   font-size: 0.98rem;
   line-height: 1.72;
+}
+
+.confBar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.confTrack {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(93, 75, 53, 0.12);
+  overflow: hidden;
+}
+
+.confFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(139, 103, 65, 0.55), #8b6741);
+  transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.confScale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.confScaleLabel {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.confLevel {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: #8b6741;
+  letter-spacing: 0.03em;
 }
 
 .bodyText {
@@ -321,8 +361,3 @@
   }
 }
 
-@media (max-width: 560px) {
-  .confidenceScore {
-    display: grid;
-  }
-}
