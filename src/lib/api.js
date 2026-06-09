@@ -2,6 +2,16 @@ import { normalizeConfidence, normalizeScore, scoreToDirection } from "./score.j
 
 const IS_DEV = process.env.NODE_ENV !== "production";
 
+function randomId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return randomId();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
 class ApiError extends Error {
   constructor(message, { status, code, requestId, endpoint, details } = {}) {
     super(message);
@@ -180,7 +190,7 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
   const normalizedDrivers = toArray(raw.drivers).map((item) => String(item).trim()).filter(Boolean).slice(0, 6);
 
   const normalized = {
-    id: crypto.randomUUID(),
+    id: randomId(),
     createdAt,
     inputType,
     url: requestMeta.url,
@@ -214,7 +224,7 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
 }
 
 async function request(endpoint, payload, inputType, requestMeta) {
-  const requestId = crypto.randomUUID();
+  const requestId = randomId();
   const requestStartedAt = new Date().toISOString();
   const target = endpoint;
   devLog(`request start ${endpoint}`, { requestId, payload });

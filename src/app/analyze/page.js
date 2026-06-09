@@ -449,7 +449,7 @@ function AnalyzePageContent() {
               <div className={styles.sectionHeader}>
                 <span>Analysis Result</span>
               </div>
-              <div className={styles.biasRow}>
+              <div className={`${styles.biasRow} ${!hasAnalysis ? styles.biasRowEmpty : ""}`}>
                 <strong>{resultTitle(result, hasAnalysis)}</strong>
               </div>
               <p className={styles.helperText}>{resultHelperText(result, hasAnalysis)}</p>
