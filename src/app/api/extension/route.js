@@ -258,6 +258,11 @@ function extractDomain(url) {
   }
 }
 
+function contentTypeFromAiJson(aiJson) {
+  const raw = String(aiJson?.content_type || "").trim().toLowerCase();
+  return raw === "opinion" || raw === "analysis" ? raw : "news";
+}
+
 async function generateBiasAnalysis(text, sourceUrl = null) {
   const sourceDomain = sourceUrl ? extractDomain(sourceUrl) : null;
   const prompt = `You are an impartial, evidence-first media analyst. Analyze the article text below for bias.
@@ -273,6 +278,17 @@ EVIDENCE SOURCE RULES — CRITICAL
 - Do NOT treat direct quotes from interview subjects, officials, politicians, spokespeople, witnesses, or anyone being covered in the story as evidence of the article's bias. A quoted person's loaded language reflects that person's bias, not the journalist's.
 - A sentence that is inside quotation marks and attributed to a named person or source (e.g., "X said", "according to Y") is NEVER eligible as a biased_phrase, no matter how loaded it sounds.
 - Only the journalist's own narration, framing sentences, descriptions, and editorial choices (what to include, omit, or emphasize) count as evidence.
+
+CONTENT TYPE CLASSIFICATION
+- First classify the article's content type as one of: "news", "opinion", or "analysis".
+  - "news": straight news reporting — primarily describes events, statements, or developments through factual reporting.
+  - "opinion": an op-ed, editorial, column, or piece that explicitly argues for the author's own viewpoint or position.
+  - "analysis": an analysis, explainer, or commentary piece that interprets or contextualizes events without being a pure opinion column.
+- Use signals such as section labels ("Opinion", "Editorial", "Analysis", "Perspective"), first-person argumentation ("I believe", "we should", "in my view"), and overall structure (argument-driven vs. event-driven) to classify.
+- This classification changes how bias should be evaluated:
+  - "opinion": a clear personal stance, persuasive language, and arguing for a position are EXPECTED and must NOT by themselves be flagged as bias. Only flag bias if the piece misrepresents facts, omits critical context in a misleading way, or presents false claims as established fact.
+  - "analysis": interpretation and informed perspective are expected. Apply a moderately relaxed standard — flag only one-sided framing, unsupported claims presented as fact, or omissions that materially mislead.
+  - "news": apply the full bias standard described below with no relaxation.
 
 BIAS TAXONOMY (use for the "why" field — applies only to the journalist's own writing)
 - "framing": the journalist's selective emphasis, ordering, or omission that alters interpretation.
@@ -298,6 +314,7 @@ Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outs
 
 Required schema:
 {
+  "content_type": "news" | "opinion" | "analysis",
   "bias_level": "none" | "slight" | "moderate" | "heavy" | "uncertain",
   "direction": "toward <entity>" | "against <entity>" | "non-directional framing bias" | "unknown",
   "analysis_confidence": <number 0.00–1.00>,
@@ -445,7 +462,7 @@ export async function POST(request) {
 
       const cacheKey = `url:${url.trim()}`;
       if (inMemoryCache.has(cacheKey)) {
-        return Response.json({ result: inMemoryCache.get(cacheKey) }, { headers });
+        return Response.json(inMemoryCache.get(cacheKey), { headers });
       }
 
       const extracted = await extractArticleTextFromUrl(url.trim());
@@ -466,14 +483,14 @@ export async function POST(request) {
 
     const cacheKey = hasUrl ? `url:${url}` : `text:${text.slice(0, 500)}`;
     if (inMemoryCache.has(cacheKey)) {
-      return Response.json({ result: inMemoryCache.get(cacheKey) }, { headers });
+      return Response.json(inMemoryCache.get(cacheKey), { headers });
     }
 
     const verdict = await detectIfArticle(text);
     if (verdict !== "article") {
-      const message = "⚠️ Could not analyze this page. Please open a real article and try again.";
-      inMemoryCache.set(cacheKey, message);
-      return Response.json({ result: message }, { headers });
+      const payload = { result: "⚠️ Could not analyze this page. Please open a real article and try again." };
+      inMemoryCache.set(cacheKey, payload);
+      return Response.json(payload, { headers });
     }
 
     const aiResponse = await generateBiasAnalysis(text, hasUrl ? url : null);
@@ -481,7 +498,9 @@ export async function POST(request) {
     try { parsedJson = JSON.parse(aiResponse); } catch { parsedJson = null; }
 
     const humanResult = buildHumanResult(parsedJson) || aiResponse;
-    inMemoryCache.set(cacheKey, humanResult);
+    const contentType = contentTypeFromAiJson(parsedJson);
+    const payload = { result: humanResult, contentType };
+    inMemoryCache.set(cacheKey, payload);
 
     // Save to cloud history and track usage for authenticated users
     if (authUser) {
@@ -491,7 +510,7 @@ export async function POST(request) {
       ]);
     }
 
-    return Response.json({ result: humanResult, saved: Boolean(authUser) }, { headers });
+    return Response.json({ ...payload, saved: Boolean(authUser) }, { headers });
   } catch (error) {
     logEvent("error", "analysis.failure", {
       requestId,

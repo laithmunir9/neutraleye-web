@@ -166,6 +166,11 @@ function isGenericDirectionLabel(value) {
   return /^(analysis\s+complete|complete|completed|success|ok)$/i.test(String(value || "").trim());
 }
 
+function normalizeContentType(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return normalized === "opinion" || normalized === "analysis" ? normalized : "news";
+}
+
 function normalizeResponse(data, inputType, requestMeta = {}) {
   const raw = data || {};
   const sectionedText = looksLikeSectionedMarkdown(raw.summary) ? raw.summary : raw.result;
@@ -193,6 +198,7 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
     id: randomId(),
     createdAt,
     inputType,
+    contentType: normalizeContentType(raw.contentType),
     url: requestMeta.url,
     title: raw.title || requestMeta.title || requestMeta.url,
     direction: String(directionLabel || "Neutral"),

@@ -237,6 +237,17 @@ EVIDENCE SOURCE RULES — CRITICAL
 - A sentence that is inside quotation marks and attributed to a named person or source (e.g., "X said", "according to Y") is NEVER eligible as a biased_phrase, no matter how loaded it sounds.
 - Only the journalist's own narration, framing sentences, descriptions, and editorial choices (what to include, omit, or emphasize) count as evidence.
 
+CONTENT TYPE CLASSIFICATION
+- First classify the article's content type as one of: "news", "opinion", or "analysis".
+  - "news": straight news reporting — primarily describes events, statements, or developments through factual reporting.
+  - "opinion": an op-ed, editorial, column, or piece that explicitly argues for the author's own viewpoint or position.
+  - "analysis": an analysis, explainer, or commentary piece that interprets or contextualizes events without being a pure opinion column.
+- Use signals such as section labels ("Opinion", "Editorial", "Analysis", "Perspective"), first-person argumentation ("I believe", "we should", "in my view"), and overall structure (argument-driven vs. event-driven) to classify.
+- This classification changes how bias should be evaluated:
+  - "opinion": a clear personal stance, persuasive language, and arguing for a position are EXPECTED and must NOT by themselves be flagged as bias. Only flag bias if the piece misrepresents facts, omits critical context in a misleading way, or presents false claims as established fact.
+  - "analysis": interpretation and informed perspective are expected. Apply a moderately relaxed standard — flag only one-sided framing, unsupported claims presented as fact, or omissions that materially mislead.
+  - "news": apply the full bias standard described below with no relaxation.
+
 BIAS TAXONOMY (use for the "why" field — applies only to the journalist's own writing)
 - "framing": the journalist's selective emphasis, ordering, or omission that alters interpretation.
 - "language": the journalist's own loaded, emotive, or judgmental wording presented as fact (not wording inside a quote from a source).
@@ -261,6 +272,7 @@ Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outs
 
 Required schema:
 {
+  "content_type": "news" | "opinion" | "analysis",
   "bias_level": "none" | "slight" | "moderate" | "heavy" | "uncertain",
   "direction": "toward <entity>" | "against <entity>" | "non-directional framing bias" | "unknown",
   "analysis_confidence": <number 0.00–1.00>,
@@ -444,6 +456,11 @@ function uniqueStrings(values) {
   return [...new Set(values.filter(Boolean).map((v) => String(v).trim()).filter(Boolean))];
 }
 
+function contentTypeFromAiJson(aiJson) {
+  const raw = String(aiJson?.content_type || "").trim().toLowerCase();
+  return raw === "opinion" || raw === "analysis" ? raw : "news";
+}
+
 function normalizeAiResult(parsed) {
   const human = String(parsed?.human || "").trim();
   const aiJson = parsed?.json || null;
@@ -478,6 +495,7 @@ function normalizeAiResult(parsed) {
     : 0.5;
   const directionLabel = aiJson ? directionLabelFromAiJson(aiJson, human) : humanSections.directionLabel || directionLabelFromAiJson(aiJson, human);
   return {
+    contentType: contentTypeFromAiJson(aiJson),
     directionLabel,
     score: scoreFromBiasLevel(aiJson?.bias_level, aiJson?.direction),
     confidence,
@@ -513,6 +531,7 @@ async function runAnalysisPipeline(text, requestId, sourceUrl = null) {
   const parsed = parseAiResponse(aiResponse);
   const normalized = normalizeAiResult(parsed);
   return {
+    contentType: normalized.contentType,
     directionLabel: normalized.directionLabel,
     score: normalized.score,
     confidence: normalized.confidence,

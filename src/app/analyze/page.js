@@ -23,10 +23,16 @@ const NEUTRAL_NOTE_ITEMS = [
   "Visible signals stayed below the threshold required for a meaningful bias flag.",
   "This result reflects the current text only and is not a guarantee that every relevant context is present."
 ];
+const CONTENT_TYPE_LABELS = {
+  news: "News",
+  opinion: "Opinion",
+  analysis: "Analysis/Commentary"
+};
 const DEFAULT_RESULT = {
   id: "",
   createdAt: "",
   inputType: "text",
+  contentType: "news",
   direction: "Neutral",
   directionLabel: "Neutral",
   confidence: 0.5,
@@ -47,6 +53,11 @@ function isNoBiasResult(result) {
   const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
 
   return label.includes("no significant bias") || label === "neutral";
+}
+
+function contentTypeLabel(result, hasAnalysis) {
+  if (!hasAnalysis) return "";
+  return CONTENT_TYPE_LABELS[result?.contentType] || "";
 }
 
 function resultTitle(result, hasAnalysis) {
@@ -448,6 +459,9 @@ function AnalyzePageContent() {
             <section className={`${styles.outputCard} ${styles.resultHero}`}>
               <div className={styles.sectionHeader}>
                 <span>Analysis Result</span>
+                {contentTypeLabel(result, hasAnalysis) ? (
+                  <span className={styles.contentTypeBadge}>{contentTypeLabel(result, hasAnalysis)}</span>
+                ) : null}
               </div>
               <div className={`${styles.biasRow} ${!hasAnalysis ? styles.biasRowEmpty : ""}`}>
                 <strong>{resultTitle(result, hasAnalysis)}</strong>
