@@ -4,7 +4,7 @@ const IS_DEV = process.env.NODE_ENV !== "production";
 
 function randomId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return randomId();
+    return crypto.randomUUID();
   }
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
