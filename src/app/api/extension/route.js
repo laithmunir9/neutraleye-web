@@ -217,7 +217,7 @@ async function extractArticleTextFromUrl(url) {
   const mainEl = $("main");
   let root = articleEl.length ? articleEl.first() : mainEl.length ? mainEl.first() : $("body");
 
-  root.find("nav, footer, header, aside, form, button").remove();
+  root.find("nav, footer, header, aside, form, button, figure, picture, [class*='caption'], [class*='byline'], [class*='author'], [rel='author'], [class*='credit'], [class*='dateline']").remove();
 
   const parts = [];
   root.find("h1,h2,h3,p,li").each((_, el) => {
@@ -268,16 +268,25 @@ SCOPE & CONTEXT
 - Do NOT introduce new factual claims or assume outside events unless the article explicitly references them.
 - Do NOT speculate about author intent.
 
-BIAS TAXONOMY (use for the "why" field)
-- "framing": selective emphasis or omission that alters interpretation.
-- "language": loaded, emotive, or judgmental wording presented as fact.
-- "source": one-sided sourcing without meaningful countervailing perspectives.
-- "attribution": claims presented as fact without clear attribution.
+EVIDENCE SOURCE RULES — CRITICAL
+- You are analyzing the JOURNALIST'S writing — their framing, word choices, structure, emphasis, and omissions — NOT the views of people quoted in the article.
+- Do NOT treat direct quotes from interview subjects, officials, politicians, spokespeople, witnesses, or anyone being covered in the story as evidence of the article's bias. A quoted person's loaded language reflects that person's bias, not the journalist's.
+- A sentence that is inside quotation marks and attributed to a named person or source (e.g., "X said", "according to Y") is NEVER eligible as a biased_phrase, no matter how loaded it sounds.
+- Only the journalist's own narration, framing sentences, descriptions, and editorial choices (what to include, omit, or emphasize) count as evidence.
+
+BIAS TAXONOMY (use for the "why" field — applies only to the journalist's own writing)
+- "framing": the journalist's selective emphasis, ordering, or omission that alters interpretation.
+- "language": the journalist's own loaded, emotive, or judgmental wording presented as fact (not wording inside a quote from a source).
+- "source": the journalist's sourcing choices — one-sided sourcing without meaningful countervailing perspectives.
+- "attribution": claims the journalist presents as fact without clear attribution.
 
 ANALYSIS RULES
-- Only flag bias when clearly supported by the text. If evidence is weak or ambiguous, set bias_level to "none" or "uncertain" and set analysis_confidence below 0.4.
-- When flagging bias, include exact quoted excerpts only.
-- Scores above 0.85 should be rare and reserved for clear, repeated, text-explicit bias.
+- Only flag bias when the journalist's own writing clearly and meaningfully shapes how a reader would perceive the story.
+- Apply a minimum-impact threshold: if any bias signals are minor, isolated, purely stylistic, or would not meaningfully change a reader's perception, set bias_level to "none" rather than flagging it.
+- Reserve "slight", "moderate", and "heavy" for cases where the journalist's framing, emphasis, omissions, or word choices would meaningfully shape a reader's interpretation.
+- If evidence is weak or ambiguous, set bias_level to "none" or "uncertain" and set analysis_confidence below 0.4.
+- When flagging bias, include exact quoted excerpts of the JOURNALIST'S OWN SENTENCES only — never a quote attributed to a person in the article.
+- Scores above 0.85 should be rare and reserved for clear, repeated, text-explicit bias in the journalist's own writing.
 
 SUGGESTED_SOURCES RULES
 - Only include specific article URLs you are reasonably confident exist and that directly cover the SAME main topic.
@@ -292,9 +301,9 @@ Required schema:
   "bias_level": "none" | "slight" | "moderate" | "heavy" | "uncertain",
   "direction": "toward <entity>" | "against <entity>" | "non-directional framing bias" | "unknown",
   "analysis_confidence": <number 0.00–1.00>,
-  "summary": "<one or two neutral sentences>",
+  "summary": "<one or two neutral sentences. If bias_level is 'none', state plainly that the writing itself is neutral/clean. If bias_level is not 'none', state plainly that the journalist's writing shows meaningful bias and briefly why.>",
   "biased_phrases": [
-    { "quote": "<exact excerpt>", "why": "framing|language|source|attribution" }
+    { "quote": "<exact excerpt of the journalist's own writing — never a quote attributed to a person in the article>", "why": "framing|language|source|attribution" }
   ],
   "suggested_sources": [
     { "title": "Article title here", "url": "https://outlet.com/article-path", "outlet": "Outlet Name" }
