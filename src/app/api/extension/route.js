@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import * as cheerio from "cheerio";
 import { createServerClient } from "@supabase/ssr";
 import { randomUUID } from "crypto";
+import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
@@ -38,6 +39,18 @@ function logEvent(level, event, meta = {}) {
   if (level === "error") { console.error(line); return; }
   if (level === "warn") { console.warn(line); return; }
   console.info(line);
+}
+
+// Genuine bugs/operational failures worth alerting on — excludes expected,
+// user-driven outcomes (validation, rate limits, "not an article").
+const SENTRY_CAPTURE_CODES = new Set(["OPENAI_ERROR", "INTERNAL_ERROR", "URL_EXTRACTION_ERROR"]);
+
+function reportToSentry(error, errorCode) {
+  if (error?._sentryReported) return;
+  if (SENTRY_CAPTURE_CODES.has(errorCode)) {
+    Sentry.captureException(error);
+  }
+  if (error && typeof error === "object") error._sentryReported = true;
 }
 
 // ── CORS ───────────────────────────────────────────────────────────────────
@@ -512,12 +525,14 @@ export async function POST(request) {
 
     return Response.json({ ...payload, saved: Boolean(authUser) }, { headers });
   } catch (error) {
+    const errorCode = error?.code || "INTERNAL_ERROR";
     logEvent("error", "analysis.failure", {
       requestId,
       ip,
-      errorCode: error?.code || "INTERNAL_ERROR",
+      errorCode,
       message: String(error?.message || error),
     });
+    reportToSentry(error, errorCode);
     return Response.json({ error: "Error checking bias.", code: "INTERNAL_ERROR" }, { status: 500, headers });
   }
 }

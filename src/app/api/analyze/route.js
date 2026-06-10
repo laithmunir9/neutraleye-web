@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import * as cheerio from "cheerio";
 import { randomUUID } from "crypto";
+import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
@@ -40,6 +41,18 @@ function logEvent(level, event, meta = {}) {
   if (level === "error") { console.error(line); return; }
   if (level === "warn") { console.warn(line); return; }
   console.info(line);
+}
+
+// Genuine bugs/operational failures worth alerting on — excludes expected,
+// user-driven outcomes (validation, rate limits, "not an article").
+const SENTRY_CAPTURE_CODES = new Set(["OPENAI_ERROR", "INTERNAL_ERROR", "URL_EXTRACTION_ERROR"]);
+
+function reportToSentry(error, errorCode) {
+  if (error?._sentryReported) return;
+  if (SENTRY_CAPTURE_CODES.has(errorCode)) {
+    Sentry.captureException(error);
+  }
+  if (error && typeof error === "object") error._sentryReported = true;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -208,6 +221,7 @@ Text:
       errorCode: error?.code || "OPENAI_ERROR",
       message: String(error?.message || error),
     });
+    reportToSentry(error, "OPENAI_ERROR");
     throw error;
   }
 }
@@ -311,6 +325,7 @@ TEXT_FOR_ANALYSIS:
       errorCode: error?.code || "OPENAI_ERROR",
       message: String(error?.message || error),
     });
+    reportToSentry(error, "OPENAI_ERROR");
     throw error;
   }
 }
@@ -638,6 +653,7 @@ export async function POST(request) {
           return errResponse(504, "Timed out while fetching URL content.", "URL_FETCH_TIMEOUT");
         if (error?.code === "URL_FETCH_FAILED")
           return errResponse(502, "Could not fetch the requested URL.", "URL_FETCH_FAILED", `status=${error?.status}`);
+        reportToSentry(error, "URL_EXTRACTION_ERROR");
         return errResponse(502, "Unexpected error fetching URL.", "URL_EXTRACTION_ERROR");
       }
 
@@ -652,12 +668,14 @@ export async function POST(request) {
 
     return errResponse(400, "Request must include non-empty 'text' or 'url'.", "VALIDATION_ERROR");
   } catch (error) {
+    const errorCode = error?.code || "INTERNAL_ERROR";
     logEvent("error", "analysis.failure", {
       requestId,
       ip,
-      errorCode: error?.code || "INTERNAL_ERROR",
+      errorCode,
       message: String(error?.message || error),
     });
+    reportToSentry(error, errorCode);
     if (error?.status && error?.code) {
       return errResponse(error.status, error.message, error.code);
     }
