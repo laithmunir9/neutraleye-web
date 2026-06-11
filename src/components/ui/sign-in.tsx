@@ -33,21 +33,18 @@ function ResultFeed() {
     return () => clearTimeout(t);
   }, [visible, resetting]);
 
+  const shownSteps = resetting ? [] : RESULT_STEPS.slice(0, visible);
+
   return (
     <div className="flex flex-col gap-2 w-full">
-      {RESULT_STEPS.map((step, i) => {
-        const shown    = !resetting && i < visible;
-        const isActive = !resetting && i === visible - 1;
-        const isDone   = !resetting && i < visible - 1;
+      {shownSteps.map((step, i) => {
+        const isActive = i === shownSteps.length - 1;
+        const isDone   = i < shownSteps.length - 1;
 
         return (
           <div
             key={step.title}
-            style={{
-              opacity:    shown ? 1 : 0,
-              transform:  shown ? 'translateY(0)' : 'translateY(6px)',
-              transition: `opacity 400ms ease ${i * 30}ms, transform 400ms ease ${i * 30}ms`,
-            }}
+            style={{ animation: 'feedItemIn 400ms ease both' }}
             className={[
               'flex items-center gap-3 px-4 py-3 rounded-xl border',
               isActive
@@ -92,6 +89,52 @@ function ResultFeed() {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ─── Signal mix bars: closes out the panel below the live feed ────────────
+
+const SIGNAL_LEVELS = [
+  { label: 'Tone',        value: 0.55 },
+  { label: 'Framing',     value: 0.85 },
+  { label: 'Attribution', value: 0.4 },
+  { label: 'Sources',     value: 0.7 },
+  { label: 'Omission',    value: 0.95 },
+] as const;
+
+function SignalBars() {
+  return (
+    <div>
+      <p
+        className="text-[10px] font-bold uppercase mb-3"
+        style={{ color: 'rgba(255,252,247,0.2)', letterSpacing: '0.18em', fontFamily: 'var(--font-sans)' }}
+      >
+        Signal mix for this result
+      </p>
+      <div className="flex items-end gap-3" style={{ height: '3.25rem' }}>
+        {SIGNAL_LEVELS.map((s, i) => (
+          <div key={s.label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+            <div
+              className="w-full h-full rounded-sm overflow-hidden flex items-end"
+              style={{ background: 'rgba(255,255,255,0.05)' }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: `${s.value * 100}%`,
+                  background: 'linear-gradient(180deg, #c4973e 0%, rgba(196,151,62,0.35) 100%)',
+                  borderRadius: '2px 2px 0 0',
+                  animation: `barGrow 900ms cubic-bezier(0.22,1,0.36,1) ${300 + i * 90}ms both`,
+                }}
+              />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,252,247,0.28)' }}>
+              {s.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -154,15 +197,9 @@ function AnalysisPanel({ heading, sub }: { heading: React.ReactNode; sub: string
           </div>
 
           <ResultFeed />
-        </div>
 
-        {/* Footer */}
-        <p
-          className="text-[10px] uppercase"
-          style={{ color: 'rgba(255,252,247,0.18)', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em' }}
-        >
-          Tone · Framing · Attribution · Sources · Omission
-        </p>
+          <SignalBars />
+        </div>
       </div>
     </section>
   );

@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
+import MediaBarrier from "@/components/MediaBarrier/MediaBarrier";
 import { MagicCard } from "@/components/ui/magic-card";
 import styles from "./page.module.css";
 
@@ -94,6 +95,9 @@ export default function Home() {
             </motion.p>
           </motion.div>
         </section>
+
+        {/* ── Media barrier ── */}
+        <MediaBarrier />
 
         {/* ── Analysis trace ── */}
         <motion.section className={styles.traceSection} {...reveal()}>

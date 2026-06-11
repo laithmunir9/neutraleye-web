@@ -153,7 +153,7 @@
 
 .principle {
   display: grid;
-  grid-template-columns: 3.5rem 1fr;
+  grid-template-columns: clamp(4.5rem, 7vw, 6.5rem) 1fr;
   gap: 0 clamp(1.5rem, 3vw, 2.5rem);
   align-items: start;
   padding: clamp(1.5rem, 2.5vw, 2rem) 0;
@@ -166,12 +166,11 @@
 
 .principleNumber {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: rgba(139, 103, 65, 0.3);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  padding-top: 0.05rem;
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 500;
+  color: rgba(139, 103, 65, 0.85);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
 }
 
 .principleContent {
@@ -339,5 +338,5 @@
 
   .pullQuoteWrap { padding-left: 1rem; padding-right: 1rem; }
 
-  .principle { grid-template-columns: 2.5rem 1fr; }
+  .principle { grid-template-columns: 3.5rem 1fr; }
 }

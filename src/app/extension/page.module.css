@@ -237,16 +237,16 @@
 .stepNum {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
-  font-weight: 400;
-  color: rgba(139, 103, 65, 0.3);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.35rem;
+  font-size: clamp(3.6rem, 6.4vw, 6rem);
+  font-weight: 500;
+  color: rgba(139, 103, 65, 0.85);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
   transition: color 200ms ease;
 }
 
-.step:hover .stepNum { color: rgba(139, 103, 65, 0.6); }
+.step:hover .stepNum { color: var(--accent-strong); }
 
 .stepTitle {
   display: block;
@@ -267,7 +267,6 @@
    FEATURES GRID
 ══════════════════════════════════════ */
 .featuresSection {
-  background: rgba(255, 252, 247, 0.5);
   border-bottom: 1px solid var(--border);
 }
 
