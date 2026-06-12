@@ -1,5 +1,36 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
+import { checkRedisRateLimit } from "@/lib/ratelimit";
+
+const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || 60_000);
+const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
+
+// In-memory store — reset on cold start (acceptable for serverless)
+const rateLimitStore = new Map();
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function logEvent(level, event, meta = {}) {
+  const line = JSON.stringify({ timestamp: nowIso(), event, ...meta });
+  if (level === "error") { console.error(line); return; }
+  if (level === "warn") { console.warn(line); return; }
+  console.info(line);
+}
+
+function getClientIp(request) {
+  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+}
+
+function checkRateLimit(ip) {
+  return checkRedisRateLimit(ip, {
+    prefix: "ne:ext-auth",
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    fallbackStore: rateLimitStore,
+  });
+}
 
 function makeSupabase() {
   return createServerClient(
@@ -9,9 +40,13 @@ function makeSupabase() {
   );
 }
 
+// Chrome extensions send an Origin like chrome-extension://<id>
+// Locked to the published NeutralEye extension's ID.
+const ALLOWED_EXTENSION_ORIGIN = "chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe";
+
 function corsHeaders(request) {
   const origin = request.headers.get("origin") || "";
-  const allowed = origin.startsWith("chrome-extension://") ? origin : "";
+  const allowed = origin === ALLOWED_EXTENSION_ORIGIN ? origin : "";
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
@@ -25,6 +60,16 @@ export async function OPTIONS(request) {
 
 export async function POST(request) {
   const headers = corsHeaders(request);
+  const ip = getClientIp(request);
+
+  const retryAfter = await checkRateLimit(ip);
+  if (retryAfter !== null) {
+    logEvent("warn", "rate_limit.exceeded", { ip, route: "extension-auth", retryAfter });
+    return NextResponse.json(
+      { error: "Too many requests. Please retry shortly.", code: "RATE_LIMITED" },
+      { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+    );
+  }
 
   let body;
   try {

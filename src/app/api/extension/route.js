@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { randomUUID } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { assertUrlIsSafe, MAX_REDIRECTS } from "@/lib/ssrf";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -55,9 +56,8 @@ function reportToSentry(error, errorCode) {
 
 // ── CORS ───────────────────────────────────────────────────────────────────
 // Chrome extensions send an Origin like chrome-extension://<id>
-// We allow any chrome-extension:// origin so the route works before the
-// extension ID is known. Lock this down to your specific extension ID once
-// it's published: e.g. "chrome-extension://abcdefghijklmnopqrstuvwxyz123456"
+// Locked to the published NeutralEye extension's ID.
+const ALLOWED_EXTENSION_ORIGIN = "chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe";
 
 const DAILY_LIMIT = 10;
 
@@ -138,7 +138,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
 
 function corsHeaders(request) {
   const origin = request.headers.get("origin") || "";
-  const allowed = origin.startsWith("chrome-extension://") ? origin : "";
+  const allowed = origin === ALLOWED_EXTENSION_ORIGIN ? origin : "";
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -191,28 +191,44 @@ function checkRateLimit(ip) {
 
 // ── URL extraction ─────────────────────────────────────────────────────────
 
+const FETCH_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+
 async function fetchHtml(url, timeoutMs = 12000) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml",
-      },
-    });
-    if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
-    return await response.text();
-  } catch (error) {
-    if (error?.name === "AbortError") throw new Error("Timed out fetching URL.");
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+  let currentUrl = url;
+
+  for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects++) {
+    await assertUrlIsSafe(currentUrl);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(currentUrl, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          "User-Agent": FETCH_USER_AGENT,
+          Accept: "text/html,application/xhtml+xml",
+        },
+      });
+
+      if (response.status >= 300 && response.status < 400 && response.headers.get("location")) {
+        currentUrl = new URL(response.headers.get("location"), currentUrl).toString();
+        continue;
+      }
+
+      if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+      return await response.text();
+    } catch (error) {
+      if (error?.name === "AbortError") throw new Error("Timed out fetching URL.");
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
+
+  throw new Error("Too many redirects while fetching URL content.");
 }
 
 async function extractArticleTextFromUrl(url) {
@@ -478,7 +494,15 @@ export async function POST(request) {
         return Response.json(inMemoryCache.get(cacheKey), { headers });
       }
 
-      const extracted = await extractArticleTextFromUrl(url.trim());
+      let extracted;
+      try {
+        extracted = await extractArticleTextFromUrl(url.trim());
+      } catch (error) {
+        if (error?.code === "URL_BLOCKED") {
+          return Response.json({ error: "This URL cannot be analyzed.", code: "URL_BLOCKED" }, { status: 400, headers });
+        }
+        throw error;
+      }
       if (!extracted || extracted.length < 300) {
         return Response.json(
           { result: "⚠️ Could not extract readable article text from that URL. Try a different article page." },

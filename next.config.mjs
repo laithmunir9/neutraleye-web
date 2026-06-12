@@ -1,4 +1,26 @@
 import { withSentryConfig } from "@sentry/nextjs";
+
+const isDev = process.env.NODE_ENV !== "production";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseWsUrl = supabaseUrl.replace(/^http/, "ws");
+
+// Content-Security-Policy
+// - 'unsafe-inline' for script/style is required by Next.js's RSC bootstrap
+//   scripts and CSS-in-JS; 'unsafe-eval' is only added in dev for Turbopack HMR.
+// - connect-src allows Supabase (REST + realtime websocket) and Sentry ingest.
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
+  "font-src 'self' data:",
+  `connect-src 'self' ${supabaseUrl} ${supabaseWsUrl} https://*.ingest.us.sentry.io${isDev ? " ws://localhost:*" : ""}`,
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   devIndicators: false,
@@ -8,7 +30,21 @@ const nextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "avatars.githubusercontent.com" }
     ]
-  }
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+          { key: "Content-Security-Policy", value: csp },
+        ],
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

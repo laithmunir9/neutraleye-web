@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import { randomUUID } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { assertUrlIsSafe, MAX_REDIRECTS } from "@/lib/ssrf";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -113,37 +114,56 @@ function validateUrlInput(value) {
 
 // ── URL extraction ─────────────────────────────────────────────────────────
 
+const FETCH_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+
 async function fetchHtml(url, timeoutMs = 12000) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml",
-      },
-    });
-    if (!response.ok) {
-      const error = new Error(`Fetch failed with status ${response.status}`);
-      error.code = "URL_FETCH_FAILED";
-      error.status = response.status;
+  let currentUrl = url;
+
+  for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects++) {
+    await assertUrlIsSafe(currentUrl);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(currentUrl, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          "User-Agent": FETCH_USER_AGENT,
+          Accept: "text/html,application/xhtml+xml",
+        },
+      });
+
+      if (response.status >= 300 && response.status < 400 && response.headers.get("location")) {
+        currentUrl = new URL(response.headers.get("location"), currentUrl).toString();
+        continue;
+      }
+
+      if (!response.ok) {
+        const error = new Error(`Fetch failed with status ${response.status}`);
+        error.code = "URL_FETCH_FAILED";
+        error.status = response.status;
+        throw error;
+      }
+      return await response.text();
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        const e = new Error("Timed out while fetching URL content.");
+        e.code = "URL_FETCH_TIMEOUT";
+        throw e;
+      }
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
-    return await response.text();
-  } catch (error) {
-    if (error?.name === "AbortError") {
-      const e = new Error("Timed out while fetching URL content.");
-      e.code = "URL_FETCH_TIMEOUT";
-      throw e;
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  const error = new Error("Too many redirects while fetching URL content.");
+  error.code = "URL_FETCH_FAILED";
+  error.status = 502;
+  throw error;
 }
 
 async function extractArticleTextFromUrl(url) {
@@ -649,6 +669,8 @@ export async function POST(request) {
         logEvent("info", "url.extraction.success", { requestId, url, extractedTextLength: extracted.length });
       } catch (error) {
         logEvent("warn", "url.extraction.failure", { requestId, url, errorCode: error?.code, message: String(error?.message) });
+        if (error?.code === "URL_BLOCKED")
+          return errResponse(400, "This URL cannot be analyzed.", "URL_BLOCKED");
         if (error?.code === "URL_FETCH_TIMEOUT")
           return errResponse(504, "Timed out while fetching URL content.", "URL_FETCH_TIMEOUT");
         if (error?.code === "URL_FETCH_FAILED")

@@ -139,7 +139,7 @@ src/
 - Additional daily limit for authenticated users: 10/day via Supabase `daily_usage` table
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
 - Returns `{ result: "<markdown>", saved: boolean }`
-- CORS: allows any `chrome-extension://` origin (lock to specific ID once published)
+- CORS: locked to the published extension's origin, `chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe`
 - Source domain exclusion: same as `/api/analyze` — url is passed through to exclude the source outlet from suggestions
 
 ### `POST /api/extension-auth` — Extension login
@@ -261,7 +261,6 @@ When building new UI, prefer extending existing components in `src/components/ui
 ## Known Issues
 
 - **Zoom / responsive scaling bugs** — Unresolved zoom and viewport scaling issues across pages. Do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
-- **Extension CORS** — Currently allows any `chrome-extension://` origin. Lock to specific extension ID once published to the Chrome Web Store.
 - **Support contact email** — `/support/page.js` uses `contact@tryneutraleye.com`. The inbox doesn't exist yet — create it once the domain is live.
 
 ---
@@ -270,7 +269,6 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up
 - **Cloudflare** — DDoS protection and CDN
-- **Extension CORS lockdown** — Restrict to specific extension ID post-publish
 - **Domain** — `tryneutraleye.com` (not yet purchased); once live: update Supabase Auth URL config, support page contact email, and legal contact email
 
 ---
