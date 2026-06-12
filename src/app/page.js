@@ -1,17 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
 import MediaBarrier from "@/components/MediaBarrier/MediaBarrier";
-import { MagicCard } from "@/components/ui/magic-card";
 import styles from "./page.module.css";
 
 const EASE = [0.22, 1, 0.36, 1];
-
-const SIGNALS = ["Tone", "Framing", "Attribution", "Sources", "Omission"];
 
 const TRACE_STEPS = [
   { type: "setup",  title: "Article submitted",        badge: "URL",        desc: "thenationalstandard.com/politics/senate-vote",           time: "14:22:01" },
@@ -24,14 +22,51 @@ const TRACE_STEPS = [
   { type: "result", title: "Result assembled",         badge: "Conclusion", desc: "Moderate bias toward Senate leadership · confidence 0.74", time: "14:22:13" },
 ];
 
-const SOURCES = [
-  { label: "Center-left daily", note: "Same story" },
-  { label: "Wire service", note: "Primary coverage" },
-  { label: "Center publication", note: "Counter-context" },
+const ANNOTATIONS = [
+  {
+    signal: "Tone",
+    body: "Loaded phrasing — “a decisive step toward long-overdue reform” frames the outcome as overdue progress before the policy itself is explained.",
+  },
+  {
+    signal: "Framing",
+    body: "Selective emphasis — the procedural detail leads the story; the policy change itself is three paragraphs down.",
+  },
+  {
+    signal: "Attribution",
+    body: "Unnamed sourcing — “three committee aides” is the only attribution offered for a contested figure.",
+  },
+  {
+    signal: "Sources",
+    body: "One-sided sourcing — the opposing view gets one sentence out of five paragraphs.",
+  },
+  {
+    signal: "Omission",
+    body: "Missing context — the CBO’s same-day cost estimate isn’t referenced anywhere in the piece.",
+  },
 ];
+
+const FURTHER = [
+  { name: "The Continental Wire", kind: "Wire service",   note: "Primary committee coverage, both sides quoted", lean: 50 },
+  { name: "The Ledger",           kind: "Center-left daily", note: "Same vote, different framing",                lean: 34 },
+  { name: "Public Record Review", kind: "Policy desk",     note: "Includes the CBO estimate in full",            lean: 62 },
+];
+
+function Mark({ index, active, onActivate, children }) {
+  return (
+    <span
+      className={`${styles.mark} ${active === index ? styles.markActive : ""}`}
+      onMouseEnter={() => onActivate(index)}
+      onMouseLeave={() => onActivate(null)}
+    >
+      {children}
+      <sup className={styles.markIndex}>{index}</sup>
+    </span>
+  );
+}
 
 export default function Home() {
   const shouldReduce = useReducedMotion();
+  const [active, setActive] = useState(null);
 
   const reveal = (delay = 0) =>
     shouldReduce
@@ -50,6 +85,16 @@ export default function Home() {
 
   const heroItem = {
     hidden: shouldReduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  };
+
+  const marginContainer = {
+    hidden: {},
+    show: { transition: { staggerChildren: shouldReduce ? 0 : 0.14, delayChildren: shouldReduce ? 0 : 0.15 } },
+  };
+
+  const marginItem = {
+    hidden: shouldReduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
   };
 
@@ -127,97 +172,100 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* ── Feature rows ── */}
-        <section className={styles.features}>
+        {/* ── Annotated read ── */}
+        <motion.section className={styles.annotated} {...reveal()}>
 
-          {/* Row 1: Signal detection — visual left, text right */}
-          <motion.div className={styles.featureRow} {...reveal()}>
-            <div className={styles.featureVisual}>
-              <MagicCard
-                className={styles.featureCardWrap}
-                gradientFrom="#c4973e"
-                gradientTo="#8b6741"
-                gradientColor="rgba(139, 103, 65, 0.07)"
-                gradientSize={180}
-              >
-                <div className={styles.featureCardContent}>
-                  <span className={styles.featureCardLabel}>Signal families</span>
-                  <div className={styles.signalPills}>
-                    {SIGNALS.map((s) => (
-                      <span key={s} className={styles.signalPill}>{s}</span>
-                    ))}
+          <div className={styles.annotatedIntro}>
+            <p className={styles.featureEyebrow}>How it reads</p>
+            <h2>Read between the lines</h2>
+            <p>NeutralEye marks up an article the way a sharp editor would — five signals, found in context, each tied to the exact language that triggered it.</p>
+          </div>
+
+          <div className={styles.spread}>
+            <article className={styles.manuscript}>
+              <p className={styles.kicker}>Politics · Senate · thenationalstandard.com</p>
+              <h3 className={styles.headline}>Senate Committee Advances Border Security Package</h3>
+              <p className={styles.byline}>Staff report · 14:22</p>
+
+              <div className={styles.body}>
+                <p>
+                  After months of stalled negotiations, the Senate Judiciary Committee voted 11–9 along
+                  party lines Tuesday to advance the border security package — what its sponsors called{" "}
+                  <Mark index={1} active={active} onActivate={setActive}>a decisive step toward long-overdue reform</Mark>{" "}
+                  after years of inaction.
+                </p>
+                <p>
+                  Coverage centered on{" "}
+                  <Mark index={2} active={active} onActivate={setActive}>the committee&rsquo;s revised inspection timeline</Mark>,
+                  framing the vote chiefly as a procedural win for chamber leadership rather than a shift
+                  in the underlying policy.
+                </p>
+                <p>
+                  <Mark index={3} active={active} onActivate={setActive}>Three committee aides said</Mark> the
+                  new funding formula was negotiated &ldquo;in good faith,&rdquo; though none were named and
+                  no on-the-record source confirmed the figures.
+                </p>
+                <p>
+                  Opposition members, who hold one of the package&rsquo;s four amendments, were{" "}
+                  <Mark index={4} active={active} onActivate={setActive}>given a single sentence</Mark> near
+                  the close of the article to register their objection.
+                </p>
+                <p>
+                  Not mentioned anywhere in the piece:{" "}
+                  <Mark index={5} active={active} onActivate={setActive}>the Congressional Budget Office&rsquo;s same-day estimate</Mark>,
+                  which projects the package would add $4.2B to the deficit over five years.
+                </p>
+              </div>
+            </article>
+
+            <motion.div
+              className={styles.margin}
+              variants={marginContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-60px" }}
+            >
+              {ANNOTATIONS.map((note, i) => (
+                <motion.div key={note.signal} variants={marginItem}>
+                  <div
+                    className={styles.note}
+                    data-active={active === i + 1}
+                    style={{ "--rot": i % 2 === 0 ? "-0.6deg" : "0.6deg" }}
+                    onMouseEnter={() => setActive(i + 1)}
+                    onMouseLeave={() => setActive(null)}
+                  >
+                    <div className={styles.noteHead}>
+                      <span className={styles.noteIndex}>{i + 1}</span>
+                      <span className={styles.noteSignal}>{note.signal}</span>
+                    </div>
+                    <p className={styles.noteText}>{note.body}</p>
                   </div>
-                  <p className={styles.cardFootnote}>Checked together, in a single pass</p>
-                </div>
-              </MagicCard>
-            </div>
-            <div className={styles.featureText}>
-              <p className={styles.featureEyebrow}>How it works</p>
-              <h2>Five signals, one read</h2>
-              <p>Every article passes through the same five checks in a single pass — tone, framing, attribution, source balance, and omission. The findings are tied together, not reported separately.</p>
-            </div>
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
 
-          {/* Row 2: Evidence — text left, visual right */}
-          <motion.div className={`${styles.featureRow} ${styles.featureRowFlip}`} {...reveal()}>
-            <div className={styles.featureText}>
-              <p className={styles.featureEyebrow}>What you get</p>
-              <h2>Quoted examples, not a verdict</h2>
-              <p>Each signal includes the exact language that triggered it, so you can inspect the analysis against the article yourself.</p>
-            </div>
-            <div className={styles.featureVisual}>
-              <MagicCard
-                className={styles.featureCardWrap}
-                gradientFrom="#c4973e"
-                gradientTo="#8b6741"
-                gradientColor="rgba(139, 103, 65, 0.07)"
-                gradientSize={180}
-              >
-                <div className={styles.featureCardContent}>
-                  <span className={styles.featureCardLabel}>Evidence trace</span>
-                  <blockquote className={styles.quotePull}>
-                    "…using language that frames the policy as an attack on ordinary families…"
-                  </blockquote>
-                  <div className={styles.quoteSignal}>
-                    <span className={styles.quoteSignalBadge}>Loaded phrasing</span>
-                    Paragraph 3
+          <div className={styles.further}>
+            <p className={styles.furtherLabel}>Further reading</p>
+            <div className={styles.furtherGrid}>
+              {FURTHER.map((f) => (
+                <div key={f.name} className={styles.furtherCard}>
+                  <span className={styles.furtherKind}>{f.kind}</span>
+                  <h4 className={styles.furtherName}>{f.name}</h4>
+                  <p className={styles.furtherNote}>{f.note}</p>
+                  <div className={styles.leanTrack}>
+                    <span className={styles.leanMarker} style={{ left: `${f.lean}%` }} />
+                  </div>
+                  <div className={styles.leanLabels}>
+                    <span>Left</span>
+                    <span>Right</span>
                   </div>
                 </div>
-              </MagicCard>
+              ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Row 3: Sources — visual left, text right */}
-          <motion.div className={styles.featureRow} {...reveal()}>
-            <div className={styles.featureVisual}>
-              <MagicCard
-                className={styles.featureCardWrap}
-                gradientFrom="#c4973e"
-                gradientTo="#8b6741"
-                gradientColor="rgba(139, 103, 65, 0.07)"
-                gradientSize={180}
-              >
-                <div className={styles.featureCardContent}>
-                  <span className={styles.featureCardLabel}>Reading context</span>
-                  <div className={styles.sourceList}>
-                    {SOURCES.map((s) => (
-                      <div key={s.label} className={styles.sourceItem}>
-                        <span className={styles.sourceItemLabel}>{s.label}</span>
-                        <span className={styles.sourceItemNote}>{s.note}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </MagicCard>
-            </div>
-            <div className={styles.featureText}>
-              <p className={styles.featureEyebrow}>What comes next</p>
-              <h2>Sources to read alongside</h2>
-              <p>Every review ends with publications that cover the same story from a different vantage point, so you can place the original article in a wider frame.</p>
-            </div>
-          </motion.div>
-
-        </section>
+        </motion.section>
 
         {/* ── CTA ── */}
         <motion.section className={styles.cta} {...reveal(0.05)}>

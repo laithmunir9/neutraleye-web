@@ -119,8 +119,7 @@
 }
 
 .copy h1,
-.cta h2,
-.featureText h2 {
+.cta h2 {
   margin: 0;
   color: var(--text);
   font-family: var(--font-display);
@@ -228,7 +227,7 @@
 
 /* ── Analysis trace section ── */
 .traceSection {
-  padding: clamp(5rem, 9vw, 7rem) var(--section-pad-x);
+  padding: clamp(5rem, 9vw, 7rem) var(--section-pad-x) clamp(1.5rem, 3vw, 2.5rem);
   display: grid;
   gap: clamp(3rem, 5vw, 4.5rem);
 }
@@ -369,162 +368,287 @@
   .traceDesc { white-space: normal; }
 }
 
-/* ── Feature rows ── */
+/* ── Annotated read ── */
 
-.features {
+.annotated {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: clamp(3rem, 6vw, 5rem);
   max-width: 72rem;
   margin: 0 auto;
-  padding: clamp(4.5rem, 8vw, 6.5rem) 2rem 0;
-}
-
-.featureRow {
+  padding: clamp(1.5rem, 3vw, 2.5rem) var(--section-pad-x) 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(2.5rem, 6vw, 6rem);
-  align-items: center;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
 }
 
-.featureText {
+.annotatedIntro {
   display: grid;
   gap: 1rem;
+  max-width: 36rem;
 }
 
-.featureText h2 {
-  max-width: 18ch;
-  font-size: clamp(2rem, 3.8vw, 3.2rem);
-  line-height: 1.06;
-}
-
-.featureText p:last-child {
+.annotatedIntro h2 {
   margin: 0;
-  max-width: 42ch;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.annotatedIntro p {
+  margin: 0;
   color: var(--secondary-text);
   font-size: 1rem;
   line-height: 1.65;
+  max-width: 48ch;
 }
 
-.featureCard {
+.spread {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 17.5rem);
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+/* ── Manuscript card ── */
+
+.manuscript {
+  position: relative;
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
-  background: var(--card-bg);
+  background: var(--surface-strong);
   box-shadow: var(--shadow);
-  padding: clamp(1.2rem, 2.5vw, 1.75rem);
-  display: grid;
-  gap: 1.1rem;
+  padding: clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3rem) clamp(2rem, 4vw, 3rem) clamp(3rem, 5vw, 4rem);
 }
 
-/* MagicCard wrapper — border/bg handled by MagicCard */
-.featureCardWrap {
-  border-radius: var(--card-radius);
+.manuscript::before {
+  content: "";
+  position: absolute;
+  top: clamp(1.5rem, 3vw, 2.25rem);
+  bottom: clamp(1.5rem, 3vw, 2.25rem);
+  left: clamp(1.75rem, 3.2vw, 2.5rem);
+  width: 1px;
+  background: rgba(139, 103, 65, 0.18);
+}
+
+.kicker {
+  margin: 0 0 0.6rem;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.headline {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.byline {
+  margin: 0 0 1.6rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.body {
+  display: grid;
+  gap: 1.05rem;
+}
+
+.body p {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(0.98rem, 1.1vw, 1.08rem);
+  line-height: 1.78;
+}
+
+/* In-text annotation marks */
+
+.mark {
+  position: relative;
+  cursor: default;
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
+  background: rgba(139, 103, 65, 0.07);
+  box-shadow: inset 0 -1.5px 0 rgba(139, 103, 65, 0.32);
+  transition: background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.markActive {
+  background: rgba(139, 103, 65, 0.16);
+  box-shadow: inset 0 -1.5px 0 var(--accent-strong);
+}
+
+.markIndex {
+  margin-left: 0.18em;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.6em;
+  font-weight: 700;
+}
+
+/* ── Margin notes ── */
+
+.margin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.25rem;
+}
+
+.note {
+  transform: rotate(var(--rot, 0deg));
+  border: 1px dashed rgba(93, 75, 53, 0.22);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 0.85rem 1rem;
   box-shadow: var(--shadow);
-  --background: #fffcf7;
+  cursor: default;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
 }
 
-.featureCardContent {
-  padding: clamp(1.2rem, 2.5vw, 1.75rem);
+.note[data-active="true"] {
+  transform: rotate(0deg) translateX(3px);
+  border-color: rgba(139, 103, 65, 0.4);
+  background: rgba(255, 252, 247, 0.98);
+  box-shadow: var(--shadow-strong);
+}
+
+.noteHead {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.4rem;
+}
+
+.noteIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: rgba(139, 103, 65, 0.1);
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.noteSignal {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.noteText {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+/* ── Further reading ── */
+
+.further {
+  border-top: 1px solid var(--border);
+  padding-top: clamp(2rem, 4vw, 2.75rem);
   display: grid;
-  gap: 1.1rem;
+  gap: 1.25rem;
 }
 
-.featureCardLabel {
+.furtherLabel {
+  margin: 0;
   color: var(--accent-strong);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.furtherGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.furtherCard {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+}
+
+.furtherKind {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.furtherName {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
   line-height: 1.3;
 }
 
-.signalPills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.signalPill {
-  padding: 0.38rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(139, 103, 65, 0.2);
-  background: rgba(139, 103, 65, 0.07);
-  color: var(--accent-strong);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.cardFootnote {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-}
-
-.quotePull {
-  margin: 0;
-  padding: 0.85rem 1rem;
-  border-left: 2.5px solid rgba(139, 103, 65, 0.4);
-  background: rgba(139, 103, 65, 0.04);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  color: var(--text);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  font-style: italic;
-}
-
-.quoteSignal {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.quoteSignalBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.1);
-  color: var(--accent-strong);
-  font-size: 0.63rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.sourceList {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.sourceItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.72rem 0.9rem;
-  border: 1px solid rgba(93, 75, 53, 0.08);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 252, 247, 0.66);
-}
-
-.sourceItemLabel {
-  color: var(--text);
+.furtherNote {
+  margin: 0 0 0.35rem;
+  color: var(--secondary-text);
   font-size: 0.84rem;
-  font-weight: 500;
+  line-height: 1.5;
 }
 
-.sourceItemNote {
+.leanTrack {
+  position: relative;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(93, 75, 53, 0.1);
+}
+
+.leanMarker {
+  position: absolute;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  transform: translate(-50%, -50%);
+}
+
+.leanLabels {
+  display: flex;
+  justify-content: space-between;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.63rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 /* ── CTA ── */
@@ -569,19 +693,35 @@
     padding-bottom: 0;
   }
 
-  .featureRow {
+  .spread {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
-  .featureRowFlip .featureVisual {
-    order: -1;
+  .margin {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .margin > * {
+    flex: 1 1 14rem;
+  }
+
+  .note {
+    transform: none;
+  }
+
+  .note[data-active="true"] {
+    transform: none;
+  }
+
+  .furtherGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 720px) {
   .hero,
-  .features,
   .cta {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -599,5 +739,17 @@
   .primaryAction,
   .secondaryAction {
     width: 100%;
+  }
+
+  .manuscript {
+    padding-left: clamp(1.75rem, 8vw, 2.25rem);
+  }
+
+  .manuscript::before {
+    left: 1rem;
+  }
+
+  .furtherGrid {
+    grid-template-columns: 1fr;
   }
 }
