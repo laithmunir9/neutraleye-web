@@ -16,35 +16,63 @@ const RESULT_STEPS = [
   { title: 'Reading context',  detail: '3 outlets covered this story differently',     badge: 'Sources',   time: '14:22:14' },
 ] as const;
 
+const TOTAL = RESULT_STEPS.length;
+const FIRST_ROW_DELAY = 300;  // before row 1 flows in
+const ROW_INTERVAL    = 1700; // gap between each subsequent row
+const SIGNAL_DELAY    = 500;  // pause after the last row before signal bars appear
+const HOLD_DURATION   = 5000; // how long the completed state stays on screen
+const RESET_DURATION  = 500;  // fade-out time before the cycle restarts
+
+type Phase = 'filling' | 'complete' | 'resetting';
+
 function ResultFeed() {
-  const [visible, setVisible] = useState(1);
-  const [resetting, setResetting] = useState(false);
+  const [visible, setVisible] = useState(0);
+  const [phase, setPhase] = useState<Phase>('filling');
+  const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
-    if (resetting) {
-      const t = setTimeout(() => { setVisible(1); setResetting(false); }, 400);
-      return () => clearTimeout(t);
-    }
-    if (visible < RESULT_STEPS.length) {
-      const t = setTimeout(() => setVisible(v => v + 1), 1700);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setResetting(true), 2800);
-    return () => clearTimeout(t);
-  }, [visible, resetting]);
+    let delay: number;
+    let action: () => void;
 
-  const shownSteps = resetting ? [] : RESULT_STEPS.slice(0, visible);
+    if (phase === 'filling') {
+      if (visible < TOTAL) {
+        delay  = visible === 0 ? FIRST_ROW_DELAY : ROW_INTERVAL;
+        action = () => setVisible(v => v + 1);
+      } else {
+        delay  = SIGNAL_DELAY;
+        action = () => { setPhase('complete'); setCycle(c => c + 1); };
+      }
+    } else if (phase === 'complete') {
+      delay  = HOLD_DURATION;
+      action = () => setPhase('resetting');
+    } else {
+      delay  = RESET_DURATION;
+      action = () => { setVisible(0); setPhase('filling'); };
+    }
+
+    const t = setTimeout(action, delay);
+    return () => clearTimeout(t);
+  }, [visible, phase]);
+
+  const resetting = phase === 'resetting';
+  const complete  = phase === 'complete';
 
   return (
+    <>
     <div className="flex flex-col gap-2 w-full">
-      {shownSteps.map((step, i) => {
-        const isActive = i === shownSteps.length - 1;
-        const isDone   = i < shownSteps.length - 1;
+      {RESULT_STEPS.map((step, i) => {
+        const shown    = !resetting && i < visible;
+        const isActive = shown && phase === 'filling' && i === visible - 1;
+        const isDone   = shown && !isActive;
 
         return (
           <div
             key={step.title}
-            style={{ animation: 'feedItemIn 400ms ease both' }}
+            style={{
+              opacity: shown ? 1 : 0,
+              transform: shown ? 'translateY(0)' : 'translateY(-8px)',
+              transition: 'opacity 400ms ease, transform 400ms ease',
+            }}
             className={[
               'flex items-center gap-3 px-4 py-3 rounded-xl border',
               isActive
@@ -90,6 +118,8 @@ function ResultFeed() {
         );
       })}
     </div>
+    <SignalBars active={complete} cycleKey={cycle} />
+    </>
   );
 }
 
@@ -103,16 +133,16 @@ const SIGNAL_LEVELS = [
   { label: 'Omission',    value: 0.95 },
 ] as const;
 
-function SignalBars() {
+function SignalBars({ active, cycleKey }: { active: boolean; cycleKey: number }) {
   return (
-    <div>
+    <div style={{ opacity: active ? 1 : 0, transition: 'opacity 500ms ease' }}>
       <p
         className="text-[10px] font-bold uppercase mb-3"
         style={{ color: 'rgba(255,252,247,0.2)', letterSpacing: '0.18em', fontFamily: 'var(--font-sans)' }}
       >
         Signal mix for this result
       </p>
-      <div className="flex items-end gap-3" style={{ height: '3.25rem' }}>
+      <div className="flex items-end gap-3" style={{ height: '3.25rem' }} key={cycleKey}>
         {SIGNAL_LEVELS.map((s, i) => (
           <div key={s.label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
             <div
@@ -180,8 +210,8 @@ function AnalysisPanel({ heading, sub }: { heading: React.ReactNode; sub: string
         </div>
 
         {/* Centre */}
-        <div className="flex-1 flex flex-col justify-center gap-7">
-          <div>
+        <div className="flex-1 flex flex-col justify-center gap-5">
+          <div className="mt-3">
             <p
               className="text-[10px] font-bold uppercase mb-3"
               style={{ color: 'rgba(196,151,62,0.5)', letterSpacing: '0.18em', fontFamily: 'var(--font-sans)' }}
@@ -197,8 +227,6 @@ function AnalysisPanel({ heading, sub }: { heading: React.ReactNode; sub: string
           </div>
 
           <ResultFeed />
-
-          <SignalBars />
         </div>
       </div>
     </section>

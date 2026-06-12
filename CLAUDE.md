@@ -102,7 +102,7 @@ src/
     AnalyzerCta/            # CTA heading + button — no card/box background (stripped this session)
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
-      sign-in.tsx           # Exports SignInPage + SignUpPage — split layout (warm beige left form / dark right analysis panel); used by login/page.js for signin and signup modes. Shared dark panel = AnalysisPanel: heading/sub + ResultFeed (animated "what every result contains" preview cards, conditionally rendered as they reveal) + SignalBars (permanent Tone/Framing/Attribution/Sources/Omission signal-mix bar chart, replaces old static footer pill row). Animations use globals.css keyframes feedItemIn / barGrow.
+      sign-in.tsx           # Exports SignInPage + SignUpPage — split layout (warm beige left form / dark right analysis panel); used by login/page.js for signin and signup modes. Shared dark panel = AnalysisPanel: heading/sub + ResultFeed (all 7 "what every result contains" rows always rendered at fixed height, opacity/translateY transition reveals them one by one so the heading never shifts) + SignalBars (Tone/Framing/Attribution/Sources/Omission bar chart, fades in via globals.css keyframe barGrow once all rows are revealed). ResultFeed runs a filling → complete (5s hold) → resetting state machine that loops indefinitely.
 
   lib/
     api.js                  # Frontend → API route calls
