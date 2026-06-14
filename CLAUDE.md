@@ -70,7 +70,7 @@ src/
     support/page.js         # Contact form using mailto: construction — requires "use client"
     login/page.js           # Auth page — sign-in and sign-up modes use SignInPage/SignUpPage from src/components/ui/sign-in.tsx (split layout); forgot-password and confirmation states use existing CSS-module forms wrapped in MarketingShell
     reset-password/page.js  # Password reset — handles Supabase recovery redirect
-    blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort
+    blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort; post page reading layout (sidebar nav + content + footer) lives in [slug]/ReadingLayout.js
     compare/page.js         # Compare Analyses — Pro-gated with blur overlay
     settings/page.js        # User settings — Display (reduce motion) + Privacy (save analysis history toggle, stored in localStorage key `neutraleye.settings.v1`)
     extension-privacy/      # Extension privacy policy
@@ -89,7 +89,7 @@ src/
     AppShell/               # App-mode layout wrapper
     MarketingShell/         # Marketing/landing layout wrapper
     HeaderBar/              # App header
-    SiteHeader/             # Grouped dropdown nav: Analyze (direct) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme
+    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware
     SiteFooter/             # 4 columns: Product / Learn / Company / Legal
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
@@ -255,6 +255,8 @@ When building new UI, prefer extending existing components in `src/components/ui
 - **Page identity rule:** Home (emotional sell) → How It Works `/how-it-works` (technical pipeline) → Methodology (reading guide). These three pages must not repeat each other's content. `/overview` redirects to `/how-it-works`.
 - **Dark hero pages:** Add `data-header-theme="dark"` on the hero section + pass `darkHeader` prop to `MarketingShell`. Used on Overview and Extension pages.
 - **CSS hover dropdowns:** Bridge the gap between trigger and panel with `padding-top` on the dropdown div — never use `top: calc(100% + gap)`. A gap breaks `:hover` continuity.
+- **Hover dropdown stuck open after click:** clicking a hover-dropdown trigger `<button>` keeps it open via `:focus-within` until the element loses focus. Add `onClick={(e) => e.currentTarget.blur()}` to the trigger to close it on click while preserving keyboard accessibility.
+- **Radix DropdownMenu dark mode:** `DropdownMenu.Portal` renders into `document.body`, so SiteHeader's CSS-module-scoped `.dark` class on `<header>` does not cascade to portaled content. Pass the header's `isDark` state directly as a conditional className on `DropdownMenu.Content`/`SubContent` (see `.dropdownContentDark` in `SiteHeader.module.css`).
 
 ---
 
