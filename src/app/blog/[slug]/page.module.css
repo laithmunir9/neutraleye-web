@@ -98,14 +98,26 @@
   gap: 0.72rem;
 }
 
-.sidebar a {
+.sidebarLink {
+  display: block;
+  padding: 0.32rem 0.9rem 0.32rem 0.8rem;
+  margin-left: -0.8rem;
+  border-radius: 0.3rem;
   color: rgba(32, 27, 22, 0.42);
-  font-size: 0.85rem;
-  line-height: 1.35;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.sidebar a:hover {
+.sidebarLink:hover {
   color: var(--text);
+}
+
+.sidebarLinkActive {
+  color: #8b6741;
+  font-weight: 500;
+  background: rgba(139, 103, 65, 0.07);
+  box-shadow: inset 2px 0 0 #8b6741;
 }
 
 .content {

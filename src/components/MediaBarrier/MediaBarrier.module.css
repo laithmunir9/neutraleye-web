@@ -1,31 +1,71 @@
 .barrier {
   position: relative;
   width: 100%;
-  border-top: 1px solid rgba(93, 75, 53, 0.18);
-  border-bottom: 1px solid rgba(93, 75, 53, 0.18);
-  padding: clamp(2.6rem, 4.5vw, 3.6rem) 0;
-  margin-top: clamp(2rem, 5vw, 4rem);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(2.1rem, 4vw, 3rem) 0;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(139, 103, 65, 0.05), transparent 70%);
+  overflow: hidden;
 }
 
 .inner {
   display: grid;
-  gap: 1.6rem;
-  justify-items: center;
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 2rem);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.4rem;
 }
 
 /* ── Label ── */
 
 .label {
-  margin: 0;
-  color: var(--muted);
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  text-align: center;
+}
+
+.labelText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #6e4f2f;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.66rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
+}
+
+.labelText::before,
+.labelText::after {
+  content: "";
+  display: inline-block;
+  width: 1.8rem;
+  height: 1px;
+  background: rgba(139, 103, 65, 0.3);
+}
+
+/* ── Ticker track ── */
+
+.track {
+  position: relative;
+  width: 100%;
+  transform: translateZ(0);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 46s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
 }
 
 /* ── Publication name row ── */
@@ -36,9 +76,32 @@
   padding: 0;
   display: flex;
   align-items: baseline;
-  justify-content: center;
+}
+
+.logoItem {
+  display: flex;
+  align-items: baseline;
+}
+
+.logoItem::after {
+  content: "·";
+  display: inline-block;
+  margin: 0 clamp(1.1rem, 1.8vw, 1.9rem);
+  color: rgba(93, 75, 53, 0.28);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.track > .logos .logoItem:last-child::after {
+  display: none;
+}
+
+/* Static (reduced-motion) row wraps and centers instead of scrolling */
+.track > .logos {
   flex-wrap: wrap;
-  gap: 0.3rem clamp(2rem, 3.8vw, 3.4rem);
+  justify-content: center;
+  padding-right: 0;
+  row-gap: 0.5rem;
 }
 
 /* ── Base logo ── */
@@ -47,12 +110,7 @@
   display: inline-block;
   color: rgba(93, 75, 53, 0.65);
   white-space: nowrap;
-  transition: color 180ms ease;
   user-select: none;
-}
-
-.logo:hover {
-  color: rgba(93, 75, 53, 0.9);
 }
 
 /* ── Per-publication typographic variants ── */
@@ -105,33 +163,15 @@
   letter-spacing: 0.01em;
 }
 
-/* ── Dark mode ── */
-
-:global(.dark) .label {
-  color: rgba(200, 175, 145, 0.42);
-}
-
-:global(.dark) .label::before,
-:global(.dark) .label::after {
-  background: rgba(139, 103, 65, 0.18);
-}
-
-:global(.dark) .logo {
-  color: rgba(200, 175, 145, 0.42);
-}
-
-:global(.dark) .logo:hover {
-  color: rgba(200, 175, 145, 0.7);
-}
-
 /* ── Responsive ── */
 
 @media (max-width: 640px) {
-  .logos {
-    gap: 0.4rem clamp(1.6rem, 5vw, 2.2rem);
+  .logoItem::after {
+    margin: 0 0.85rem;
   }
 
-  .logo_condensed {
-    display: none;
+  .logo_serif,
+  .logo_editorial {
+    font-size: 1rem;
   }
 }

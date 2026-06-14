@@ -227,7 +227,7 @@
 
 /* ── Analysis trace section ── */
 .traceSection {
-  padding: clamp(5rem, 9vw, 7rem) var(--section-pad-x) clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(2rem, 4vw, 3rem) var(--section-pad-x) clamp(1.5rem, 3vw, 2rem);
   display: grid;
   gap: clamp(3rem, 5vw, 4.5rem);
 }

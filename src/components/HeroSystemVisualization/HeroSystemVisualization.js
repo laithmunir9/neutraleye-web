@@ -26,18 +26,18 @@ const SCENES = [
   {
     id: "branch",
     nodes: [
-      { key: "a", x: 58,  y: 385, label: "Article URL",      labelDx: 16, labelDy: 4,   accent: false },
-      { key: "b", x: 200, y: 290, label: "Text parsed",      labelDx: 16, labelDy: 4,   accent: false },
-      { key: "c", x: 370, y: 158, label: "Tone: loaded",     labelDx: 16, labelDy: 4,   accent: true  },
-      { key: "d", x: 370, y: 368, label: "Sources: sparse",  labelDx: 16, labelDy: 4,   accent: true  },
-      { key: "e", x: 555, y: 255, label: "Left-leaning",     labelDx: 0,  labelDy: -18, accent: true  },
+      { key: "a", x: 55,  y: 392, label: "Article URL",      labelDx: 16,  labelDy: 4,   accent: false },
+      { key: "b", x: 190, y: 300, label: "Text parsed",      labelDx: -16, labelDy: -14, accent: false },
+      { key: "c", x: 355, y: 150, label: "Tone: loaded",     labelDx: 0,   labelDy: -18, accent: true  },
+      { key: "d", x: 355, y: 372, label: "Sources: sparse",  labelDx: 0,   labelDy: 20,  accent: true  },
+      { key: "e", x: 585, y: 95,  label: "Left-leaning",     labelDx: 0,   labelDy: -18, accent: true  },
     ],
     edges: [
-      { key: "ab", x1: 58,  y1: 385, x2: 200, y2: 290 },
-      { key: "bc", x1: 200, y1: 290, x2: 370, y2: 158 },
-      { key: "bd", x1: 200, y1: 290, x2: 370, y2: 368 },
-      { key: "ce", x1: 370, y1: 158, x2: 555, y2: 255 },
-      { key: "de", x1: 370, y1: 368, x2: 555, y2: 255 },
+      { key: "ab", x1: 55,  y1: 392, x2: 190, y2: 300 },
+      { key: "bc", x1: 190, y1: 300, x2: 355, y2: 150 },
+      { key: "bd", x1: 190, y1: 300, x2: 355, y2: 372 },
+      { key: "ce", x1: 355, y1: 150, x2: 585, y2: 95 },
+      { key: "de", x1: 355, y1: 372, x2: 585, y2: 95 },
     ],
   },
   {
@@ -61,9 +61,9 @@ const SCENES = [
     nodes: [
       { key: "a", x: 62,  y: 338, label: "URL submitted",    labelDx: 16, labelDy: 4,   accent: false },
       { key: "b", x: 205, y: 245, label: "Article scraped",  labelDx: 16, labelDy: 4,   accent: false },
-      { key: "c", x: 345, y: 138, label: "Attribution gap",  labelDx: 16, labelDy: 4,   accent: true  },
+      { key: "c", x: 345, y: 138, label: "Attribution gap",  labelDx: 16, labelDy: 0,   accent: true  },
       { key: "d", x: 345, y: 338, label: "Counter-context",  labelDx: 16, labelDy: 4,   accent: false },
-      { key: "e", x: 478, y: 228, label: "Right-leaning",    labelDx: 0,  labelDy: -18, accent: true  },
+      { key: "e", x: 478, y: 228, label: "Right-leaning",    labelDx: 16, labelDy: 18,  accent: true  },
       { key: "f", x: 588, y: 118, label: "Sources flagged",  labelDx: 0,  labelDy: -18, accent: true  },
     ],
     edges: [
@@ -149,7 +149,7 @@ export default function HeroSystemVisualization() {
                   className={`${styles.nodeLabel} ${node.accent ? styles.nodeLabelAccent : ""}`}
                   x={node.x + node.labelDx}
                   y={node.y + node.labelDy}
-                  textAnchor={node.labelDx === 0 ? "middle" : "start"}
+                  textAnchor={node.labelDx === 0 ? "middle" : node.labelDx < 0 ? "end" : "start"}
                 >
                   {node.label}
                 </text>

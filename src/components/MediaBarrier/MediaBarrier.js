@@ -13,6 +13,18 @@ const PUBLICATIONS = [
   { name: "NPR",                variant: "mono" },
 ];
 
+function LogoRow({ ariaHidden }) {
+  return (
+    <ul className={styles.logos} role="list" aria-hidden={ariaHidden || undefined}>
+      {PUBLICATIONS.map((pub) => (
+        <li key={pub.name} className={styles.logoItem}>
+          <span className={`${styles.logo} ${styles[`logo_${pub.variant}`]}`}>{pub.name}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function MediaBarrier() {
   const shouldReduce = useReducedMotion();
 
@@ -25,23 +37,20 @@ export default function MediaBarrier() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
-        <p className={styles.label}>reads content from</p>
+        <p className={styles.label}>
+          <span className={styles.labelText}>Reads content from</span>
+        </p>
 
-        <ul className={styles.logos} role="list">
-          {PUBLICATIONS.map((pub, i) => (
-            <li key={pub.name}>
-              <motion.span
-                className={`${styles.logo} ${styles[`logo_${pub.variant}`]}`}
-                initial={shouldReduce ? false : { opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.065 }}
-              >
-                {pub.name}
-              </motion.span>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.track}>
+          {shouldReduce ? (
+            <LogoRow />
+          ) : (
+            <div className={styles.marquee}>
+              <LogoRow />
+              <LogoRow ariaHidden />
+            </div>
+          )}
+        </div>
       </motion.div>
     </div>
   );

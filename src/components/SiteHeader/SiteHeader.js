@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/supabase/AuthProvider";
 import styles from "./SiteHeader.module.css";
 
 const NAV_GROUPS = [
-  { href: "/analyze", label: "Analyze" },
+  { href: "/analyze", label: "Analyze", cta: true },
   {
     label: "Product",
     items: [
@@ -169,14 +169,29 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
       <nav className={styles.nav} aria-label="Primary">
         {NAV_GROUPS.map((group) =>
           group.href ? (
-            /* Direct link — no dropdown */
-            <Link key={group.label} href={group.href} className={styles.navLink}>
-              {group.label}
-            </Link>
+            group.cta ? (
+              /* Analyze — accent CTA pill with blinking eye glyph */
+              <Link key={group.label} href={group.href} className={styles.analyzeCta}>
+                <svg className={styles.analyzeIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+                  <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+                </svg>
+                {group.label}
+              </Link>
+            ) : (
+              /* Direct link — no dropdown */
+              <Link key={group.label} href={group.href} className={styles.navLink}>
+                {group.label}
+              </Link>
+            )
           ) : (
             /* Dropdown group */
             <div key={group.label} className={styles.navGroup}>
-              <button className={styles.navGroupBtn} type="button">
+              <button
+                className={styles.navGroupBtn}
+                type="button"
+                onClick={(e) => e.currentTarget.blur()}
+              >
                 {group.label}
                 <svg className={styles.navChevron} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <polyline points="6 9 12 15 18 9"/>
@@ -215,7 +230,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
-              <DropdownMenu.Content className={styles.dropdownContent} align="end" sideOffset={8}>
+              <DropdownMenu.Content className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} align="end" sideOffset={8}>
                 <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
                   <Link href="/login" className={styles.dropdownMenuItemInner}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -236,7 +251,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
                     </svg>
                   </DropdownMenu.SubTrigger>
                   <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={styles.dropdownContent} sideOffset={4} alignOffset={-4}>
+                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-4}>
                       <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
                         <Link href="/terms">Terms of Service</Link>
                       </DropdownMenu.Item>
@@ -264,7 +279,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
-              <DropdownMenu.Content className={styles.dropdownContent} align="end" sideOffset={8}>
+              <DropdownMenu.Content className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} align="end" sideOffset={8}>
                 <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
                   <Link href="/settings">My Account</Link>
                 </DropdownMenu.Item>
@@ -280,7 +295,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
                     </svg>
                   </DropdownMenu.SubTrigger>
                   <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={styles.dropdownContent} sideOffset={4} alignOffset={-4}>
+                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-4}>
                       <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
                         <Link href="/terms">Terms of Service</Link>
                       </DropdownMenu.Item>
