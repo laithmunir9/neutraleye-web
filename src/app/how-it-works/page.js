@@ -5,7 +5,7 @@ import styles from "../overview/page.module.css";
 
 const heroInputs = ["Article text", "Tone", "Source mix", "Framing", "Attribution"];
 const heroOutputs = ["Direction", "Summary", "Examples", "Confidence", "Next reads"];
-const heroRailY = [50, 175, 300, 425, 550];
+const heroRailY = [100, 200, 300, 400, 500];
 
 const pipelineSteps = [
   {
@@ -185,16 +185,16 @@ export default function HowItWorksPage() {
                   <stop offset="100%" stopColor="rgba(255,255,255,0.13)" />
                 </linearGradient>
               </defs>
-              <path className={styles.heroConnectionLeft} d="M280 50 C480 55 600 150 760 230" />
-              <path className={styles.heroConnectionLeft} d="M280 175 C480 170 600 220 740 260" />
-              <path className={styles.heroConnectionLeft} d="M280 300 C480 295 580 300 680 300" />
-              <path className={styles.heroConnectionLeft} d="M280 425 C480 430 600 380 740 340" />
-              <path className={styles.heroConnectionLeft} d="M280 550 C480 545 600 450 760 370" />
-              <path className={styles.heroConnectionRight} d="M1320 50 C1120 55 1000 150 840 230" />
-              <path className={styles.heroConnectionRight} d="M1320 175 C1120 170 1000 220 860 260" />
-              <path className={styles.heroConnectionRight} d="M1320 300 C1120 295 1020 300 920 300" />
-              <path className={styles.heroConnectionRight} d="M1320 425 C1120 430 1000 380 860 340" />
-              <path className={styles.heroConnectionRight} d="M1320 550 C1120 545 1000 450 840 370" />
+              <path className={styles.heroConnectionLeft} d="M280 100 C480 104 600 180 760 244" />
+              <path className={styles.heroConnectionLeft} d="M280 200 C480 196 600 236 740 268" />
+              <path className={styles.heroConnectionLeft} d="M280 300 C480 296 580 300 680 300" />
+              <path className={styles.heroConnectionLeft} d="M280 400 C480 404 600 364 740 332" />
+              <path className={styles.heroConnectionLeft} d="M280 500 C480 496 600 420 760 356" />
+              <path className={styles.heroConnectionRight} d="M1320 100 C1120 104 1000 180 840 244" />
+              <path className={styles.heroConnectionRight} d="M1320 200 C1120 196 1000 236 860 268" />
+              <path className={styles.heroConnectionRight} d="M1320 300 C1120 296 1020 300 920 300" />
+              <path className={styles.heroConnectionRight} d="M1320 400 C1120 404 1000 364 860 332" />
+              <path className={styles.heroConnectionRight} d="M1320 500 C1120 496 1000 420 840 356" />
               {heroInputs.map((item, i) => (
                 <g key={item}>
                   <text className={styles.heroSvgLabel} x="255" y={heroRailY[i]} textAnchor="end" dominantBaseline="middle">{item}</text>
@@ -209,7 +209,7 @@ export default function HowItWorksPage() {
               ))}
             </svg>
             <div className={styles.heroCopy}>
-              <h1>How<br />NeutralEye<br />Works</h1>
+              <h1>How NeutralEye<br />Works</h1>
               <p className={styles.lead}>
                 Article text goes in. A structured bias analysis — direction, evidence, confidence, and next reads — comes out.
               </p>
