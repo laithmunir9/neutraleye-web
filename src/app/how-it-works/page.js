@@ -174,42 +174,42 @@ export default function HowItWorksPage() {
           <div className={styles.heroInner}>
             <svg className={styles.heroConnections} viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
               <defs>
-                <linearGradient id="hero-line-left-fade" x1="370" x2="790" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+                <linearGradient id="hero-line-left-fade" x1="280" x2="760" y1="0" y2="0" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="rgba(255,255,255,0.13)" />
                   <stop offset="68%" stopColor="rgba(255,255,255,0.1)" />
                   <stop offset="100%" stopColor="rgba(255,255,255,0)" />
                 </linearGradient>
-                <linearGradient id="hero-line-right-fade" x1="810" x2="1230" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+                <linearGradient id="hero-line-right-fade" x1="840" x2="1320" y1="0" y2="0" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="rgba(255,255,255,0)" />
                   <stop offset="32%" stopColor="rgba(255,255,255,0.1)" />
                   <stop offset="100%" stopColor="rgba(255,255,255,0.13)" />
                 </linearGradient>
               </defs>
-              <path className={styles.heroConnectionLeft} d="M370 50 C550 55 650 175 790 255" />
-              <path className={styles.heroConnectionLeft} d="M370 175 C550 170 650 230 790 275" />
-              <path className={styles.heroConnectionLeft} d="M370 300 C550 295 650 300 790 300" />
-              <path className={styles.heroConnectionLeft} d="M370 425 C550 430 650 370 790 325" />
-              <path className={styles.heroConnectionLeft} d="M370 550 C550 545 650 425 790 345" />
-              <path className={styles.heroConnectionRight} d="M1230 50 C1050 55 950 175 810 255" />
-              <path className={styles.heroConnectionRight} d="M1230 175 C1050 170 950 230 810 275" />
-              <path className={styles.heroConnectionRight} d="M1230 300 C1050 295 950 300 810 300" />
-              <path className={styles.heroConnectionRight} d="M1230 425 C1050 430 950 370 810 325" />
-              <path className={styles.heroConnectionRight} d="M1230 550 C1050 545 950 425 810 345" />
+              <path className={styles.heroConnectionLeft} d="M280 50 C480 55 600 150 760 230" />
+              <path className={styles.heroConnectionLeft} d="M280 175 C480 170 600 220 740 260" />
+              <path className={styles.heroConnectionLeft} d="M280 300 C480 295 580 300 680 300" />
+              <path className={styles.heroConnectionLeft} d="M280 425 C480 430 600 380 740 340" />
+              <path className={styles.heroConnectionLeft} d="M280 550 C480 545 600 450 760 370" />
+              <path className={styles.heroConnectionRight} d="M1320 50 C1120 55 1000 150 840 230" />
+              <path className={styles.heroConnectionRight} d="M1320 175 C1120 170 1000 220 860 260" />
+              <path className={styles.heroConnectionRight} d="M1320 300 C1120 295 1020 300 920 300" />
+              <path className={styles.heroConnectionRight} d="M1320 425 C1120 430 1000 380 860 340" />
+              <path className={styles.heroConnectionRight} d="M1320 550 C1120 545 1000 450 840 370" />
               {heroInputs.map((item, i) => (
                 <g key={item}>
-                  <text className={styles.heroSvgLabel} x="345" y={heroRailY[i]} textAnchor="end" dominantBaseline="middle">{item}</text>
-                  <circle className={styles.heroSvgNode} cx="370" cy={heroRailY[i]} r="5.5" />
+                  <text className={styles.heroSvgLabel} x="255" y={heroRailY[i]} textAnchor="end" dominantBaseline="middle">{item}</text>
+                  <circle className={styles.heroSvgNode} cx="280" cy={heroRailY[i]} r="5.5" />
                 </g>
               ))}
               {heroOutputs.map((item, i) => (
                 <g key={item}>
-                  <circle className={styles.heroSvgNode} cx="1230" cy={heroRailY[i]} r="5.5" />
-                  <text className={styles.heroSvgLabel} x="1255" y={heroRailY[i]} textAnchor="start" dominantBaseline="middle">{item}</text>
+                  <circle className={styles.heroSvgNode} cx="1320" cy={heroRailY[i]} r="5.5" />
+                  <text className={styles.heroSvgLabel} x="1345" y={heroRailY[i]} textAnchor="start" dominantBaseline="middle">{item}</text>
                 </g>
               ))}
             </svg>
             <div className={styles.heroCopy}>
-              <h1>How NeutralEye<br />Works</h1>
+              <h1>How<br />NeutralEye<br />Works</h1>
               <p className={styles.lead}>
                 Article text goes in. A structured bias analysis — direction, evidence, confidence, and next reads — comes out.
               </p>
