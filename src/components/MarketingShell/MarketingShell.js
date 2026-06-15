@@ -6,6 +6,7 @@ export default function MarketingShell({ children, darkHeader = false }) {
   return (
     <div className={styles.shell}>
       <div className={styles.ambientTop} aria-hidden="true" />
+      <div className={styles.canvasFrame} aria-hidden="true" />
       <SiteHeader compact defaultDark={darkHeader} />
 
       {children}

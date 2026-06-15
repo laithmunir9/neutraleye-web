@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import styles from "./MediaBarrier.module.css";
 
 const PUBLICATIONS = [
@@ -30,13 +30,7 @@ export default function MediaBarrier() {
 
   return (
     <div className={styles.barrier}>
-      <motion.div
-        className={styles.inner}
-        initial={shouldReduce ? false : { opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      >
+      <div className={styles.inner}>
         <p className={styles.label}>
           <span className={styles.labelText}>Reads content from</span>
         </p>
@@ -48,10 +42,11 @@ export default function MediaBarrier() {
             <div className={styles.marquee}>
               <LogoRow />
               <LogoRow ariaHidden />
+              <LogoRow ariaHidden />
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

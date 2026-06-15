@@ -2,24 +2,39 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  display: grid;
-  grid-template-columns: minmax(14rem, 1fr) auto minmax(14rem, 1fr);
+  display: flex;
   align-items: center;
-  gap: 1.5rem;
   width: 100%;
   min-height: var(--site-header-height);
   padding: 1rem 2.25rem;
   backdrop-filter: blur(18px);
   background: var(--bg);
+  border-bottom: 1px solid rgba(93, 75, 53, 0.14);
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
     color 180ms ease;
 }
 
-.compact {
-  padding-left: 2.25rem;
-  padding-right: 2.25rem;
+@media (min-width: 1024px) {
+  .compact {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .compact .headerInner {
+    padding: 0 2.25rem;
+  }
+}
+
+.headerInner {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) auto minmax(14rem, 1fr);
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 92rem;
+  margin: 0 auto;
 }
 
 .brand {
@@ -636,6 +651,9 @@
   .header {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .headerInner {
     display: flex;
     justify-content: space-between;
     align-items: center;

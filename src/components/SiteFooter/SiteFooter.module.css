@@ -13,7 +13,8 @@
   gap: 2rem 3rem;
   align-items: start;
   width: 100%;
-  margin: 0;
+  max-width: 92rem;
+  margin: 0 auto;
   padding: 2.15rem 2.25rem 0;
   color: var(--text);
 }

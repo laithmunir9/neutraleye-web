@@ -14,3 +14,37 @@
     linear-gradient(180deg, rgba(40, 29, 19, 0.02), transparent 70%);
   pointer-events: none;
 }
+
+.canvasFrame {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  margin: 0 auto;
+  max-width: 92rem;
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .canvasFrame {
+    display: block;
+  }
+}
+
+.canvasFrame::before,
+.canvasFrame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.canvasFrame::before {
+  left: 0;
+}
+
+.canvasFrame::after {
+  right: 0;
+}

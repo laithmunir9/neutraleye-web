@@ -174,6 +174,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
 
   return (
     <header className={`${styles.header} ${compact ? styles.compact : ""} ${isDark ? styles.dark : ""}`}>
+      <div className={styles.headerInner}>
       <Link href="/" className={styles.brand} aria-label="NeutralEye home">
         <Image src="/neutraleye-logo-48.png" alt="" width={32} height={32} />
         <span>NeutralEye</span>
@@ -318,6 +319,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
             )}
           </svg>
         </button>
+      </div>
       </div>
 
       <div id="mobile-nav" className={styles.mobileMenu} data-open={mobileOpen}>
