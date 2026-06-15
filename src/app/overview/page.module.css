@@ -619,6 +619,9 @@
 /* ── Responsive ── */
 @media (max-width: 1320px) {
   .heroInner { grid-template-columns: 1fr; justify-items: center; min-height: 35rem; }
+}
+
+@media (max-width: 860px) {
   .heroConnections { display: none; }
 }
 
