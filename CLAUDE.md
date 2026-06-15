@@ -87,10 +87,11 @@ src/
 
   components/
     AppShell/               # App-mode layout wrapper
-    MarketingShell/         # Marketing/landing layout wrapper
+    MarketingShell/         # Marketing/landing layout wrapper — includes `.canvasFrame` (position:fixed, 92rem max-width, z-index:200, visible at ≥1024px) with ::before/::after 1px vertical guide lines at rgba(128,128,128,0.12); `.shell` warm gradient background; `.ambientTop` top-edge fade overlay
+    MediaBarrier/           # "Reads content from" publication ticker — 3-row marquee duplicate for seamless loop (-33.3333% keyframe); background rgba(139,103,65,0.03) matching About pull-quote; edge fades via ::before/::after gradients clipped at canvas-frame lines via overflow:hidden on .track
     HeaderBar/              # App header
-    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware
-    SiteFooter/             # 4 columns: Product / Learn / Company / Legal
+    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment
+    SiteFooter/             # 4 columns: Product / Learn / Company / Legal; `.footer` is full-bleed (border-top, panel-strong bg); `.footerInner` (max-width:92rem; margin:0 auto; padding:2.15rem 2.25rem) aligns content to canvas-frame lines
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
     ResultCard/             # Bias result display card
@@ -257,12 +258,15 @@ When building new UI, prefer extending existing components in `src/components/ui
 - **CSS hover dropdowns:** Bridge the gap between trigger and panel with `padding-top` on the dropdown div — never use `top: calc(100% + gap)`. A gap breaks `:hover` continuity.
 - **Hover dropdown stuck open after click:** clicking a hover-dropdown trigger `<button>` keeps it open via `:focus-within` until the element loses focus. Add `onClick={(e) => e.currentTarget.blur()}` to the trigger to close it on click while preserving keyboard accessibility.
 - **Radix DropdownMenu dark mode:** `DropdownMenu.Portal` renders into `document.body`, so SiteHeader's CSS-module-scoped `.dark` class on `<header>` does not cascade to portaled content. Pass the header's `isDark` state directly as a conditional className on `DropdownMenu.Content`/`SubContent` (see `.dropdownContentDark` in `SiteHeader.module.css`).
+- **Canvas-frame guide lines:** `MarketingShell` renders a `position:fixed; inset:0; max-width:92rem; z-index:200; pointer-events:none` `.canvasFrame` div whose `::before`/`::after` pseudo-elements are 1px vertical lines in `rgba(128,128,128,0.12)`. Visible at ≥1024px viewports, they mark the 92rem content boundary at any zoom level and stay readable on both light and dark section backgrounds without blend modes.
+- **Aligning content to canvas-frame lines:** Header (`.headerInner`) and footer (`.footerInner`) both use `max-width:92rem; margin:0 auto; padding:0 2.25rem` so their content edges sit 2.25rem inside the guide lines. The `.header`/`.footer` wrappers are full-bleed.
+- **Section separators — no full-bleed border lines:** Avoid `border-top`/`border-bottom` on full-bleed sections that cross the canvas-frame guide lines. Use a subtle background tint instead — `rgba(139,103,65,0.03)` is the standard (used by About pull-quote and MediaBarrier). The one intentional exception is the header's `border-bottom` and footer's `border-top`, which are full-bleed by design and match each other in style (`rgba(93,75,53,0.14)`).
 
 ---
 
 ## Known Issues
 
-- **Zoom / responsive scaling bugs** — Unresolved zoom and viewport scaling issues across pages. Do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
+- **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **Support contact email** — `/support/page.js` uses `contact@tryneutraleye.com`. The inbox doesn't exist yet — create it once the domain is live.
 
 ---
