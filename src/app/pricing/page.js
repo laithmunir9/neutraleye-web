@@ -136,7 +136,6 @@ export default function PricingPage() {
 
           {/* Pro */}
           <div className={`${styles.card} ${styles.cardPro}`}>
-            <div className={styles.proBanner}>Most Popular</div>
             <div className={styles.cardInner}>
               <div className={`${styles.planName} ${styles.planNamePro}`}>Pro</div>
               <p className={styles.planDesc}>

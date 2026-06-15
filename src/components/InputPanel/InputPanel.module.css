@@ -124,6 +124,7 @@
 
 .tabs button {
   flex: 1;
+  min-height: 2.75rem;
   border: 1px solid transparent;
   background: transparent;
   color: rgba(32, 27, 22, 0.72);

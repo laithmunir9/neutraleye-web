@@ -69,6 +69,7 @@
 
 .input {
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.6rem 0.85rem;
   font-size: 0.9rem;
   font-family: var(--font-sans);
@@ -92,6 +93,7 @@
 
 .submitBtn {
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.65rem 1rem;
   font-size: 0.9rem;
   font-weight: 600;

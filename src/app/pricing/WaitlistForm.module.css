@@ -20,7 +20,7 @@
 .input {
   flex: 1;
   min-width: 0;
-  height: 2.35rem;
+  height: 2.75rem;
   padding: 0 0.75rem;
   border-radius: 999px;
   border: 1px solid rgba(93, 75, 53, 0.24);
@@ -47,7 +47,7 @@
 
 .btn {
   flex-shrink: 0;
-  height: 2.35rem;
+  height: 2.75rem;
   padding: 0 0.95rem;
   border-radius: 999px;
   border: none;

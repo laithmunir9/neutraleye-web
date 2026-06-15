@@ -190,4 +190,19 @@
   .table {
     min-width: 780px;
   }
+
+  .actionButton {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 13px;
+  }
+
+  .menuOpen .inspectButton,
+  .menuOpen .deleteButton {
+    min-height: 2.75rem;
+    max-height: 2.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 13px;
+  }
 }

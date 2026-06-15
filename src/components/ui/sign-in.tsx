@@ -375,7 +375,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                     className="w-full bg-transparent text-sm px-4 py-3.5 pr-11 rounded-lg focus:outline-none"
                     style={{ color: '#201b16' }} />
                   <button type="button" onClick={() => setShowPassword(p => !p)}
-                    className="absolute inset-y-0 right-3.5 flex items-center"
+                    className="absolute inset-y-0 right-0 w-11 flex items-center justify-center"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}>
                     {showPassword
                       ? <EyeOff className="w-4 h-4" style={{ color: '#7b6a58' }} />
@@ -560,7 +560,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
                     className="w-full bg-transparent text-sm px-4 py-3.5 pr-11 rounded-lg focus:outline-none"
                     style={{ color: '#201b16' }} />
                   <button type="button" onClick={() => setShowPassword(p => !p)}
-                    className="absolute inset-y-0 right-3.5 flex items-center"
+                    className="absolute inset-y-0 right-0 w-11 flex items-center justify-center"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}>
                     {showPassword
                       ? <EyeOff className="w-4 h-4" style={{ color: '#7b6a58' }} />

@@ -91,9 +91,11 @@
   transition: color 150ms ease, background 150ms ease;
 }
 
-.navLink:hover {
-  color: var(--text);
-  background: rgba(139, 103, 65, 0.06);
+@media (hover: hover) and (pointer: fine) {
+  .navLink:hover {
+    color: var(--text);
+    background: rgba(139, 103, 65, 0.06);
+  }
 }
 
 .navLinkActive {
@@ -207,7 +209,9 @@
 
 .question::-webkit-details-marker { display: none; }
 
-.question:hover { color: var(--accent-strong); }
+@media (hover: hover) and (pointer: fine) {
+  .question:hover { color: var(--accent-strong); }
+}
 
 /* +/− toggle icon */
 .toggle {
@@ -271,12 +275,20 @@ details[open] .question {
     position: static;
     border-right: 0;
     border-bottom: 1px solid var(--border);
-    padding: 1.5rem 0;
-    grid-auto-flow: column;
-    grid-template-columns: auto 1fr auto;
+    margin: 0 -1.5rem;
+    padding: 1.5rem 1.5rem;
     align-items: center;
-    gap: 0.5rem;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav > nav {
+    display: flex;
+    gap: 0.5rem;
   }
 
   .navHeading { display: none; }
@@ -297,12 +309,13 @@ details[open] .question {
   }
 
   .sections {
-    padding: 2.5rem 0 4rem;
+    padding: 3.5rem 0 4rem;
   }
 }
 
 @media (max-width: 600px) {
   .hero { padding-left: 1rem; padding-right: 1rem; }
   .layout { padding: 0 1rem; }
+  .nav { margin: 0 -1rem; padding-left: 1rem; padding-right: 1rem; }
   .sectionNumber { font-size: 4.5rem; }
 }

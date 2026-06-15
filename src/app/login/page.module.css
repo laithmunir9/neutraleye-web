@@ -92,6 +92,7 @@
 
 .submitBtn {
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.65rem 1rem;
   font-size: 0.9rem;
   font-weight: 600;
@@ -136,6 +137,7 @@
   justify-content: center;
   gap: 0.65rem;
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.65rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;

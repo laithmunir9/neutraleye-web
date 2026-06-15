@@ -129,10 +129,22 @@ function userAvatar(user) {
 
 export default function SiteHeader({ compact = false, defaultDark = false }) {
   const [isDark, setIsDark] = useState(defaultDark);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading, supabase } = useAuth();
   const pathname = usePathname();
   const isPro = user?.user_metadata?.plan === "pro";
   const showUpgradeCta = pathname !== "/pricing" && !isPro;
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     function updateTheme() {
@@ -157,6 +169,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
 
   async function handleSignOut() {
     await supabase.auth.signOut();
+    setMobileOpen(false);
   }
 
   return (
@@ -240,30 +253,15 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
                   </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
-                <DropdownMenu.Sub>
-                  <DropdownMenu.SubTrigger className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Legal
-                    <svg className={styles.subArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  </DropdownMenu.SubTrigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-4}>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/terms">Terms of Service</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/privacy">Privacy Policy</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/extension-privacy">Extension Privacy</Link>
-                      </DropdownMenu.Item>
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/terms">Terms of Service</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/privacy">Privacy Policy</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/extension-privacy">Extension Privacy</Link>
+                </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
@@ -284,30 +282,15 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
                   <Link href="/settings">My Account</Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
-                <DropdownMenu.Sub>
-                  <DropdownMenu.SubTrigger className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Legal
-                    <svg className={styles.subArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  </DropdownMenu.SubTrigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-4}>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/terms">Terms of Service</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/privacy">Privacy Policy</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/extension-privacy">Extension Privacy</Link>
-                      </DropdownMenu.Item>
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/terms">Terms of Service</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/privacy">Privacy Policy</Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+                  <Link href="/extension-privacy">Extension Privacy</Link>
+                </DropdownMenu.Item>
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
                 <DropdownMenu.Item className={styles.dropdownMenuItem} onSelect={handleSignOut}>
                   Sign out
@@ -318,6 +301,71 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
         )}
 
         {loading && <span className={styles.authPlaceholder} aria-hidden="true" />}
+
+        <button
+          className={styles.hamburger}
+          type="button"
+          aria-label="Menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
+          onClick={() => setMobileOpen((open) => !open)}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {mobileOpen ? (
+              <path d="M18 6 6 18M6 6l12 12" />
+            ) : (
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      <div id="mobile-nav" className={styles.mobileMenu} data-open={mobileOpen}>
+        <nav className={styles.mobileNav} aria-label="Mobile">
+          <Link href="/analyze" className={styles.mobileAnalyzeCta}>
+            <svg className={styles.analyzeIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+            </svg>
+            Analyze
+          </Link>
+
+          {NAV_GROUPS.filter((group) => group.items).map((group) => (
+            <div key={group.label} className={styles.mobileGroup}>
+              <p className={styles.mobileGroupLabel}>{group.label}</p>
+              {group.items.map((item) => (
+                <Link key={item.href} href={item.href} className={styles.mobileLink}>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+
+          <div className={styles.mobileDivider} />
+
+          {showUpgradeCta && (
+            <Link href="/pricing" className={styles.mobileLink}>Upgrade to Pro</Link>
+          )}
+
+          {!loading && !user && (
+            <Link href="/login" className={styles.mobileLink}>Log in / Sign up</Link>
+          )}
+
+          {!loading && user && (
+            <>
+              <Link href="/settings" className={styles.mobileLink}>My Account</Link>
+              <button type="button" className={styles.mobileLink} onClick={handleSignOut}>Sign out</button>
+            </>
+          )}
+
+          <div className={styles.mobileDivider} />
+
+          <div className={styles.mobileLegal}>
+            <Link href="/terms">Terms of Service</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/extension-privacy">Extension Privacy</Link>
+          </div>
+        </nav>
       </div>
     </header>
   );
