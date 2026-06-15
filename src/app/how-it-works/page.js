@@ -3,9 +3,9 @@ import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "../overview/page.module.css";
 
-const heroInputs = ["Article text", "Source mix", "Framing", "Attribution"];
-const heroOutputs = ["Summary", "Examples", "Confidence", "Next reads"];
-const heroRailY = [50, 217, 383, 550];
+const heroInputs = ["Article text", "Tone", "Source mix", "Framing", "Attribution"];
+const heroOutputs = ["Direction", "Summary", "Examples", "Confidence", "Next reads"];
+const heroRailY = [50, 175, 300, 425, 550];
 
 const pipelineSteps = [
   {
@@ -185,14 +185,16 @@ export default function HowItWorksPage() {
                   <stop offset="100%" stopColor="rgba(255,255,255,0.13)" />
                 </linearGradient>
               </defs>
-              <path className={styles.heroConnectionLeft} d="M370 50 C550 55 650 180 790 260" />
-              <path className={styles.heroConnectionLeft} d="M370 217 C550 210 650 250 790 290" />
-              <path className={styles.heroConnectionLeft} d="M370 383 C550 390 650 320 790 310" />
-              <path className={styles.heroConnectionLeft} d="M370 550 C550 545 650 400 790 330" />
-              <path className={styles.heroConnectionRight} d="M1230 50 C1050 55 950 180 810 260" />
-              <path className={styles.heroConnectionRight} d="M1230 217 C1050 210 950 250 810 290" />
-              <path className={styles.heroConnectionRight} d="M1230 383 C1050 390 950 320 810 310" />
-              <path className={styles.heroConnectionRight} d="M1230 550 C1050 545 950 400 810 330" />
+              <path className={styles.heroConnectionLeft} d="M370 50 C550 55 650 175 790 255" />
+              <path className={styles.heroConnectionLeft} d="M370 175 C550 170 650 230 790 275" />
+              <path className={styles.heroConnectionLeft} d="M370 300 C550 295 650 300 790 300" />
+              <path className={styles.heroConnectionLeft} d="M370 425 C550 430 650 370 790 325" />
+              <path className={styles.heroConnectionLeft} d="M370 550 C550 545 650 425 790 345" />
+              <path className={styles.heroConnectionRight} d="M1230 50 C1050 55 950 175 810 255" />
+              <path className={styles.heroConnectionRight} d="M1230 175 C1050 170 950 230 810 275" />
+              <path className={styles.heroConnectionRight} d="M1230 300 C1050 295 950 300 810 300" />
+              <path className={styles.heroConnectionRight} d="M1230 425 C1050 430 950 370 810 325" />
+              <path className={styles.heroConnectionRight} d="M1230 550 C1050 545 950 425 810 345" />
               {heroInputs.map((item, i) => (
                 <g key={item}>
                   <text className={styles.heroSvgLabel} x="345" y={heroRailY[i]} textAnchor="end" dominantBaseline="middle">{item}</text>
