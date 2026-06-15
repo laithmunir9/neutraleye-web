@@ -3,10 +3,8 @@
   width: 100%;
   margin-top: clamp(1.5rem, 3vw, 2.5rem);
   padding: clamp(2.1rem, 4vw, 3rem) 0;
-  --barrier-bg: #f1ede8;
-  background:
-    radial-gradient(ellipse 60% 100% at 50% 50%, rgba(139, 103, 65, 0.05), transparent 70%),
-    var(--barrier-bg);
+  --barrier-bg: #f4f0ea;
+  background: rgba(139, 103, 65, 0.03);
   overflow: hidden;
   contain: layout paint;
 }
