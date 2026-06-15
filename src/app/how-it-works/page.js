@@ -209,7 +209,7 @@ export default function HowItWorksPage() {
               ))}
             </svg>
             <div className={styles.heroCopy}>
-              <h1>How NeutralEye<br />Works</h1>
+              <h1>How NeutralEye Works</h1>
               <p className={styles.lead}>
                 Article text goes in. A structured bias analysis — direction, evidence, confidence, and next reads — comes out.
               </p>
