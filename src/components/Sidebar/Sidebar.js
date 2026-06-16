@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ScanSearch, History, Columns2, Settings2 } from "lucide-react";
 import { EXTENSION_URL } from "@/lib/content";
@@ -43,13 +44,7 @@ export default function Sidebar() {
           className={styles.extensionLink}
           title="Install the NeutralEye browser extension"
         >
-          <svg className={styles.extensionIcon} width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 12L12 1A11 11 0 0 1 21.53 17.5Z" fill="#EA4335"/>
-            <path d="M12 12L21.53 17.5A11 11 0 0 1 2.47 17.5Z" fill="#FBBC04"/>
-            <path d="M12 12L2.47 17.5A11 11 0 0 1 12 1Z" fill="#34A853"/>
-            <circle cx="12" cy="12" r="6.5" fill="white"/>
-            <circle cx="12" cy="12" r="4.5" fill="#4285F4"/>
-          </svg>
+          <Image src="/chrome-icon.png" alt="" width={20} height={20} className={styles.extensionIcon} aria-hidden="true" />
           <span className={styles.extensionLabel}>NeutralEye for Chrome</span>
         </a>
       </div>
