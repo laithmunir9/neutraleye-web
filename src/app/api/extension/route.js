@@ -78,9 +78,11 @@ function parseToken(request) {
 async function resolveAuthUser(token) {
   if (!token) return null;
   try {
-    const { data: { user } } = await makeSupabase().auth.getUser(token);
+    const { data: { user }, error } = await makeSupabase().auth.getUser(token);
+    if (error) logEvent("warn", "auth.getUser.error", { message: error.message });
     return user || null;
-  } catch {
+  } catch (e) {
+    logEvent("warn", "auth.getUser.exception", { message: String(e?.message || e) });
     return null;
   }
 }
@@ -103,7 +105,7 @@ async function incrementUserDailyUsage(supabase, userId) {
 async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headline) {
   if (!parsedJson) return;
   const drivers = [...new Set((parsedJson.biased_phrases || []).map((p) => String(p.why || "")).filter(Boolean))];
-  await supabase.from("analyses").insert({
+  const { error } = await supabase.from("analyses").insert({
     id: randomUUID(),
     user_id: userId,
     created_at: new Date().toISOString(),
@@ -121,6 +123,10 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     recommendations: parsedJson.recommendations || [],
     request_meta: null,
   });
+  if (error) {
+    logEvent("error", "save.analysis.error", { userId, message: error.message, code: error.code });
+    throw error;
+  }
 }
 
 function corsHeaders(request) {
@@ -438,6 +444,7 @@ export async function POST(request) {
   const token = parseToken(request);
   const authUser = await resolveAuthUser(token);
   const authedSupabase = authUser ? makeSupabase(token) : null;
+  logEvent("info", "auth.resolved", { requestId, hasToken: Boolean(token), userId: authUser?.id || null });
 
   let body;
   try {
