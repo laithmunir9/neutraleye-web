@@ -5,6 +5,8 @@
   padding: clamp(2.1rem, 4vw, 3rem) 0;
   --barrier-bg: #f4f0ea;
   background: rgba(139, 103, 65, 0.03);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   overflow: hidden;
   contain: layout paint;
 }

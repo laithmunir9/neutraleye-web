@@ -127,7 +127,7 @@ function userAvatar(user) {
   return user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 }
 
-export default function SiteHeader({ compact = false, defaultDark = false }) {
+export default function SiteHeader({ compact = false, defaultDark = false, noBorder = false }) {
   const [isDark, setIsDark] = useState(defaultDark);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading, supabase } = useAuth();
@@ -173,7 +173,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
   }
 
   return (
-    <header className={`${styles.header} ${compact ? styles.compact : ""} ${isDark ? styles.dark : ""}`}>
+    <header className={`${styles.header} ${compact ? styles.compact : ""} ${isDark ? styles.dark : ""} ${noBorder ? styles.noBorder : ""}`}>
       <div className={styles.headerInner}>
       <Link href="/" className={styles.brand} aria-label="NeutralEye home">
         <Image src="/neutraleye-logo-48.png" alt="" width={32} height={32} />
