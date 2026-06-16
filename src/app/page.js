@@ -120,24 +120,23 @@ export default function Home() {
             animate="show"
           >
             <div className={styles.copy}>
-              <motion.p className={styles.eyebrow} variants={heroItem}>
-              <span className={styles.eyebrowDot} aria-hidden="true" />
-              Media bias analysis
-            </motion.p>
+              <motion.div className={styles.eyebrow} variants={heroItem}>
+                <span className={styles.eyebrowDot} />
+                Media Bias Analysis
+              </motion.div>
               <motion.h1 variants={heroItem}>See how an article moves the reader</motion.h1>
               <motion.p className={styles.lead} variants={heroItem}>
-                NeutralEye reads tone, framing, sourcing, and omission, then returns quoted evidence and context for
-                what to read next.
+                Checks tone, framing, sourcing, and omission — with the evidence behind every call.
               </motion.p>
             </div>
             <motion.div className={styles.actions} variants={heroItem}>
               <Link href="/analyze" className={styles.heroBtn}>
                 Open Analyzer
               </Link>
+              <p className={styles.trustSignal}>
+                No account required · Free to start
+              </p>
             </motion.div>
-            <motion.p className={styles.trustSignal} variants={heroItem}>
-              No account required · Free to start
-            </motion.p>
           </motion.div>
         </section>
 
