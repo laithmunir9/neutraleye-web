@@ -67,11 +67,17 @@ export default function HistoryTable({ items, onDelete }) {
           {items.map((item, index) => {
             const menuId = item.id || `${item.createdAt}-${index}`;
             const isOpen = openMenuId === menuId;
+            const fromExtension = item.requestMeta?.source === "extension";
 
             return (
               <tr key={menuId}>
                 <td>{new Date(item.createdAt).toLocaleString()}</td>
-                <td>{domainOrTitle(item)}</td>
+                <td>
+                  <span className={styles.titleCell}>
+                    {domainOrTitle(item)}
+                    {fromExtension && <span className={styles.sourceBadge}>Extension</span>}
+                  </span>
+                </td>
                 <td>{item.directionLabel || item.direction}</td>
                 <td>{Math.round((item.confidence || 0) * 100)}%</td>
                 <td>
@@ -92,19 +98,21 @@ export default function HistoryTable({ items, onDelete }) {
                     >
                       Actions
                     </button>
-                    <button
-                      className={styles.inspectButton}
-                      type="button"
-                      aria-hidden={!isOpen}
-                      tabIndex={isOpen ? 0 : -1}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setOpenMenuId("");
-                        router.push(`/analyze?id=${item.id}`);
-                      }}
-                    >
-                      Inspect
-                    </button>
+                    {!fromExtension && (
+                      <button
+                        className={styles.inspectButton}
+                        type="button"
+                        aria-hidden={!isOpen}
+                        tabIndex={isOpen ? 0 : -1}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setOpenMenuId("");
+                          router.push(`/analyze?id=${item.id}`);
+                        }}
+                      >
+                        Inspect
+                      </button>
+                    )}
                     <button
                       className={styles.deleteButton}
                       type="button"

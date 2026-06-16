@@ -121,7 +121,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     examples: (parsedJson.biased_phrases || []).map((p) => ({ quote: p.quote, why: p.why })),
     sources: parsedJson.suggested_sources || [],
     recommendations: parsedJson.recommendations || [],
-    request_meta: null,
+    request_meta: { source: "extension" },
   });
   if (error) {
     logEvent("error", "save.analysis.error", { userId, message: error.message, code: error.code });

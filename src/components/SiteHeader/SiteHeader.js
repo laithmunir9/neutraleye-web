@@ -316,10 +316,8 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
                   ) : userInitial(user)}
                 </button>
               ) : (
-                <button className={styles.personButton} aria-label="Account menu">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
-                  </svg>
+                <button className={styles.avatarButton} aria-label="Account menu">
+                  {userInitial(user)}
                 </button>
               )}
             </DropdownMenu.Trigger>
