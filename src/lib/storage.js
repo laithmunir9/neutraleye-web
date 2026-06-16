@@ -30,7 +30,8 @@ export function saveAnalysis(record, user = null) {
   writeAll(next);
 
   if (user?.id) {
-    saveAnalysisToSupabase(record, user.id).catch((err) => {
+    const tagged = { ...record, requestMeta: { ...(record.requestMeta || {}), source: "website" } };
+    saveAnalysisToSupabase(tagged, user.id).catch((err) => {
       if (process.env.NODE_ENV !== "production") {
         console.warn("[neutraleye] supabase save failed", err);
       }

@@ -6,13 +6,27 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./HistoryTable.module.css";
 
 function domainOrTitle(record) {
-  if (record.title && record.title !== record.url) return record.title;
-  if (!record.url) return "Direct text input";
-  try {
-    return new URL(record.url).hostname;
-  } catch {
-    return record.url;
+  let domain = null;
+  if (record.url) {
+    try { domain = new URL(record.url).hostname; } catch { domain = null; }
   }
+  const title = record.title && record.title !== record.url ? record.title : null;
+  if (domain && title) return `${domain} — ${title}`;
+  if (title) return title;
+  if (domain) return domain;
+  return "Direct text input";
+}
+
+function directionLabel(record) {
+  const d = String(record.directionLabel || record.direction || "").toLowerCase();
+  if (!d || d === "unknown") return "No bias detected";
+  return record.directionLabel || record.direction;
+}
+
+function confidenceDisplay(record) {
+  const d = String(record.direction || "").toLowerCase();
+  if (!d || d === "unknown") return "—";
+  return `${Math.round((record.confidence || 0) * 100)}%`;
 }
 
 export default function HistoryTable({ items, onDelete }) {
@@ -68,6 +82,7 @@ export default function HistoryTable({ items, onDelete }) {
             const menuId = item.id || `${item.createdAt}-${index}`;
             const isOpen = openMenuId === menuId;
             const fromExtension = item.requestMeta?.source === "extension";
+            const fromWebsite = item.requestMeta?.source === "website";
 
             return (
               <tr key={menuId}>
@@ -76,10 +91,11 @@ export default function HistoryTable({ items, onDelete }) {
                   <span className={styles.titleCell}>
                     {domainOrTitle(item)}
                     {fromExtension && <span className={styles.sourceBadge}>Extension</span>}
+                    {fromWebsite && <span className={styles.sourceBadge}>Website</span>}
                   </span>
                 </td>
-                <td>{item.directionLabel || item.direction}</td>
-                <td>{Math.round((item.confidence || 0) * 100)}%</td>
+                <td>{directionLabel(item)}</td>
+                <td>{confidenceDisplay(item)}</td>
                 <td>
                   <div
                     className={`${styles.menu} ${isOpen ? styles.menuOpen : ""}`}
