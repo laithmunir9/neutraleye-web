@@ -77,8 +77,8 @@ const SCENES = [
   },
 ];
 
-const CYCLE_MS = 6800;
-const STAGGER = 620;
+const CYCLE_MS = 6200;
+const STAGGER = 700;
 
 function nodeDelay(i) { return `${i * STAGGER}ms`; }
 function edgeDelay(i) { return `${i * STAGGER + 280}ms`; }
@@ -107,7 +107,7 @@ export default function HeroSystemVisualization() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Edges */}
             {scene.edges.map((edge, i) => (

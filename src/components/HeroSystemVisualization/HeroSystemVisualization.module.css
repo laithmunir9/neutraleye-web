@@ -59,13 +59,13 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   opacity: 0;
-  animation: edgeDraw 0.45s ease forwards;
+  animation: edgeDraw 0.65s ease forwards;
 }
 
 /* Nodes */
 .nodeGroup {
   opacity: 0;
-  animation: nodeAppear 0.3s ease forwards;
+  animation: nodeAppear 0.5s ease forwards;
 }
 
 .nodeGlow {
