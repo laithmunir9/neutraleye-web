@@ -508,6 +508,136 @@ export const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ email, onBack })
   );
 };
 
+// ─── Forgot-password page ─────────────────────────────────────────────────
+
+interface ForgotPasswordPageProps {
+  description?: React.ReactNode;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onBack?: () => void;
+  loading?: boolean;
+}
+
+export const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
+  description,
+  onSubmit,
+  onBack,
+  loading,
+}) => (
+  <div
+    className="h-[100dvh] w-[100dvw] flex flex-col md:flex-row overflow-hidden"
+    style={{ fontFamily: 'var(--font-sans)', background: '#f7f4ef', color: '#201b16' }}
+  >
+    <LeftPanel>
+      <div className="flex flex-col gap-6">
+        <div className="animate-element animate-delay-100">
+          <h1
+            className="text-[2.6rem] leading-[1.05] font-normal mb-2"
+            style={{ fontFamily: 'var(--font-display)', color: '#201b16' }}
+          >
+            Reset your password.
+          </h1>
+          <p className="text-sm leading-relaxed" style={{ color: '#65584b' }}>
+            {description ?? "Enter your email and we'll send you a reset link."}
+          </p>
+        </div>
+
+        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <div className="animate-element animate-delay-200 flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#7b6a58' }}>Email</label>
+            <InputWrapper>
+              <input name="email" type="email" placeholder="you@example.com" autoComplete="email" required
+                className="w-full bg-transparent text-sm px-4 py-3.5 rounded-lg focus:outline-none"
+                style={{ color: '#201b16' }} />
+            </InputWrapper>
+          </div>
+
+          <button type="submit" disabled={loading}
+            className="animate-element animate-delay-300 w-full rounded-lg py-3.5 text-sm font-semibold transition-opacity hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
+            style={{ background: '#8b6741', color: '#f8f4ee' }}>
+            {loading ? 'Sending…' : 'Send reset link'}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={onBack}
+          className="animate-element animate-delay-400 inline-flex items-center gap-1.5 text-sm font-semibold transition-opacity hover:opacity-70 self-start"
+          style={{ color: '#8b6741', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to sign in
+        </button>
+      </div>
+    </LeftPanel>
+
+    <AnalysisPanel
+      sub="Forgot your password"
+      heading={<>Back to reading<br />in seconds.</>}
+    />
+  </div>
+);
+
+// ─── Password-reset-sent page ─────────────────────────────────────────────
+
+interface PasswordResetSentPageProps {
+  email?: string;
+  onBack?: () => void;
+}
+
+export const PasswordResetSentPage: React.FC<PasswordResetSentPageProps> = ({ email, onBack }) => (
+  <div
+    className="h-[100dvh] w-[100dvw] flex flex-col md:flex-row overflow-hidden"
+    style={{ fontFamily: 'var(--font-sans)', background: '#f7f4ef', color: '#201b16' }}
+  >
+    <LeftPanel>
+      <div className="flex flex-col gap-7">
+        <div
+          className="animate-element animate-delay-100 flex items-center justify-center w-14 h-14 rounded-2xl"
+          style={{ background: 'rgba(139,103,65,0.1)', border: '1px solid rgba(139,103,65,0.18)' }}
+        >
+          <Mail className="w-6 h-6" style={{ color: '#8b6741' }} strokeWidth={1.5} />
+        </div>
+
+        <div className="animate-element animate-delay-200">
+          <h1
+            className="text-[2.6rem] leading-[1.05] font-normal mb-3"
+            style={{ fontFamily: 'var(--font-display)', color: '#201b16' }}
+          >
+            Check your inbox.
+          </h1>
+          <p className="text-sm leading-relaxed" style={{ color: '#65584b' }}>
+            If{' '}
+            {email ? <strong style={{ color: '#201b16' }}>{email}</strong> : 'that address'}{' '}
+            has an account, a password reset link is on its way. Follow the instructions in the email to set a new password.
+          </p>
+        </div>
+
+        <p
+          className="animate-element animate-delay-300 text-xs leading-relaxed px-3 py-2.5 rounded-lg"
+          style={{ color: '#7b6a58', background: 'rgba(93,75,53,0.07)', border: '1px solid rgba(93,75,53,0.1)' }}
+        >
+          Didn&apos;t receive it? Check your spam folder, or wait a moment and try again.
+        </p>
+
+        <button
+          type="button"
+          onClick={onBack}
+          className="animate-element animate-delay-400 inline-flex items-center gap-1.5 text-sm font-semibold transition-opacity hover:opacity-70 self-start"
+          style={{ color: '#8b6741', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to sign in
+        </button>
+      </div>
+    </LeftPanel>
+
+    <AnalysisPanel
+      sub="Next step"
+      heading={<>Follow the link<br />in your email.</>}
+    />
+  </div>
+);
+
 // ─── Set-new-password page ─────────────────────────────────────────────────
 
 interface SetNewPasswordPageProps {

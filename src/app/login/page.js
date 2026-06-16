@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import { SignInPage, SignUpPage, CheckEmailPage } from "@/components/ui/sign-in";
+import { SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage } from "@/components/ui/sign-in";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./page.module.css";
 
@@ -83,8 +83,11 @@ function AuthForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const emailValue = String(formData.get("email") || "");
+    setEmail(emailValue);
     const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(emailValue, {
       redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     });
     setLoading(false);
@@ -118,72 +121,21 @@ function AuthForm() {
 
   if (isForgot && forgotSent) {
     return (
-      <MarketingShell>
-        <main className={styles.main}>
-          <div className={styles.card}>
-            <div className={styles.confirmBox}>
-              <div className={styles.confirmIcon} aria-hidden="true">✉</div>
-              <h1 className={styles.title}>Check your email</h1>
-              <p className={styles.confirmText}>
-                If <strong>{email}</strong> has an account, we sent a password reset link. Check your inbox and follow the instructions.
-              </p>
-              <button
-                type="button"
-                className={styles.switchLink}
-                onClick={() => switchMode("signin")}
-              >
-                Back to sign in
-              </button>
-            </div>
-          </div>
-        </main>
-      </MarketingShell>
+      <PasswordResetSentPage
+        email={email}
+        onBack={() => switchMode("signin")}
+      />
     );
   }
 
   if (isForgot) {
     return (
-      <MarketingShell>
-        <main className={styles.main}>
-          <div className={styles.card}>
-            <div className={styles.heading}>
-              <h1 className={styles.title}>Reset password</h1>
-              <p className={styles.subtitle}>Enter your email and we&apos;ll send you a reset link.</p>
-            </div>
-
-            {error && <p className={styles.errorBanner}>{error}</p>}
-
-            <form onSubmit={handleForgotPassword} className={styles.form}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className={styles.input}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
-              </div>
-              <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? "Sending…" : "Send reset link"}
-              </button>
-            </form>
-
-            <p className={styles.switchPrompt}>
-              <button
-                type="button"
-                className={styles.switchLink}
-                onClick={() => switchMode("signin")}
-              >
-                Back to sign in
-              </button>
-            </p>
-          </div>
-        </main>
-      </MarketingShell>
+      <ForgotPasswordPage
+        description={error ? <span style={{ color: "#8a443c", fontSize: "0.85rem" }}>{error}</span> : undefined}
+        onSubmit={handleForgotPassword}
+        onBack={() => switchMode("signin")}
+        loading={loading}
+      />
     );
   }
 
