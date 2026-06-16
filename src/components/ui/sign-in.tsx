@@ -508,6 +508,111 @@ export const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ email, onBack })
   );
 };
 
+// ─── Set-new-password page ─────────────────────────────────────────────────
+
+interface SetNewPasswordPageProps {
+  description?: React.ReactNode;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onBack?: () => void;
+  loading?: boolean;
+}
+
+export const SetNewPasswordPage: React.FC<SetNewPasswordPageProps> = ({
+  description,
+  onSubmit,
+  onBack,
+  loading,
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm,  setShowConfirm]  = useState(false);
+
+  return (
+    <div
+      className="h-[100dvh] w-[100dvw] flex flex-col md:flex-row overflow-hidden"
+      style={{ fontFamily: 'var(--font-sans)', background: '#f7f4ef', color: '#201b16' }}
+    >
+      <LeftPanel>
+        <div className="flex flex-col gap-6">
+          <div className="animate-element animate-delay-100">
+            <h1
+              className="text-[2.6rem] leading-[1.05] font-normal mb-2"
+              style={{ fontFamily: 'var(--font-display)', color: '#201b16' }}
+            >
+              Set new password.
+            </h1>
+            <p className="text-sm leading-relaxed" style={{ color: '#65584b' }}>
+              {description ?? 'Choose a strong password for your account.'}
+            </p>
+          </div>
+
+          <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+            <div className="animate-element animate-delay-200 flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#7b6a58' }}>New password</label>
+              <InputWrapper>
+                <div className="relative">
+                  <input name="password" type={showPassword ? 'text' : 'password'}
+                    placeholder="At least 8 characters"
+                    autoComplete="new-password" required minLength={8}
+                    className="w-full bg-transparent text-sm px-4 py-3.5 pr-11 rounded-lg focus:outline-none"
+                    style={{ color: '#201b16' }} />
+                  <button type="button" onClick={() => setShowPassword(p => !p)}
+                    className="absolute inset-y-0 right-0 w-11 flex items-center justify-center"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                    {showPassword
+                      ? <EyeOff className="w-4 h-4" style={{ color: '#7b6a58' }} />
+                      : <Eye    className="w-4 h-4" style={{ color: '#7b6a58' }} />}
+                  </button>
+                </div>
+              </InputWrapper>
+            </div>
+
+            <div className="animate-element animate-delay-300 flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#7b6a58' }}>Confirm password</label>
+              <InputWrapper>
+                <div className="relative">
+                  <input name="confirm" type={showConfirm ? 'text' : 'password'}
+                    placeholder="Same as above"
+                    autoComplete="new-password" required minLength={8}
+                    className="w-full bg-transparent text-sm px-4 py-3.5 pr-11 rounded-lg focus:outline-none"
+                    style={{ color: '#201b16' }} />
+                  <button type="button" onClick={() => setShowConfirm(p => !p)}
+                    className="absolute inset-y-0 right-0 w-11 flex items-center justify-center"
+                    aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                    {showConfirm
+                      ? <EyeOff className="w-4 h-4" style={{ color: '#7b6a58' }} />
+                      : <Eye    className="w-4 h-4" style={{ color: '#7b6a58' }} />}
+                  </button>
+                </div>
+              </InputWrapper>
+            </div>
+
+            <button type="submit" disabled={loading}
+              className="animate-element animate-delay-400 w-full rounded-lg py-3.5 text-sm font-semibold transition-opacity hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
+              style={{ background: '#8b6741', color: '#f8f4ee' }}>
+              {loading ? 'Saving…' : 'Update password'}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={onBack}
+            className="animate-element animate-delay-500 inline-flex items-center gap-1.5 text-sm font-semibold transition-opacity hover:opacity-70 self-start"
+            style={{ color: '#8b6741', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back to sign in
+          </button>
+        </div>
+      </LeftPanel>
+
+      <AnalysisPanel
+        sub="Your account"
+        heading={<>A fresh start<br />for your account.</>}
+      />
+    </div>
+  );
+};
+
 // ─── Sign-up page ───────────────────────────────────────────────────────────
 
 export const SignUpPage: React.FC<SignUpPageProps> = ({
