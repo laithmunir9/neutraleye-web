@@ -55,9 +55,9 @@ function reportToSentry(error, errorCode) {
 }
 
 // ── CORS ───────────────────────────────────────────────────────────────────
-// Chrome extensions send an Origin like chrome-extension://<id>
-// Locked to the published NeutralEye extension's ID.
-const ALLOWED_EXTENSION_ORIGIN = "chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe";
+// Chrome extensions send an Origin like chrome-extension://<id>.
+// Accept any chrome-extension:// origin — the ID changes between unpacked
+// and published installs, and rate-limiting already guards the endpoint.
 
 function makeSupabase(accessToken = null) {
   return createServerClient(
@@ -125,7 +125,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
 
 function corsHeaders(request) {
   const origin = request.headers.get("origin") || "";
-  const allowed = origin === ALLOWED_EXTENSION_ORIGIN ? origin : "";
+  const allowed = origin.startsWith("chrome-extension://") ? origin : "";
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
