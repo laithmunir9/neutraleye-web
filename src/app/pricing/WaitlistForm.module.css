@@ -36,6 +36,16 @@
   color: rgba(93, 75, 53, 0.38);
 }
 
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fffcf7 inset;
+  box-shadow: 0 0 0 1000px #fffcf7 inset;
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+  transition: background-color 0s 99999s;
+}
+
 .input:focus {
   border-color: rgba(139, 103, 65, 0.5);
   box-shadow: 0 0 0 3px rgba(139, 103, 65, 0.1);
