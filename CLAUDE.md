@@ -13,7 +13,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 
 **Companion repo:** `neutraleye-extension` — Chrome extension frontend that calls this repo's API routes.
 
-**Production domain (not yet live):** `tryneutraleye.com` — update Supabase Auth URL config once connected.
+**Production domain:** `tryneutraleye.com` — purchased and connected to Vercel. **Still needed:** update Supabase Auth redirect URLs to `tryneutraleye.com`.
 
 ---
 
@@ -68,8 +68,8 @@ src/
     about/page.js           # Founder story / mission — essay format with drop cap, no cards
     changelog/page.js       # Vertical timeline of releases with New/Improved/Fixed type tags
     support/page.js         # Contact form using mailto: construction — requires "use client"
-    login/page.js           # Auth page — sign-in and sign-up modes use SignInPage/SignUpPage from src/components/ui/sign-in.tsx (split layout); forgot-password and confirmation states use existing CSS-module forms wrapped in MarketingShell
-    reset-password/page.js  # Password reset — handles Supabase recovery redirect
+    login/page.js           # Auth page — all four auth states use sign-in.tsx split layout: SignInPage (sign-in), SignUpPage (sign-up), ForgotPasswordPage (forgot-password email form), PasswordResetSentPage (link-sent confirmation); CheckEmailPage used after sign-up
+    reset-password/page.js  # Password reset — uses SetNewPasswordPage from sign-in.tsx; handles Supabase recovery redirect
     blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort; post page reading layout (sidebar nav + content + footer) lives in [slug]/ReadingLayout.js
     compare/page.js         # Compare Analyses — Pro-gated with blur overlay
     settings/page.js        # User settings — Display (reduce motion) + Privacy (save analysis history toggle, stored in localStorage key `neutraleye.settings.v1`)
@@ -103,7 +103,7 @@ src/
     AnalyzerCta/            # CTA heading + button — no card/box background (stripped this session)
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
-      sign-in.tsx           # Exports SignInPage + SignUpPage — split layout (warm beige left form / dark right analysis panel); used by login/page.js for signin and signup modes. Shared dark panel = AnalysisPanel: heading/sub + ResultFeed (all 7 "what every result contains" rows always rendered at fixed height, opacity/translateY transition reveals them one by one so the heading never shifts) + SignalBars (Tone/Framing/Attribution/Sources/Omission bar chart, fades in via globals.css keyframe barGrow once all rows are revealed). ResultFeed runs a filling → complete (5s hold) → resetting state machine that loops indefinitely.
+      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on SubTrigger pointerEnter and closes 150ms after pointer leaves either element.
 
   lib/
     api.js                  # Frontend → API route calls
@@ -275,7 +275,8 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up
 - **Cloudflare** — DDoS protection and CDN
-- **Domain** — `tryneutraleye.com` (not yet purchased); once live: update Supabase Auth URL config, support page contact email, and legal contact email
+- **Supabase Auth URLs** — update redirect URLs in Supabase dashboard to `tryneutraleye.com` (domain is live, this is not done yet)
+- **Transactional email** — integrate Resend for branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`; see TODO comment in `login/page.js`
 
 ---
 
