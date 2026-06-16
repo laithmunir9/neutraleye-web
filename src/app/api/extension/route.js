@@ -102,6 +102,18 @@ async function incrementUserDailyUsage(supabase, userId) {
   }
 }
 
+function buildDirectionLabel(parsedJson) {
+  const biasLevel = String(parsedJson?.bias_level || "").trim().toLowerCase();
+  const direction = String(parsedJson?.direction || "").trim();
+  const nd = direction.toLowerCase();
+  if (biasLevel === "none") return "unknown";
+  if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown") return direction || "unknown";
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  if (biasLevel && direction) return `${cap(biasLevel)} bias ${direction}`;
+  if (biasLevel) return `${cap(biasLevel)} bias detected`;
+  return direction || "unknown";
+}
+
 async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headline) {
   if (!parsedJson) return;
   const drivers = [...new Set((parsedJson.biased_phrases || []).map((p) => String(p.why || "")).filter(Boolean))];
@@ -113,7 +125,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     url: inputUrl || null,
     title: headline || null,
     direction: parsedJson.direction || "unknown",
-    direction_label: parsedJson.direction || "unknown",
+    direction_label: buildDirectionLabel(parsedJson),
     confidence: parsedJson.analysis_confidence ?? 0,
     score: parsedJson.analysis_confidence ?? 0,
     summary: parsedJson.summary || "",
