@@ -5,46 +5,54 @@
 
 .surface {
   position: relative;
-  min-height: clamp(22rem, 34vw, 26rem);
+  min-height: clamp(26rem, 40vw, 32rem);
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgba(93, 75, 53, 0.08);
-  border-radius: var(--radius-md);
-  background:
-    linear-gradient(90deg, rgba(248, 244, 238, 0.98), rgba(248, 244, 238, 0.58) 34%, rgba(248, 244, 238, 0.84) 100%),
-    radial-gradient(circle at 66% 48%, rgba(255, 252, 247, 0.12), rgba(255, 252, 247, 0.86) 62%, rgba(255, 252, 247, 0.98) 100%);
-  background-size: 1.18rem 1.18rem, auto;
   isolation: isolate;
 }
 
-.surface::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(circle at 62% 46%, transparent 0 27%, rgba(255, 252, 247, 0.22) 45%, rgba(255, 252, 247, 0.92) 78%),
-    linear-gradient(90deg, rgba(255, 252, 247, 0.98), rgba(255, 252, 247, 0.08) 48%, rgba(255, 252, 247, 0.66));
-  pointer-events: none;
-}
-
-/* Dot grid */
+/* Circular dot grid — inset: -2rem so the outermost visible dots are always whole */
+/* Only the sweep mask lives here — no radial clipping */
 .field {
   position: absolute;
-  inset: 2.6rem 1.6rem 3.6rem;
+  inset: -2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='2' fill='%235d4b35' fill-opacity='0.26'/%3E%3C/svg%3E");
+  background-size: 2rem 2rem;
+  mask-image: linear-gradient(to right, black 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 72%, transparent 100%);
+  mask-size: 4% 100%;
+  -webkit-mask-size: 4% 100%;
+  mask-position: left;
+  -webkit-mask-position: left;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  animation: fieldSweep 3.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   z-index: 1;
-  opacity: 0.72;
-  background-image: radial-gradient(circle, rgba(32, 27, 22, 0.18) 1px, transparent 1.65px);
-  background-size: 1.15rem 1.15rem;
-  mask-image: radial-gradient(circle at 56% 46%, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.36) 48%, transparent 78%);
-  animation: fieldBreathe 8.8s ease-in-out infinite;
 }
 
-/* SVG map */
+/* Rounded-square vignette — box-shadow inset traces border-radius, covering edge dots
+   with the background colour rather than clipping them. Dots stay complete, just fade. */
+.fieldOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 2.5rem;
+  box-shadow: inset 0 0 4.5rem 2rem #f8f4ee;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Wraps field + overlay + SVG so they fade in/out together */
+.sceneLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* SVG map — above the overlay */
 .map {
   position: absolute;
-  inset: 2.15rem 1.6rem 3.35rem;
-  z-index: 2;
+  inset: 1rem 0.25rem 1.5rem;
+  z-index: 3;
   width: auto;
   height: auto;
   overflow: visible;
@@ -59,13 +67,13 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   opacity: 0;
-  animation: edgeDraw 0.45s ease forwards;
+  animation: edgeDraw 0.65s ease forwards;
 }
 
 /* Nodes */
 .nodeGroup {
   opacity: 0;
-  animation: nodeAppear 0.3s ease forwards;
+  animation: nodeAppear 0.5s ease forwards;
 }
 
 .nodeGlow {
@@ -98,29 +106,6 @@
   stroke: #f8f4ee;
 }
 
-/* Scene dots */
-.dots {
-  position: absolute;
-  bottom: 1rem;
-  right: 1.1rem;
-  z-index: 5;
-  display: flex;
-  gap: 0.42rem;
-}
-
-.dot {
-  display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(139, 103, 65, 0.22);
-  transition: background 300ms, transform 300ms;
-}
-
-.dotActive {
-  background: #8b6741;
-  transform: scale(1.35);
-}
 
 /* Keyframes */
 @keyframes edgeDraw {
@@ -133,15 +118,23 @@
   to   { opacity: 1; }
 }
 
-@keyframes fieldBreathe {
-  0%, 100% { opacity: 0.48; transform: scale(0.995); }
-  50%       { opacity: 0.76; transform: scale(1.01);  }
+/* Dot field sweeps left-to-right: mask-size grows from 4% to 139% */
+/* Single gradient layer — 72% stop means full opacity once size reaches 100/0.72 ≈ 139% */
+@keyframes fieldSweep {
+  from {
+    mask-size: 4% 100%;
+    -webkit-mask-size: 4% 100%;
+  }
+  to {
+    mask-size: 139% 100%;
+    -webkit-mask-size: 139% 100%;
+  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .field { animation: none; }
-  .edge  { animation: none; opacity: 1; stroke-dashoffset: 0; }
+  .field     { animation: none; mask-size: 139% 100%; -webkit-mask-size: 139% 100%; }
+  .edge      { animation: none; opacity: 1; stroke-dashoffset: 0; }
   .nodeGroup { animation: none; opacity: 1; }
 }
 
@@ -150,10 +143,6 @@
   .surface {
     min-height: 30rem;
     border-radius: var(--radius-lg);
-  }
-
-  .field {
-    inset: 3rem 1.4rem 4.2rem;
   }
 
   .map {
@@ -169,10 +158,6 @@
 @media (max-width: 640px) {
   .surface {
     min-height: 25rem;
-  }
-
-  .field {
-    inset: 3rem 0.5rem 3.8rem;
   }
 
   .map {

@@ -15,12 +15,12 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(24rem, 1.08fr);
-  align-items: end;
+  align-items: center;
   gap: clamp(1.75rem, 4vw, 3.2rem);
   max-width: 72rem;
-  min-height: clamp(31rem, 60svh, 39rem);
+  min-height: clamp(34rem, 66svh, 44rem);
   margin: 0 auto;
-  padding: clamp(2.5rem, 5vw, 4.2rem) var(--section-pad-x) clamp(1.1rem, 2vw, 1.8rem);
+  padding: clamp(3rem, 6vw, 5rem) var(--section-pad-x) clamp(2rem, 3.5vw, 3rem);
   isolation: isolate;
 }
 
@@ -41,7 +41,8 @@
   order: 2;
   z-index: 0;
   width: 100%;
-  align-self: end;
+  align-self: center;
+  margin-left: -1.5rem;
   opacity: 0.98;
   pointer-events: auto;
 }
@@ -52,14 +53,14 @@
   z-index: 2;
   align-self: center;
   display: grid;
-  gap: 1.55rem;
+  gap: 1.75rem;
   max-width: 35rem;
-  padding: 1rem 0 0;
+  padding: 0;
 }
 
 .copy {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .eyebrow {
@@ -143,7 +144,8 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  align-items: center;
+  gap: 1.2rem;
 }
 
 .heroBtn {
@@ -686,6 +688,7 @@
 
   .heroSystem {
     margin-top: 0.35rem;
+    margin-left: 0;
     max-width: 44rem;
   }
 
