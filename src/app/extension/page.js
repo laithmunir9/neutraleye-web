@@ -245,7 +245,7 @@ export default function ExtensionPage() {
                 </div>
                 <div>
                   <strong>Free to install and use</strong>
-                  <p>10 analyses per day on the free plan. No credit card required to get started.</p>
+                  <p>Free to use, with unlimited analyses during our beta. No credit card required.</p>
                 </div>
               </article>
               <article className={styles.trustItem}>

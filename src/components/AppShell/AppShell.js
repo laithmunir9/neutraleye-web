@@ -8,7 +8,7 @@ import styles from "./AppShell.module.css";
 export default function AppShell({ children }) {
   return (
     <div className={styles.root}>
-      <SiteHeader />
+      <SiteHeader noBorder />
       <div className={styles.workspace}>
         <Sidebar />
         <div className={styles.content}>

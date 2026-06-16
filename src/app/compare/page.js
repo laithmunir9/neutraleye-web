@@ -23,13 +23,12 @@ function ProGate({ user }) {
     <div className={styles.gateOverlay}>
       <div className={styles.gateCard}>
         <div className={styles.gateIconWrap}>{LOCK_ICON}</div>
-        <span className={styles.gateBadge}>Pro</span>
+        <span className={styles.gateBadge}>Coming Soon</span>
         <h2 className={styles.gateTitle}>Compare Analyses</h2>
         <p className={styles.gateDesc}>
-          Side-by-side comparison of bias results is a Pro feature.
-          {!user && " Sign in or upgrade to get access."}
+          Side-by-side bias comparison is a Pro feature launching soon. Join the waitlist to be notified.
         </p>
-        <Link href="/pricing" className={styles.gateBtn}>View Plans</Link>
+        <Link href="/pricing" className={styles.gateBtn}>Join the Waitlist</Link>
         {!user && (
           <Link href="/login" className={styles.gateSecondary}>Sign in</Link>
         )}

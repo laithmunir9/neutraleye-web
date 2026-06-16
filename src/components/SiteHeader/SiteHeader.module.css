@@ -16,6 +16,10 @@
     color 180ms ease;
 }
 
+.noBorder {
+  border-bottom-color: transparent;
+}
+
 @media (min-width: 1024px) {
   .compact {
     padding-left: 0;

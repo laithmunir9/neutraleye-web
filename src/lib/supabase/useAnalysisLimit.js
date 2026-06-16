@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import { checkLocalLimit, incrementLocalUsage, DAILY_LIMIT } from "@/lib/usage";
+import { checkLocalLimit, incrementLocalUsage } from "@/lib/usage";
 
 export function useAnalysisLimit() {
   const { user, loading } = useAuth();
-  const [state, setState] = useState({ count: 0, remaining: DAILY_LIMIT, limited: false, ready: false });
+  const [state, setState] = useState({ count: 0, remaining: null, limited: false, ready: false });
 
   const fetchRemote = useCallback(async () => {
     try {
