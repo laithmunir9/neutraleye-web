@@ -89,9 +89,9 @@ export default function HistoryTable({ items, onDelete }) {
                 <td>{new Date(item.createdAt).toLocaleString()}</td>
                 <td>
                   <span className={styles.titleCell}>
-                    {domainOrTitle(item)}
                     {fromExtension && <span className={styles.sourceBadge}>Extension</span>}
                     {fromWebsite && <span className={styles.sourceBadge}>Website</span>}
+                    <span>{domainOrTitle(item)}</span>
                   </span>
                 </td>
                 <td>{directionLabel(item)}</td>

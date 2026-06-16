@@ -166,9 +166,22 @@ async function fetchHtml(url, timeoutMs = 12000) {
   throw error;
 }
 
+function extractPageTitle($) {
+  const og = $('meta[property="og:title"]').attr("content");
+  if (og?.trim()) return og.trim();
+  const tw = $('meta[name="twitter:title"]').attr("content");
+  if (tw?.trim()) return tw.trim();
+  const tag = $("title").first().text();
+  if (tag?.trim()) return tag.trim();
+  const h1 = $("h1").first().text();
+  if (h1?.trim()) return h1.trim();
+  return null;
+}
+
 async function extractArticleTextFromUrl(url) {
   const html = await fetchHtml(url, 12000);
   const $ = cheerio.load(html);
+  const pageTitle = extractPageTitle($);
 
   $("script, style, noscript, svg, canvas, iframe").remove();
   $('[class*="ad-"],[class*="-ad"],[id*="ad-"],[class*="advertisement"],[class*="sponsored"],[class*="promo-"]').remove();
@@ -209,7 +222,7 @@ async function extractArticleTextFromUrl(url) {
 
   let text = deduped.join("\n\n");
   if (!text || text.length < 300) text = cleanWhitespace(root.text());
-  return safeTrim(cleanWhitespace(text), MAX_EXTRACTED_TEXT_LENGTH);
+  return { text: safeTrim(cleanWhitespace(text), MAX_EXTRACTED_TEXT_LENGTH), title: pageTitle };
 }
 
 // ── OpenAI calls ───────────────────────────────────────────────────────────
@@ -554,7 +567,7 @@ function parseAiResponse(aiResponse) {
 
 // ── Analysis pipeline ──────────────────────────────────────────────────────
 
-async function runAnalysisPipeline(text, requestId, sourceUrl = null) {
+async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle = null) {
   const verdict = await detectIfArticle(text, requestId);
   if (verdict !== "article") {
     const error = new Error("Submitted content does not look like a readable article.");
@@ -578,6 +591,7 @@ async function runAnalysisPipeline(text, requestId, sourceUrl = null) {
     result: normalized.rawResult,
     json: parsed.json,
     extractedText: text,
+    title: pageTitle || null,
   };
 }
 
@@ -664,8 +678,11 @@ export async function POST(request) {
       logEvent("info", "analysis.start", { requestId, mode: "url", url, ip });
 
       let extracted = "";
+      let pageTitle = null;
       try {
-        extracted = await extractArticleTextFromUrl(url);
+        const extraction = await extractArticleTextFromUrl(url);
+        extracted = extraction.text;
+        pageTitle = extraction.title;
         logEvent("info", "url.extraction.success", { requestId, url, extractedTextLength: extracted.length });
       } catch (error) {
         logEvent("warn", "url.extraction.failure", { requestId, url, errorCode: error?.code, message: String(error?.message) });
@@ -683,7 +700,7 @@ export async function POST(request) {
         return errResponse(422, "Could not extract enough readable article text from that URL.", "URL_EXTRACTION_TOO_SHORT");
       }
 
-      const result = await runAnalysisPipeline(extracted, requestId, url);
+      const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle);
       inMemoryCache.set(key, result);
       return Response.json(result);
     }

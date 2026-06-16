@@ -111,8 +111,12 @@
 
 .titleCell {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+}
+
+.titleCell > span:last-child {
+  line-height: 1.45;
 }
 
 .sourceBadge {
@@ -127,6 +131,7 @@
   letter-spacing: 0.03em;
   white-space: nowrap;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .menu {
