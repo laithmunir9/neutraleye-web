@@ -168,7 +168,7 @@ function getUrlQualityError(value) {
 function AnalyzePageContent() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const { remaining, limited, ready: limitReady, increment } = useAnalysisLimit();
+  const { increment } = useAnalysisLimit();
   const [mode, setMode] = useState("text");
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
@@ -220,10 +220,9 @@ function AnalyzePageContent() {
 
   const canAnalyze = useMemo(() => {
     if (loading) return false;
-    if (limited) return false;
     if (mode === "url") return Boolean(url.trim());
     return text.trim().length >= 200;
-  }, [mode, text, url, loading, limited]);
+  }, [mode, text, url, loading]);
 
   function handleModeChange(nextMode) {
     setMode(nextMode);
@@ -247,10 +246,6 @@ function AnalyzePageContent() {
   }
 
   const handleAnalyze = useCallback(async () => {
-    if (limited) {
-      setErrorState({ title: "Daily limit reached", message: "You've used all 10 free analyses for today. Come back tomorrow or upgrade to Pro for unlimited access." });
-      return;
-    }
     setErrorState(null);
     setLoading(true);
     if (mode === "url") {
@@ -390,7 +385,7 @@ function AnalyzePageContent() {
     } finally {
       setLoading(false);
     }
-  }, [mode, text, url, limited, increment]);
+  }, [mode, text, url, increment]);
 
   function handleExample() {
     const sampleText =
@@ -414,22 +409,6 @@ function AnalyzePageContent() {
           title="Analyze an Article"
           subtitle="Paste article text or a URL. NeutralEye checks tone, framing, and omission and returns what it finds."
         />
-
-        {limitReady && limited && (
-          <div className={styles.limitBanner}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            You've used all 10 free analyses for today.{" "}
-            <Link href="/pricing" className={styles.limitLink}>Upgrade to Pro</Link>
-            {" "}for unlimited access.
-          </div>
-        )}
-        {limitReady && !limited && remaining <= 3 && (
-          <div className={styles.limitChip}>
-            {remaining} {remaining === 1 ? "analysis" : "analyses"} remaining today
-          </div>
-        )}
 
         <section className={styles.grid}>
           <div className={styles.inputColumn}>

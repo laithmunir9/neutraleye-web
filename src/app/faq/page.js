@@ -78,19 +78,19 @@ const SECTIONS = [
     questions: [
       {
         q: "How many analyses can I run for free?",
-        a: "Free users get 5 analyses per minute and 10 per day through the Chrome extension. The web analyzer has a separate rate limit of 5 requests per minute. No account is required to get started — limits apply per IP address for anonymous users.",
+        a: "Unlimited — there is no daily cap during our beta. A rate limit of 5 requests per minute per IP applies to prevent abuse, but there is no per-day ceiling. No account is required to get started.",
       },
       {
         q: "What does a Pro plan include?",
-        a: "Pro gives you higher daily limits, saved analysis history, and access to Compare Analyses — which lets you run two articles side by side and see where framing diverges. Pro is billed monthly. Stripe integration is coming soon — join the waitlist on the pricing page.",
+        a: "Pro brings cloud history synced across all your devices and Compare Analyses — which lets you run two articles side by side and see where framing diverges. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
       },
       {
         q: "Does the extension have the same limits as the website?",
-        a: "The extension and website have separate rate limits. Extension analyses count against your extension daily quota; web analyses count separately. Signing in links both to your account so history saves across both.",
+        a: "Both the extension and website use a rate limit of 5 requests per minute per IP. There is no daily quota on either. Signing in links both to your account so history saves across both.",
       },
       {
         q: "Do I need an account to use NeutralEye?",
-        a: "No. You can run analyses on the website without an account, subject to the anonymous rate limit. An account is needed to save history, use the extension with authenticated limits, and access Pro features.",
+        a: "No. You can run unlimited analyses on the website without an account. An account is needed to save history across devices and to access upcoming Pro features like Compare Analyses.",
       },
     ],
   },

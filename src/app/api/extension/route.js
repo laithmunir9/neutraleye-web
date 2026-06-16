@@ -59,8 +59,6 @@ function reportToSentry(error, errorCode) {
 // Locked to the published NeutralEye extension's ID.
 const ALLOWED_EXTENSION_ORIGIN = "chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe";
 
-const DAILY_LIMIT = 10;
-
 function makeSupabase(accessToken = null) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -85,17 +83,6 @@ async function resolveAuthUser(token) {
   } catch {
     return null;
   }
-}
-
-async function checkUserDailyLimit(supabase, userId) {
-  const today = new Date().toISOString().slice(0, 10);
-  const { data } = await supabase
-    .from("daily_usage")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("usage_date", today)
-    .maybeSingle();
-  return (data?.count ?? 0) >= DAILY_LIMIT;
 }
 
 async function incrementUserDailyUsage(supabase, userId) {
@@ -451,18 +438,6 @@ export async function POST(request) {
   const token = parseToken(request);
   const authUser = await resolveAuthUser(token);
   const authedSupabase = authUser ? makeSupabase(token) : null;
-
-  // Per-user daily limit for authenticated requests (on top of IP limit)
-  if (authUser) {
-    const overLimit = await checkUserDailyLimit(authedSupabase, authUser.id);
-    if (overLimit) {
-      logEvent("warn", "daily_limit.exceeded", { requestId, userId: authUser.id });
-      return Response.json(
-        { error: "Daily limit reached. Come back tomorrow or upgrade to Pro.", code: "DAILY_LIMIT_REACHED" },
-        { status: 429, headers: { ...headers, "Retry-After": "86400" } }
-      );
-    }
-  }
 
   let body;
   try {

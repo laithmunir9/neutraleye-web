@@ -231,7 +231,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
 
       <div className={styles.headerActions}>
         {showUpgradeCta && (
-          <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Pro</Link>
+          <Link href="/pricing" className={styles.upgradeCta}>Pro — Coming Soon</Link>
         )}
 
         {!loading && !user && (
@@ -346,7 +346,7 @@ export default function SiteHeader({ compact = false, defaultDark = false }) {
           <div className={styles.mobileDivider} />
 
           {showUpgradeCta && (
-            <Link href="/pricing" className={styles.mobileLink}>Upgrade to Pro</Link>
+            <Link href="/pricing" className={styles.mobileLink}>Pro — Coming Soon</Link>
           )}
 
           {!loading && !user && (
