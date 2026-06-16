@@ -40,13 +40,9 @@ function makeSupabase() {
   );
 }
 
-// Chrome extensions send an Origin like chrome-extension://<id>
-// Locked to the published NeutralEye extension's ID.
-const ALLOWED_EXTENSION_ORIGIN = "chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe";
-
 function corsHeaders(request) {
   const origin = request.headers.get("origin") || "";
-  const allowed = origin === ALLOWED_EXTENSION_ORIGIN ? origin : "";
+  const allowed = origin.startsWith("chrome-extension://") ? origin : "";
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
