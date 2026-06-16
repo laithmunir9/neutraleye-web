@@ -494,7 +494,7 @@ export async function POST(request) {
     text = text.trim();
 
     const cacheKey = hasUrl ? `url:${url}` : `text:${text.slice(0, 500)}`;
-    if (inMemoryCache.has(cacheKey)) {
+    if (!authUser && inMemoryCache.has(cacheKey)) {
       return Response.json(inMemoryCache.get(cacheKey), { headers });
     }
 

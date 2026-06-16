@@ -179,6 +179,7 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
   const pathname = usePathname();
   const isPro = user?.user_metadata?.plan === "pro";
   const showUpgradeCta = pathname !== "/pricing" && !isPro;
+  const isGoogleUser = user?.app_metadata?.provider === "google";
 
   useEffect(() => {
     setMobileOpen(false);
@@ -308,11 +309,19 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
         {!loading && user && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className={`${styles.avatarButton} ${userAvatar(user) ? styles.avatarButtonImg : ""}`} aria-label="Account menu">
-                {userAvatar(user) ? (
-                  <Image src={userAvatar(user)} alt="" width={36} height={36} className={styles.avatarImg} referrerPolicy="no-referrer" />
-                ) : userInitial(user)}
-              </button>
+              {isGoogleUser ? (
+                <button className={`${styles.avatarButton} ${userAvatar(user) ? styles.avatarButtonImg : ""}`} aria-label="Account menu">
+                  {userAvatar(user) ? (
+                    <Image src={userAvatar(user)} alt="" width={36} height={36} className={styles.avatarImg} referrerPolicy="no-referrer" />
+                  ) : userInitial(user)}
+                </button>
+              ) : (
+                <button className={styles.personButton} aria-label="Account menu">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+                  </svg>
+                </button>
+              )}
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} align="end" sideOffset={8}>
