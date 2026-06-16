@@ -445,7 +445,8 @@ export async function POST(request) {
   const token = parseToken(request);
   const authUser = await resolveAuthUser(token);
   const authedSupabase = authUser ? makeSupabase(token) : null;
-  logEvent("info", "auth.resolved", { requestId, hasToken: Boolean(token), userId: authUser?.id || null });
+  const tokenExpired = Boolean(token && !authUser);
+  logEvent("info", "auth.resolved", { requestId, hasToken: Boolean(token), userId: authUser?.id || null, tokenExpired });
 
   let body;
   try {
@@ -530,7 +531,7 @@ export async function POST(request) {
       ]);
     }
 
-    return Response.json({ ...payload, saved: Boolean(authUser) }, { headers });
+    return Response.json({ ...payload, saved: Boolean(authUser), tokenExpired }, { headers });
   } catch (error) {
     const errorCode = error?.code || "INTERNAL_ERROR";
     logEvent("error", "analysis.failure", {
