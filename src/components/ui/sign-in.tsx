@@ -257,24 +257,42 @@ const GoogleIcon = () => (
 
 // ─── Shared left-panel shell ───────────────────────────────────────────────
 
-function LeftPanel({ children }: { children: React.ReactNode }) {
+const AUTH_PATHS = ['/login', '/reset-password', '/auth'];
+
+function goBackToSite() {
+  try {
+    const ref = document.referrer;
+    if (ref && new URL(ref).origin === window.location.origin) {
+      const path = new URL(ref).pathname;
+      if (!AUTH_PATHS.some(p => path.startsWith(p))) {
+        window.history.back();
+        return;
+      }
+    }
+  } catch {}
+  window.location.href = '/';
+}
+
+function LeftPanel({ children, showBack = false }: { children: React.ReactNode; showBack?: boolean }) {
   return (
     <section
       className="flex-1 flex flex-col overflow-y-auto"
       style={{ background: '#f7f4ef' }}
     >
-      {/* Back button */}
-      <div className="px-8 pt-7 md:px-14 md:pt-8">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-60"
-          style={{ color: '#7b6a58' }}
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back
-        </button>
+      {/* Back button — only on sign-in / sign-up */}
+      <div className="px-8 pt-7 md:px-14 md:pt-8" style={{ minHeight: '3rem' }}>
+        {showBack && (
+          <button
+            type="button"
+            onClick={goBackToSite}
+            className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-60"
+            style={{ color: '#7b6a58' }}
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back
+          </button>
+        )}
       </div>
 
       {/* Centred form */}
@@ -340,7 +358,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       className="h-[100dvh] w-[100dvw] flex flex-col md:flex-row overflow-hidden"
       style={{ fontFamily: 'var(--font-sans)', background: '#f7f4ef', color: '#201b16' }}
     >
-      <LeftPanel>
+      <LeftPanel showBack>
         <div className="flex flex-col gap-6">
           {/* Headline */}
           <div className="animate-element animate-delay-100">
@@ -759,7 +777,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({
       className="h-[100dvh] w-[100dvw] flex flex-col md:flex-row overflow-hidden"
       style={{ fontFamily: 'var(--font-sans)', background: '#f7f4ef', color: '#201b16' }}
     >
-      <LeftPanel>
+      <LeftPanel showBack>
         <div className="flex flex-col gap-6">
           {/* Headline */}
           <div className="animate-element animate-delay-100">
