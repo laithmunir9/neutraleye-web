@@ -127,6 +127,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     logEvent("error", "save.analysis.error", { userId, message: error.message, code: error.code });
     throw error;
   }
+  logEvent("info", "save.analysis.success", { userId });
 }
 
 function corsHeaders(request) {
