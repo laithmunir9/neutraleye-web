@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { EXTENSION_URL } from "@/lib/content";
@@ -125,6 +125,51 @@ function userInitial(user) {
 
 function userAvatar(user) {
   return user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+}
+
+function LegalSub({ isDark }) {
+  const [open, setOpen] = useState(false);
+  const timer = useRef(null);
+
+  function delayClose() { timer.current = setTimeout(() => setOpen(false), 150); }
+  function cancelClose() { clearTimeout(timer.current); }
+
+  return (
+    <DropdownMenu.Sub open={open} onOpenChange={setOpen}>
+      <DropdownMenu.SubTrigger
+        className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}
+        onPointerEnter={() => { cancelClose(); setOpen(true); }}
+        onPointerLeave={delayClose}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Legal
+        <svg className={styles.subArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </DropdownMenu.SubTrigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.SubContent
+          className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`}
+          sideOffset={4}
+          alignOffset={-6}
+          onPointerEnter={cancelClose}
+          onPointerLeave={delayClose}
+        >
+          <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+            <Link href="/terms">Terms of Service</Link>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+            <Link href="/privacy">Privacy Policy</Link>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
+            <Link href="/extension-privacy">Extension Privacy</Link>
+          </DropdownMenu.Item>
+        </DropdownMenu.SubContent>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Sub>
+  );
 }
 
 export default function SiteHeader({ compact = false, defaultDark = false, noBorder = false }) {
@@ -254,30 +299,7 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
                   </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
-                <DropdownMenu.Sub>
-                  <DropdownMenu.SubTrigger className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Legal
-                    <svg className={styles.subArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  </DropdownMenu.SubTrigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-6}>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/terms">Terms of Service</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/privacy">Privacy Policy</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/extension-privacy">Extension Privacy</Link>
-                      </DropdownMenu.Item>
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
+                <LegalSub isDark={isDark} />
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
@@ -298,30 +320,7 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
                   <Link href="/settings">My Account</Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
-                <DropdownMenu.Sub>
-                  <DropdownMenu.SubTrigger className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Legal
-                    <svg className={styles.subArrow} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                  </DropdownMenu.SubTrigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.SubContent className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} sideOffset={4} alignOffset={-6}>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/terms">Terms of Service</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/privacy">Privacy Policy</Link>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item className={styles.dropdownMenuItem} asChild>
-                        <Link href="/extension-privacy">Extension Privacy</Link>
-                      </DropdownMenu.Item>
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
+                <LegalSub isDark={isDark} />
                 <DropdownMenu.Separator className={styles.dropdownSeparator} />
                 <DropdownMenu.Item className={styles.dropdownMenuItem} onSelect={handleSignOut}>
                   Sign out
