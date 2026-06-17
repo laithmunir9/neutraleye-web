@@ -465,6 +465,9 @@ function driverLabelFromReason(reason) {
   if (n === "framing") return "Framing";
   if (n === "source") return "Source imbalance";
   if (n === "attribution") return "Attribution gaps";
+  // AI sometimes returns descriptive labels (e.g. "LOADED PHRASING") — title-case them
+  const raw = String(reason || "").trim();
+  if (raw) return raw.split(/[\s_-]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
   return "Bias signal";
 }
 

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
 import InputPanel from "@/components/InputPanel/InputPanel";
+import QuoteEvidence from "@/components/QuoteEvidence/QuoteEvidence";
 import Link from "next/link";
 import { analyzeText, analyzeUrl, ApiError } from "@/lib/api";
 import { saveAnalysis } from "@/lib/storage";
@@ -475,11 +476,17 @@ function AnalyzePageContent() {
                 <span>Examples of Bias</span>
               </div>
               {result.examples.length ? (
-                <ul className={styles.simpleList}>
+                <div className={styles.examplesList}>
                   {result.examples.map((example, index) => (
-                    <li key={`${example.quote}-${index}`}>{example.quote}</li>
+                    <QuoteEvidence
+                      key={`${example.quote}-${index}`}
+                      quote={example.quote}
+                      label={example.label}
+                      explanation={example.explanation}
+                      highlight={example.highlights || []}
+                    />
                   ))}
-                </ul>
+                </div>
               ) : (
                 <p className={`${styles.bodyText} ${styles.placeholderText}`}>
                   {hasAnalysis && isNoBiasResult(result)

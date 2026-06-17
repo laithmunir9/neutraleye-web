@@ -212,6 +212,11 @@
   line-height: 1.7;
 }
 
+.examplesList {
+  display: grid;
+  gap: 0.75rem;
+}
+
 .orderedList,
 .simpleList {
   display: grid;
