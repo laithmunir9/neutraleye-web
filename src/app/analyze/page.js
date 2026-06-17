@@ -553,7 +553,7 @@ function AnalyzePageContent() {
                 <span>Analysis Confidence</span>
               </div>
               <div className={styles.confidenceScore}>
-                <strong>{hasAnalysis ? (isNoBiasResult(result) ? "—" : formatConfidenceScore(result.confidence)) : "--"}</strong>
+                <strong>{hasAnalysis && !isNoBiasResult(result) ? formatConfidenceScore(result.confidence) : "--"}</strong>
                 {hasAnalysis && !isNoBiasResult(result) ? (
                   <div className={styles.confBar}>
                     <div className={styles.confTrack}>
@@ -570,8 +570,9 @@ function AnalyzePageContent() {
                   </div>
                 ) : (
                   <p>
-                    Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing,
-                    and omission. It is not a claim of factual certainty.
+                    {hasAnalysis && isNoBiasResult(result)
+                      ? "No confidence score is generated when no significant bias is detected. The analysis found no strong directional pattern to measure against."
+                      : "Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing, and omission. It is not a claim of factual certainty."}
                   </p>
                 )}
               </div>
