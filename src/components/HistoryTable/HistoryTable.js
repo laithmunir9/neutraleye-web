@@ -17,15 +17,18 @@ function domainOrTitle(record) {
   return "Direct text input";
 }
 
-function directionLabel(record) {
+function isNoBiasRecord(record) {
   const d = String(record.directionLabel || record.direction || "").toLowerCase();
-  if (!d || d === "unknown") return "No bias detected";
+  return !d || d === "unknown" || d.includes("no significant bias");
+}
+
+function directionLabel(record) {
+  if (isNoBiasRecord(record)) return "No significant bias detected";
   return record.directionLabel || record.direction;
 }
 
 function confidenceDisplay(record) {
-  const d = String(record.direction || "").toLowerCase();
-  if (!d || d === "unknown") return "—";
+  if (isNoBiasRecord(record)) return "—";
   return `${Math.round((record.confidence || 0) * 100)}%`;
 }
 

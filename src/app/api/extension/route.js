@@ -106,7 +106,7 @@ function buildDirectionLabel(parsedJson) {
   const biasLevel = String(parsedJson?.bias_level || "").trim().toLowerCase();
   const direction = String(parsedJson?.direction || "").trim();
   const nd = direction.toLowerCase();
-  if (biasLevel === "none") return "unknown";
+  if (biasLevel === "none") return "No significant bias detected";
   if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown") return direction || "unknown";
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   if (biasLevel && direction) return `${cap(biasLevel)} bias ${direction}`;

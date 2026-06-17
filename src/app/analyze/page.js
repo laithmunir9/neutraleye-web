@@ -548,34 +548,36 @@ function AnalyzePageContent() {
               )}
             </section>
 
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Analysis Confidence</span>
-              </div>
-              <div className={styles.confidenceScore}>
-                <strong>{hasAnalysis ? formatConfidenceScore(result.confidence) : "--"}</strong>
-                {hasAnalysis ? (
-                  <div className={styles.confBar}>
-                    <div className={styles.confTrack}>
-                      <div
-                        className={styles.confFill}
-                        style={{ width: `${Math.round(result.confidence * 100)}%` }}
-                      />
+            {!(hasAnalysis && isNoBiasResult(result)) && (
+              <section className={styles.outputCard}>
+                <div className={styles.sectionHeader}>
+                  <span>Analysis Confidence</span>
+                </div>
+                <div className={styles.confidenceScore}>
+                  <strong>{hasAnalysis ? formatConfidenceScore(result.confidence) : "--"}</strong>
+                  {hasAnalysis ? (
+                    <div className={styles.confBar}>
+                      <div className={styles.confTrack}>
+                        <div
+                          className={styles.confFill}
+                          style={{ width: `${Math.round(result.confidence * 100)}%` }}
+                        />
+                      </div>
+                      <div className={styles.confScale}>
+                        <span className={styles.confScaleLabel}>Low</span>
+                        <span className={styles.confLevel}>{confidenceLevel(result.confidence)}</span>
+                        <span className={styles.confScaleLabel}>High</span>
+                      </div>
                     </div>
-                    <div className={styles.confScale}>
-                      <span className={styles.confScaleLabel}>Low</span>
-                      <span className={styles.confLevel}>{confidenceLevel(result.confidence)}</span>
-                      <span className={styles.confScaleLabel}>High</span>
-                    </div>
-                  </div>
-                ) : (
-                  <p>
-                    Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing,
-                    and omission. It is not a claim of factual certainty.
-                  </p>
-                )}
-              </div>
-            </section>
+                  ) : (
+                    <p>
+                      Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing,
+                      and omission. It is not a claim of factual certainty.
+                    </p>
+                  )}
+                </div>
+              </section>
+            )}
           </section>
         </section>
       </div>

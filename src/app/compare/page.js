@@ -262,7 +262,7 @@ export default function ComparePage() {
                           <p className={styles.directionLine}>
                             <strong>{displayDirection(item)}</strong>
                           </p>
-                          <p className={styles.meta}>Confidence: {Math.round((item.confidence || 0) * 100)}%</p>
+                          <p className={styles.meta}>Confidence: {isNoBiasResult(item) ? "—" : `${Math.round((item.confidence || 0) * 100)}%`}</p>
                           <p className={styles.summary}>{displaySummary(item)}</p>
                         </div>
                       ) : (
