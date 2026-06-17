@@ -83,6 +83,7 @@ src/
       analyze/route.js      # Web bias analysis — text + URL modes
       extension/route.js    # Extension bias analysis — text only
       extension-auth/route.js # Extension login (email/password → Supabase)
+      extension-refresh/route.js # Extension token refresh — exchanges refresh token for new access token
       usage/route.js        # Daily usage check + increment
 
   components/
@@ -90,7 +91,7 @@ src/
     MarketingShell/         # Marketing/landing layout wrapper — includes `.canvasFrame` (position:fixed, 92rem max-width, z-index:200, visible at ≥1024px) with ::before/::after 1px vertical guide lines at rgba(128,128,128,0.12); `.shell` warm gradient background; `.ambientTop` top-edge fade overlay
     MediaBarrier/           # "Reads content from" publication ticker — 3-row marquee duplicate for seamless loop (-33.3333% keyframe); background rgba(139,103,65,0.03) matching About pull-quote; edge fades via ::before/::after gradients clipped at canvas-frame lines via overflow:hidden on .track
     HeaderBar/              # App header
-    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment
+    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment. Avatar: Google users show photo or initial letter; email/password users show first initial in the same styled circle (determined by `user.app_metadata.provider === "google"`).
     SiteFooter/             # 4 columns: Product / Learn / Company / Legal; `.footer` is full-bleed (border-top, panel-strong bg); `.footerInner` (max-width:92rem; margin:0 auto; padding:2.15rem 2.25rem) aligns content to canvas-frame lines
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
@@ -98,9 +99,9 @@ src/
     ResultsHeader/          # Results page header
     ConfidenceRing/         # Animated confidence score ring
     DriverChips/            # Bias driver pill tags
-    QuoteEvidence/          # Evidence quote display
-    HistoryTable/           # Analysis history list
-    AnalyzerCta/            # CTA heading + button — no card/box background (stripped this session)
+    QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
+    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows "No significant bias detected"; Confidence shows "—" when no bias
+    AnalyzerCta/            # CTA heading + button — no card/box background
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
       sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on SubTrigger pointerEnter and closes 150ms after pointer leaves either element.
@@ -139,8 +140,10 @@ src/
 - Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:ext` key prefix), applies to ALL requests including authenticated
 - Additional daily limit for authenticated users: 10/day via Supabase `daily_usage` table
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
-- Returns `{ result: "<markdown>", saved: boolean }`
-- CORS: locked to the published extension's origin, `chrome-extension://fdkachmcdaebefhpkpjapoglbiakoffe`
+- Returns `{ result: "<markdown>", saved: boolean, tokenExpired: boolean }` — `tokenExpired: true` signals the extension to clear its stored token and force re-login
+- Authenticated requests always bypass the in-memory cache so the Supabase save always runs
+- Saves to `analyses` with `request_meta: { source: "extension" }` and `direction_label` built as `"${TitleCase(bias_level)} bias ${direction}"`
+- CORS: accepts any `chrome-extension://` origin — the extension ID differs between unpacked and published builds; rate limiting already guards the endpoint
 - Source domain exclusion: same as `/api/analyze` — url is passed through to exclude the source outlet from suggestions
 
 ### `POST /api/extension-auth` — Extension login
@@ -148,8 +151,24 @@ src/
 - Returns `{ accessToken, refreshToken, email, expiresAt }`
 - Sign up is website-only; this endpoint is login only
 
+### `POST /api/extension-refresh` — Extension token refresh
+- Accepts `{ refreshToken }` → Supabase `auth.refreshSession()`
+- Returns `{ accessToken, refreshToken, email, expiresAt }` or 401 if the refresh token is invalid/expired
+- Called silently by the extension when the access token is within 5 minutes of expiry (`expiresAt` is a Unix timestamp in seconds)
+
 ### `GET /api/usage` — Check daily usage (authenticated)
 ### `POST /api/usage` — Increment daily usage (authenticated)
+
+---
+
+## No-Bias Result Consistency
+
+When `bias_level === "none"`, every surface must show "No significant bias detected" (not "No bias detected") and hide or dash out the confidence score:
+- **Extension API** (`buildDirectionLabel`): returns `"No significant bias detected"` — not `"unknown"`
+- **HistoryTable**: `isNoBiasRecord()` checks for `"unknown"`, empty, or `"no significant bias"` — confidence shows "—"
+- **Analyze page**: confidence section shows `"--"` with a no-bias-specific message instead of the score/bar
+- **ResultsHeader**: confidence ring and percentage are hidden entirely
+- **Compare page**: confidence shows "—" for no-bias items
 
 ---
 
@@ -157,6 +176,8 @@ src/
 
 **Tables:**
 - `analyses` — user analysis history (`id`, `user_id`, `created_at`, `input_type`, `url`, `title`, `direction`, `direction_label`, `confidence`, `score`, `summary`, `drivers`, `examples`, `sources`, `recommendations`, `request_meta`)
+  - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. HistoryTable reads this to show source badges and hide the Inspect button for extension rows.
+  - `examples` stores `[{ quote, label, explanation, highlights }]` for website saves; `[{ quote, why }]` for extension saves.
 - `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
 
 **Auth:** Email + password, Google OAuth. Sign up on website only; extension supports sign in only.
@@ -225,6 +246,8 @@ npm run lint      # ESLint
 npm run test      # Jest tests
 ```
 
+**Note:** `npm run build` may fail locally due to missing `@next/swc` native bindings (WASM fallback doesn't support `turbo.createProject`). Vercel builds work fine. Use `npm run lint` and `npm run test` for local validation.
+
 ---
 
 ## Code Style & Conventions
@@ -236,6 +259,8 @@ npm run test      # Jest tests
 - **Logging:** Always use `logEvent(level, event, meta)` in API routes — never raw `console.log`
 - **No secrets in code:** All keys and URLs via environment variables only
 - **Prompt changes:** Both `/api/analyze` and `/api/extension` share the same prompt structure — keep them in sync when editing either. Both also share the source-domain exclusion logic.
+- **`driverLabelFromReason`** in `analyze/route.js`: maps "language" → "Loaded wording", "framing" → "Framing", "source" → "Source imbalance", "attribution" → "Attribution gaps". Any other value (e.g. AI returns "LOADED PHRASING") is title-cased and passed through rather than collapsed to a generic fallback.
+- **`storage.js` `saveAnalysis`**: always tags website Supabase saves with `requestMeta.source = "website"` before persisting. The extension API tags its own saves with `source: "extension"` server-side.
 
 ---
 
@@ -273,10 +298,19 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 ## Roadmap
 
-- **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up
-- **Cloudflare** — DDoS protection and CDN
-- **Supabase Auth URLs** — update redirect URLs in Supabase dashboard to `tryneutraleye.com` (domain is live, this is not done yet)
+- **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
 - **Transactional email** — integrate Resend for branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`; see TODO comment in `login/page.js`
+
+## Infrastructure Status
+
+| Item | Status |
+|------|--------|
+| Domain (`tryneutraleye.com`) | ✅ Live, connected to Vercel |
+| Supabase Auth redirect URLs | ✅ Updated to `tryneutraleye.com` |
+| `contact@tryneutraleye.com` inbox | ✅ Exists |
+| Cloudflare | ✅ Done |
+| Sentry | ✅ Done |
+| Stripe | ⏸ Paused |
 
 ---
 
