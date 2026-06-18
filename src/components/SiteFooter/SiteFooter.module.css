@@ -25,6 +25,10 @@
   justify-items: start;
 }
 
+.footerLogo {
+  border-radius: 50%;
+}
+
 .footerBrandLink {
   display: inline-flex;
   align-items: center;
