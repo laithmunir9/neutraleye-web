@@ -34,9 +34,9 @@ const FOOTER_COLS = [
 ];
 
 const FOOTER_LEGAL_LINKS = [
-  { href: "/privacy",           label: "Website Privacy" },
+  { href: "/terms",             label: "Terms of Service" },
+  { href: "/privacy",           label: "Privacy Policy" },
   { href: "/extension-privacy", label: "Extension Privacy" },
-  { href: "/terms",             label: "Terms & Conditions" },
 ];
 
 export default function SiteFooter({ compact = false }) {
