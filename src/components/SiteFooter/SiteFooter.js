@@ -7,10 +7,10 @@ const FOOTER_COLS = [
     heading: "Product",
     label: "Footer product",
     links: [
-      { href: "/analyze",   label: "Analyze" },
-      { href: "/extension", label: "Chrome Extension" },
-      { href: "/pricing",   label: "Pricing" },
+      { href: "/analyze",      label: "Analyze" },
       { href: "/how-it-works", label: "How It Works" },
+      { href: "/extension",   label: "Chrome Extension" },
+      { href: "/pricing",     label: "Pricing" },
     ],
   },
   {
