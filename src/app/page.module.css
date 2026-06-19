@@ -166,10 +166,9 @@
 
 .trustSignal {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.88rem;
+  font-weight: 500;
   color: var(--muted);
-  letter-spacing: 0.025em;
 }
 
 .primaryAction,
