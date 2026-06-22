@@ -389,8 +389,13 @@
   user-select: none;
 }
 
-.dropdownMenuItem:hover,
-.dropdownMenuItem:focus {
+@media (hover: hover) {
+  .dropdownMenuItem:hover {
+    background: var(--panel);
+  }
+}
+
+.dropdownMenuItem:focus-visible {
   background: var(--panel);
 }
 
@@ -424,8 +429,13 @@
   color: rgba(255, 252, 247, 0.92);
 }
 
-.dropdownContentDark .dropdownMenuItem:hover,
-.dropdownContentDark .dropdownMenuItem:focus {
+@media (hover: hover) {
+  .dropdownContentDark .dropdownMenuItem:hover {
+    background: rgba(255, 252, 247, 0.06);
+  }
+}
+
+.dropdownContentDark .dropdownMenuItem:focus-visible {
   background: rgba(255, 252, 247, 0.06);
 }
 
