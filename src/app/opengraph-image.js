@@ -1,16 +1,11 @@
 import { ImageResponse } from "next/og";
 
+export const runtime = "edge";
 export const alt = "NeutralEye — See How an Article Frames the Story";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const fontPromise = fetch(
-  new URL("./PlayfairDisplay-Regular.woff2", import.meta.url)
-).then((res) => res.arrayBuffer());
-
-export default async function OGImage() {
-  const serifFont = await fontPromise;
-
+export default function OGImage() {
   return new ImageResponse(
     (
       <div
@@ -44,11 +39,11 @@ export default async function OGImage() {
         >
           <span
             style={{
-              fontFamily: "Playfair Display",
               fontSize: 56,
               fontWeight: 400,
               color: "#1a1816",
-              letterSpacing: "0",
+              letterSpacing: "-0.01em",
+              fontStyle: "italic",
             }}
           >
             NeutralEye
@@ -68,16 +63,6 @@ export default async function OGImage() {
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: [
-        {
-          name: "Playfair Display",
-          data: serifFont,
-          style: "normal",
-          weight: 400,
-        },
-      ],
-    }
+    { ...size }
   );
 }
