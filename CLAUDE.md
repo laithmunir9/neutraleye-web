@@ -13,7 +13,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 
 **Companion repo:** `neutraleye-extension` — Chrome extension frontend that calls this repo's API routes.
 
-**Production domain:** `tryneutraleye.com` — purchased and connected to Vercel. **Still needed:** update Supabase Auth redirect URLs to `tryneutraleye.com`.
+**Production domain:** `tryneutraleye.com` — purchased and connected to Vercel.
 
 ---
 
@@ -25,6 +25,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 | API Routes     | `src/app/api/` → Vercel           | All backend logic lives here, no separate server             |
 | Database       | Supabase                          | Auth + analyses + daily_usage tables, RLS active             |
 | Rate limiting  | Upstash Redis                     | Sliding window via `@upstash/ratelimit`; falls back to in-memory locally |
+| Email          | Resend                            | Support form + future transactional email                    |
 | Payments       | Stripe                            | Not yet set up                                               |
 | Security       | Cloudflare                        | Planned                                                      |
 | Monitoring     | Sentry                            | Set up — frontend + backend verified                         |
@@ -67,7 +68,7 @@ src/
     faq/page.js             # Two-column FAQ with <details>/<summary> accordions and sticky nav
     about/page.js           # Founder story / mission — essay format with drop cap, no cards
     changelog/page.js       # Vertical timeline of releases with New/Improved/Fixed type tags
-    support/page.js         # Contact form using mailto: construction — requires "use client"
+    support/page.js         # Contact form — POSTs to /api/support via Resend, requires "use client"
     login/page.js           # Auth page — all four auth states use sign-in.tsx split layout: SignInPage (sign-in), SignUpPage (sign-up), ForgotPasswordPage (forgot-password email form), PasswordResetSentPage (link-sent confirmation); CheckEmailPage used after sign-up
     reset-password/page.js  # Password reset — uses SetNewPasswordPage from sign-in.tsx; handles Supabase recovery redirect
     blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort; post page reading layout (sidebar nav + content + footer) lives in [slug]/ReadingLayout.js
@@ -104,7 +105,7 @@ src/
     AnalyzerCta/            # CTA heading + button — no card/box background
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
-      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on SubTrigger pointerEnter and closes 150ms after pointer leaves either element.
+      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on hover (mouse) or tap (touch) and closes 150ms after pointer leaves either element (mouse) or on second tap (touch).
 
   lib/
     api.js                  # Frontend → API route calls
@@ -158,6 +159,11 @@ src/
 
 ### `GET /api/usage` — Check daily usage (authenticated)
 ### `POST /api/usage` — Increment daily usage (authenticated)
+
+### `POST /api/support` — Contact form
+- Accepts `{ name, email, subject, message }` from the support page
+- Sends email via Resend to `contact@tryneutraleye.com` with sender as `replyTo`
+- Validates all fields, email format, and length limits (name: 100, message: 5000)
 
 ---
 
@@ -228,6 +234,9 @@ EXT_RATE_LIMIT_MAX=5
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 
+# Resend — transactional email (support form)
+RESEND_API_KEY=
+
 # Sentry — error monitoring (set by Sentry wizard, also add to Vercel)
 SENTRY_AUTH_TOKEN=
 ```
@@ -286,20 +295,21 @@ When building new UI, prefer extending existing components in `src/components/ui
 - **Canvas-frame guide lines:** `MarketingShell` renders a `position:fixed; inset:0; max-width:92rem; z-index:200; pointer-events:none` `.canvasFrame` div whose `::before`/`::after` pseudo-elements are 1px vertical lines in `rgba(128,128,128,0.12)`. Visible at ≥1024px viewports, they mark the 92rem content boundary at any zoom level and stay readable on both light and dark section backgrounds without blend modes.
 - **Aligning content to canvas-frame lines:** Header (`.headerInner`) and footer (`.footerInner`) both use `max-width:92rem; margin:0 auto; padding:0 2.25rem` so their content edges sit 2.25rem inside the guide lines. The `.header`/`.footer` wrappers are full-bleed.
 - **Section separators — no full-bleed border lines:** Avoid `border-top`/`border-bottom` on full-bleed sections that cross the canvas-frame guide lines. Use a subtle background tint instead — `rgba(139,103,65,0.03)` is the standard (used by About pull-quote and MediaBarrier). The one intentional exception is the header's `border-bottom` and footer's `border-top`, which are full-bleed by design and match each other in style (`rgba(93,75,53,0.14)`).
+- **Touch-safe hover dropdowns:** Gate `onPointerEnter`/`onPointerLeave` handlers behind `e.pointerType === "mouse"` so Radix's built-in tap behavior works on touch devices. For toggle-to-close, use a `justClosed` ref to suppress Radix's immediate re-open after `onOpenChange`. Scope `:hover` styles behind `@media (hover: hover)` to prevent sticky highlights on mobile.
 
 ---
 
 ## Known Issues
 
 - **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
-- **Support contact email** — `/support/page.js` uses `contact@tryneutraleye.com`. The inbox doesn't exist yet — create it once the domain is live.
+- **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
 
 ---
 
 ## Roadmap
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
-- **Transactional email** — integrate Resend for branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`; see TODO comment in `login/page.js`
+- **Transactional email** — Resend is installed and used for the support form. Still needed: branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`
 
 ## Infrastructure Status
 
@@ -310,6 +320,9 @@ When building new UI, prefer extending existing components in `src/components/ui
 | `contact@tryneutraleye.com` inbox | ✅ Exists |
 | Cloudflare | ✅ Done |
 | Sentry | ✅ Done |
+| OG / metadata URLs | ✅ Updated to `tryneutraleye.com` |
+| Sitemap | ✅ Updated to `tryneutraleye.com` |
+| Resend (support form) | ✅ Live |
 | Stripe | ⏸ Paused |
 
 ---
