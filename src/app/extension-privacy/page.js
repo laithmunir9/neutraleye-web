@@ -7,7 +7,7 @@ export const metadata = {
   description: "How the NeutralEye browser extension handles article and browser data."
 };
 
-const LAST_UPDATED = "June 2, 2026";
+const LAST_UPDATED = "June 22, 2026";
 
 export default function ExtensionPrivacyPage() {
   return (
@@ -111,11 +111,52 @@ export default function ExtensionPrivacyPage() {
           </article>
 
           <article>
-            <h2>Local Browser Storage</h2>
+            <h2>Data Storage</h2>
             <p>
-              Extension settings, authentication tokens, and saved results may be stored locally in your browser. You
-              can remove locally stored extension data by clearing browser storage, using browser extension controls,
-              or uninstalling the extension.
+              Extension data is stored in two places, depending on how you use the extension:
+            </p>
+            <ul>
+              <li>
+                <strong>Local browser storage:</strong> Extension settings, authentication tokens, and locally saved
+                results are stored in your browser using the extension&apos;s local storage. This data stays on your
+                device and can be removed by clearing browser storage, using browser extension controls, or
+                uninstalling the extension.
+              </li>
+              <li>
+                <strong>Server-side storage:</strong> If you are signed in, analysis results may be saved to your
+                NeutralEye account on our servers, hosted by our database provider (Supabase). Your email address,
+                account ID, and saved analyses are stored securely in our cloud infrastructure.
+              </li>
+            </ul>
+            <p>
+              If you use the extension without signing in, no data is stored on our servers. Analysis requests are
+              processed and the results are returned to your browser without being saved server-side.
+            </p>
+          </article>
+
+          <article>
+            <h2>Data Retention</h2>
+            <p>
+              Locally stored extension data remains in your browser until you remove it or uninstall the extension.
+            </p>
+            <p>
+              If you have a NeutralEye account, your account data and saved analyses are retained for as long as your
+              account is active. You can request deletion of your account and all associated data by contacting us. When
+              your account is deleted, your saved analyses and account information are removed from our servers.
+            </p>
+            <p>
+              Server-side operational records, such as error logs and security logs, are kept only as long as reasonably
+              needed to operate, secure, debug, or comply with legal obligations for the service.
+            </p>
+          </article>
+
+          <article>
+            <h2>Security</h2>
+            <p>
+              We use reasonable technical and organizational safeguards designed to protect information processed by the
+              extension. Account data is protected using industry-standard authentication practices, and server-side data
+              is stored using encrypted, access-controlled cloud infrastructure. No online service can guarantee absolute
+              security.
             </p>
           </article>
 
