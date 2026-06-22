@@ -1,14 +1,15 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "NeutralEye — See How an Article Frames the Story";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const fontPromise = fetch(
+  new URL("./PlayfairDisplay-Regular.woff2", import.meta.url)
+).then((res) => res.arrayBuffer());
+
 export default async function OGImage() {
-  const serifFont = await fetch(
-    new URL("./PlayfairDisplay-Regular.woff2", import.meta.url)
-  ).then((res) => res.arrayBuffer());
+  const serifFont = await fontPromise;
 
   return new ImageResponse(
     (
