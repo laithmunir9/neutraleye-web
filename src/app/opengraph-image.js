@@ -6,6 +6,10 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OGImage() {
+  const serifFont = await fetch(
+    new URL("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2")
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     (
       <div
@@ -17,10 +21,8 @@ export default async function OGImage() {
           alignItems: "center",
           justifyContent: "center",
           background: "linear-gradient(145deg, #f8f4ee 0%, #efe8dd 100%)",
-          fontFamily: "system-ui, sans-serif",
         }}
       >
-        {/* Logo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://tryneutraleye.com/neutraleye-logo-128.png"
@@ -30,31 +32,32 @@ export default async function OGImage() {
           style={{ borderRadius: "50%" }}
         />
 
-        {/* Title */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             marginTop: 32,
-            gap: 12,
+            gap: 14,
           }}
         >
           <span
             style={{
+              fontFamily: "Playfair Display",
               fontSize: 56,
-              fontWeight: 700,
+              fontWeight: 400,
               color: "#1a1816",
-              letterSpacing: "-0.02em",
+              letterSpacing: "0",
             }}
           >
             NeutralEye
           </span>
           <span
             style={{
-              fontSize: 24,
+              fontFamily: "system-ui, sans-serif",
+              fontSize: 22,
               color: "#8b6741",
-              fontWeight: 500,
+              fontWeight: 400,
               maxWidth: 600,
               textAlign: "center",
               lineHeight: 1.4,
@@ -65,6 +68,16 @@ export default async function OGImage() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        {
+          name: "Playfair Display",
+          data: serifFont,
+          style: "normal",
+          weight: 400,
+        },
+      ],
+    }
   );
 }
