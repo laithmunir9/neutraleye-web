@@ -7,7 +7,7 @@ export const contentType = "image/png";
 
 export default async function OGImage() {
   const serifFont = await fetch(
-    new URL("https://fonts.gstatic.com/s/playfairdisplay/v37/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2")
+    new URL("./PlayfairDisplay-Regular.woff2", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
@@ -54,7 +54,6 @@ export default async function OGImage() {
           </span>
           <span
             style={{
-              fontFamily: "system-ui, sans-serif",
               fontSize: 22,
               color: "#8b6741",
               fontWeight: 400,
