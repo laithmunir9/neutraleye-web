@@ -399,6 +399,10 @@
   background: var(--panel);
 }
 
+.dropdownMenuItemOpen {
+  background: var(--panel);
+}
+
 .dropdownSeparator {
   height: 1px;
   background: var(--border);
@@ -436,6 +440,10 @@
 }
 
 .dropdownContentDark .dropdownMenuItem:focus-visible {
+  background: rgba(255, 252, 247, 0.06);
+}
+
+.dropdownContentDark .dropdownMenuItemOpen {
   background: rgba(255, 252, 247, 0.06);
 }
 

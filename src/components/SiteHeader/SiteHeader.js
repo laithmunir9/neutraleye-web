@@ -142,7 +142,7 @@ function LegalSub({ isDark }) {
   return (
     <DropdownMenu.Sub open={open} onOpenChange={handleOpenChange}>
       <DropdownMenu.SubTrigger
-        className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}
+        className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner} ${open ? styles.dropdownMenuItemOpen : ""}`}
         onPointerEnter={(e) => { if (e.pointerType === "mouse") { cancelClose(); setOpen(true); } }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") delayClose(); }}
         onPointerDown={(e) => {
