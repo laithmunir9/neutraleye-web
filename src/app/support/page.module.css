@@ -288,8 +288,22 @@
   box-shadow: 0 6px 18px rgba(139, 103, 65, 0.32);
 }
 
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .submitBtn:active {
   transform: translateY(0);
+}
+
+.formError {
+  margin: 0;
+  color: #b44;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .formNote {

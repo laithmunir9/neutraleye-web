@@ -36,19 +36,34 @@ export default function SupportPage() {
     message: "",
   });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const subject = encodeURIComponent(`[NeutralEye] ${form.subject}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
-    );
-    window.location.href = `mailto:contact@tryneutraleye.com?subject=${subject}&body=${body}`;
-    setSent(true);
+    setError("");
+    setSending(true);
+    try {
+      const res = await fetch("/api/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Failed to send message. Please try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -106,9 +121,9 @@ export default function SupportPage() {
             {sent ? (
               <div className={styles.successState}>
                 <span className={styles.successIcon} aria-hidden="true">✓</span>
-                <h2>Your email client should have opened.</h2>
+                <h2>Message sent.</h2>
                 <p>
-                  If it didn't, send your message directly to{" "}
+                  We typically respond within one business day. You can also reach us at{" "}
                   <a href="mailto:contact@tryneutraleye.com">contact@tryneutraleye.com</a>.
                 </p>
                 <button
@@ -183,13 +198,12 @@ export default function SupportPage() {
                   />
                 </div>
 
+                {error && <p className={styles.formError}>{error}</p>}
+
                 <div className={styles.formFooter}>
-                  <button type="submit" className={styles.submitBtn}>
-                    Send message
+                  <button type="submit" className={styles.submitBtn} disabled={sending}>
+                    {sending ? "Sending…" : "Send message"}
                   </button>
-                  <p className={styles.formNote}>
-                    This opens your email client with the message pre-filled.
-                  </p>
                 </div>
               </form>
             )}
