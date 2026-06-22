@@ -44,9 +44,6 @@ function AuthForm() {
     setForgotSent(false);
   }
 
-  // TODO(post-launch): Integrate Resend for branded transactional emails
-  // (signup confirmation, password reset) sent from contact@tryneutraleye.com,
-  // replacing Supabase's default auth email provider.
   async function handleEmailAuth(e) {
     e.preventDefault();
     setError("");
