@@ -130,19 +130,24 @@ function userAvatar(user) {
 function LegalSub({ isDark }) {
   const [open, setOpen] = useState(false);
   const timer = useRef(null);
+  const justClosed = useRef(false);
 
   function delayClose() { timer.current = setTimeout(() => setOpen(false), 150); }
   function cancelClose() { clearTimeout(timer.current); }
+  function handleOpenChange(next) {
+    if (justClosed.current) { justClosed.current = false; return; }
+    setOpen(next);
+  }
 
   return (
-    <DropdownMenu.Sub open={open} onOpenChange={setOpen}>
+    <DropdownMenu.Sub open={open} onOpenChange={handleOpenChange}>
       <DropdownMenu.SubTrigger
         className={`${styles.dropdownMenuItem} ${styles.dropdownMenuItemInner}`}
         onPointerEnter={(e) => { if (e.pointerType === "mouse") { cancelClose(); setOpen(true); } }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") delayClose(); }}
         onPointerDown={(e) => {
           if (e.pointerType !== "mouse" && open) {
-            e.preventDefault();
+            justClosed.current = true;
             setOpen(false);
             e.currentTarget.blur();
           }
