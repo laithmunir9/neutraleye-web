@@ -1,10 +1,10 @@
-const BASE = "https://neutraleye-web.vercel.app";
+const BASE = "https://tryneutraleye.com";
 
 export default function sitemap() {
   return [
     { url: BASE, lastModified: new Date(), priority: 1 },
     { url: `${BASE}/analyze`, lastModified: new Date(), priority: 0.9 },
-    { url: `${BASE}/overview`, lastModified: new Date(), priority: 0.8 },
+    { url: `${BASE}/how-it-works`, lastModified: new Date(), priority: 0.8 },
     { url: `${BASE}/extension`, lastModified: new Date(), priority: 0.8 },
     { url: `${BASE}/methodology`, lastModified: new Date(), priority: 0.7 },
     { url: `${BASE}/faq`, lastModified: new Date(), priority: 0.7 },
