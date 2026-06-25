@@ -7,7 +7,7 @@ export const metadata = {
   description: "How the NeutralEye browser extension handles article and browser data."
 };
 
-const LAST_UPDATED = "June 22, 2026";
+const LAST_UPDATED = "June 25, 2026";
 
 export default function ExtensionPrivacyPage() {
   return (
@@ -17,159 +17,205 @@ export default function ExtensionPrivacyPage() {
           <p className={styles.eyebrow}>Legal</p>
           <h1>Extension Privacy Policy</h1>
           <p>
-            This policy explains how the NeutralEye browser extension handles article content, page URLs, account
-            data, and extension data when you use it to analyze news articles.
+            This policy explains how the NeutralEye browser extension collects, uses, stores, and shares user data.
+            It applies to all users of the NeutralEye Chrome extension.
           </p>
           <span>Last updated: {LAST_UPDATED}</span>
         </section>
 
         <section className={styles.notice}>
-          <strong>Chrome Web Store disclosure</strong>
+          <strong>Chrome Web Store User Data Policy compliance</strong>
           <p>
-            The extension uses user data only to provide and improve NeutralEye's user-facing article analysis feature.
-            We do not sell user data, use it for targeted advertising, or collect browsing activity in the background
-            for unrelated purposes.
+            NeutralEye&apos;s use and transfer of information received from Google APIs adheres to the{" "}
+            <a href="https://developer.chrome.com/docs/webstore/program-policies/user-data-faq" target="_blank" rel="noopener noreferrer">
+              Chrome Web Store User Data Policy
+            </a>, including the Limited Use requirements. Specifically:
           </p>
+          <ol>
+            <li>The extension uses user data <strong>only</strong> to provide the user-facing article bias analysis feature described in the Chrome Web Store listing.</li>
+            <li>The extension does <strong>not</strong> transfer user data to third parties except (a) as necessary to provide the bias analysis feature, (b) for security purposes, or (c) to comply with applicable laws.</li>
+            <li>The extension does <strong>not</strong> use or transfer user data for serving advertisements, including retargeting, personalized, or interest-based advertising.</li>
+            <li>The extension does <strong>not</strong> use or transfer user data to determine creditworthiness or for lending purposes.</li>
+            <li>Human access to user data occurs only when necessary for security/abuse investigation, legal compliance, or when the user provides affirmative consent. No routine human review of submitted content occurs.</li>
+          </ol>
         </section>
 
         <section className={styles.content}>
           <article>
-            <h2>Information The Extension May Process</h2>
-            <p>Depending on how you use the extension, it may process:</p>
+            <h2>What Data The Extension Collects</h2>
+            <p>When you click the NeutralEye extension icon and request an analysis, the extension collects the following data:</p>
+
+            <h3>Collected automatically from the active page</h3>
             <ul>
-              <li>The URL of the current page when you ask NeutralEye to analyze it.</li>
-              <li>Readable article text extracted from the active page.</li>
-              <li>Article text that you manually paste or submit through the extension interface.</li>
-              <li>Analysis results returned by NeutralEye, including summary, confidence, examples, and recommendations.</li>
-              <li>If you sign in to the extension: your email address, authentication token, and account ID, used to identify your account and enforce daily usage limits.</li>
-              <li>Extension settings, status, and saved results stored locally in your browser.</li>
-              <li>Basic technical data needed for security, debugging, error handling, and service reliability.</li>
+              <li><strong>Article text:</strong> The readable body text extracted from the active tab&apos;s DOM.</li>
+              <li><strong>Page URL:</strong> The URL of the page you are viewing.</li>
+              <li><strong>Page metadata:</strong> The article headline, author name, and publication date, if present in the page&apos;s HTML meta tags.</li>
+            </ul>
+
+            <h3>Collected if you sign in</h3>
+            <ul>
+              <li><strong>Email address:</strong> The email address you enter to sign in to your NeutralEye account.</li>
+              <li><strong>Password:</strong> Your password is transmitted to our authentication server during sign-in. It is not stored in the extension or on our servers in plain text.</li>
+              <li><strong>Authentication tokens:</strong> An access token and refresh token returned by our server after sign-in, stored locally in the extension to keep you signed in.</li>
+            </ul>
+
+            <h3>Generated by the service</h3>
+            <ul>
+              <li><strong>Analysis results:</strong> Bias direction, confidence score, summary, driver labels, example quotes, and source recommendations returned by the analysis.</li>
+            </ul>
+          </article>
+
+          <article>
+            <h2>What Data The Extension Does Not Collect</h2>
+            <ul>
+              <li>The extension does <strong>not</strong> collect browsing history.</li>
+              <li>The extension does <strong>not</strong> run in the background or monitor pages you visit.</li>
+              <li>The extension does <strong>not</strong> collect data from any page until you click the extension icon and initiate an analysis.</li>
+              <li>The extension does <strong>not</strong> read cookies, form inputs, passwords from web pages, or any data unrelated to the article text.</li>
+              <li>The extension does <strong>not</strong> collect financial, health, or other categories of sensitive personal information.</li>
+              <li>The extension does <strong>not</strong> track your activity across websites.</li>
+            </ul>
+          </article>
+
+          <article>
+            <h2>How Data Is Used</h2>
+            <p>Each type of collected data is used for a specific purpose:</p>
+            <ul>
+              <li><strong>Article text, page URL, and page metadata</strong> are sent to NeutralEye&apos;s analysis server, which forwards the article text to an AI language model (OpenAI) to generate a bias analysis. The page URL is used to exclude the source publication from the list of recommended alternative sources.</li>
+              <li><strong>Email address and authentication tokens</strong> are used to authenticate your account, enforce daily usage limits, and save analysis results to your cloud history.</li>
+              <li><strong>Analysis results</strong> are displayed in the extension popup. If you are signed in, results are also saved to your NeutralEye account for access in your analysis history.</li>
+            </ul>
+            <p>
+              All data usage is directly related to providing the bias analysis feature. No data is used for purposes
+              unrelated to this feature.
+            </p>
+          </article>
+
+          <article>
+            <h2>How Data Is Shared With Third Parties</h2>
+            <p>The extension shares user data with the following third-party service providers, solely to deliver the bias analysis feature:</p>
+            <ul>
+              <li>
+                <strong>OpenAI</strong> (AI analysis provider): Article text is sent to OpenAI&apos;s API to generate the bias analysis.
+                OpenAI processes the text to produce the analysis result. OpenAI&apos;s data usage is governed by{" "}
+                <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener noreferrer">
+                  OpenAI&apos;s API data usage policy
+                </a>.
+              </li>
+              <li>
+                <strong>Supabase</strong> (authentication and database provider): If you sign in, your email address, account ID, and saved analysis results are stored in Supabase&apos;s cloud database.
+                Supabase&apos;s data handling is governed by{" "}
+                <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">
+                  Supabase&apos;s privacy policy
+                </a>.
+              </li>
+              <li>
+                <strong>Vercel</strong> (hosting provider): API requests pass through Vercel&apos;s infrastructure, which hosts NeutralEye&apos;s backend. Vercel may process request metadata (IP address, timestamps) as part of its hosting service.
+              </li>
+            </ul>
+            <p>We do not sell, rent, or trade user data to any third party. We do not share user data with data brokers, advertising networks, or analytics platforms.</p>
+          </article>
+
+          <article>
+            <h2>Data Storage</h2>
+            <p>User data is stored in two locations:</p>
+
+            <h3>Local browser storage (on your device)</h3>
+            <p>
+              The following data is stored locally in your browser using Chrome&apos;s extension storage API (<code>chrome.storage.local</code>):
+            </p>
+            <ul>
+              <li>Authentication tokens (access token, refresh token) if you are signed in.</li>
+              <li>Your email address for display in the extension popup.</li>
+              <li>Token expiration timestamp.</li>
+            </ul>
+            <p>
+              This data stays on your device. You can remove it by signing out within the extension, clearing your browser data, or uninstalling the extension.
+            </p>
+
+            <h3>Server-side storage (NeutralEye&apos;s servers)</h3>
+            <p>If you are signed in, the following data is stored on NeutralEye&apos;s servers (hosted by Supabase):</p>
+            <ul>
+              <li>Your email address and account ID.</li>
+              <li>Analysis results (bias direction, confidence, summary, driver labels, example quotes, source recommendations) linked to your account.</li>
+              <li>The URL and title of analyzed articles, stored as part of the analysis record.</li>
+              <li>Daily usage count for rate limiting.</li>
+            </ul>
+            <p>If you use the extension without signing in, no user data is stored on our servers. The analysis request is processed, the result is returned to your browser, and no record is retained.</p>
+          </article>
+
+          <article>
+            <h2>Data Retention</h2>
+            <ul>
+              <li><strong>Locally stored data</strong> remains in your browser until you sign out, clear browser storage, or uninstall the extension.</li>
+              <li><strong>Account data and saved analyses</strong> are retained for as long as your NeutralEye account is active. When you delete your account, all associated data (email, saved analyses, usage records) is permanently deleted from our servers.</li>
+              <li><strong>Server-side operational records</strong> (error logs, security logs) are retained only as long as reasonably necessary for security, debugging, and legal compliance, and are then deleted.</li>
+              <li><strong>Anonymous analysis requests</strong> (from users who are not signed in) are not stored on our servers after the response is returned.</li>
             </ul>
           </article>
 
           <article>
             <h2>When Data Is Collected</h2>
             <p>
-              The extension is designed to process article content when you use the extension's interface to request an
-              analysis. It is not intended to continuously monitor your browsing history or analyze pages in the
-              background without a user-facing action.
+              Data collection occurs <strong>only</strong> when you click the NeutralEye extension icon and initiate an analysis.
+              The extension does not collect any data in the background, does not run on page load, and does not monitor your browsing activity.
+              The <code>activeTab</code> permission grants the extension temporary access to the current page only when you click the extension icon.
             </p>
           </article>
 
           <article>
-            <h2>How Information Is Used</h2>
-            <p>Information processed by the extension is used to:</p>
+            <h2>Permissions</h2>
+            <p>The extension requests the following browser permissions:</p>
             <ul>
-              <li>Identify readable article content on the active page.</li>
-              <li>Send the article or submitted text to NeutralEye's analysis service.</li>
-              <li>Generate bias-signal analysis, structured results, and confidence information.</li>
-              <li>Show results inside the extension or linked NeutralEye web experience.</li>
-              <li>Authenticate signed-in users and enforce per-account daily usage limits.</li>
-              <li>Maintain, debug, secure, and improve the extension and analysis service.</li>
+              <li><strong><code>activeTab</code>:</strong> Grants temporary access to the content of the tab you are viewing, only when you click the extension icon. This permission does not allow background access to any page.</li>
+              <li><strong><code>scripting</code>:</strong> Allows the extension to inject a content script into the active tab to extract article text when you request an analysis.</li>
+              <li><strong><code>storage</code>:</strong> Allows the extension to save authentication tokens and settings locally in your browser.</li>
             </ul>
+            <p>The extension does not request access to all websites, browsing history, bookmarks, downloads, or any other browser data.</p>
           </article>
 
           <article>
             <h2>Accounts And Authentication</h2>
             <p>
               The extension supports optional sign-in for users with a NeutralEye account. Signing in is not required
-              to use the extension. If you sign in, your authentication token is stored locally in the extension and
-              used to identify your account when making analysis requests. Signed-in users have a shared daily usage
-              limit across the extension and website. Sign-up is available on the NeutralEye website only; the
-              extension supports sign-in only.
-            </p>
-          </article>
-
-          <article>
-            <h2>Sharing And Transfers</h2>
-            <p>
-              The extension may transmit article URLs, article text, extracted content, and request metadata to
-              NeutralEye's servers and service providers that help provide the analysis, such as hosting, security,
-              logging, extraction, and AI analysis providers.
-            </p>
-            <p>
-              We do not sell extension user data. We do not use or transfer extension user data for personalized,
-              retargeted, or interest-based advertising.
-            </p>
-          </article>
-
-          <article>
-            <h2>Human Access</h2>
-            <p>
-              We do not use submitted extension data for routine human review. Human access may occur only when needed
-              for support you request, security and abuse investigation, legal compliance, or with your consent.
-            </p>
-          </article>
-
-          <article>
-            <h2>Permissions</h2>
-            <p>
-              The extension requests only the permissions needed to provide its article analysis feature. Browser
-              permissions may allow the extension to read page content or the active tab when necessary to perform the
-              analysis you request.
-            </p>
-          </article>
-
-          <article>
-            <h2>Data Storage</h2>
-            <p>
-              Extension data is stored in two places, depending on how you use the extension:
-            </p>
-            <ul>
-              <li>
-                <strong>Local browser storage:</strong> Extension settings, authentication tokens, and locally saved
-                results are stored in your browser using the extension&apos;s local storage. This data stays on your
-                device and can be removed by clearing browser storage, using browser extension controls, or
-                uninstalling the extension.
-              </li>
-              <li>
-                <strong>Server-side storage:</strong> If you are signed in, analysis results may be saved to your
-                NeutralEye account on our servers, hosted by our database provider (Supabase). Your email address,
-                account ID, and saved analyses are stored securely in our cloud infrastructure.
-              </li>
-            </ul>
-            <p>
-              If you use the extension without signing in, no data is stored on our servers. Analysis requests are
-              processed and the results are returned to your browser without being saved server-side.
-            </p>
-          </article>
-
-          <article>
-            <h2>Data Retention</h2>
-            <p>
-              Locally stored extension data remains in your browser until you remove it or uninstall the extension.
-            </p>
-            <p>
-              If you have a NeutralEye account, your account data and saved analyses are retained for as long as your
-              account is active. You can request deletion of your account and all associated data by contacting us. When
-              your account is deleted, your saved analyses and account information are removed from our servers.
-            </p>
-            <p>
-              Server-side operational records, such as error logs and security logs, are kept only as long as reasonably
-              needed to operate, secure, debug, or comply with legal obligations for the service.
+              to use the extension. If you sign in, your email and password are sent securely over HTTPS to NeutralEye&apos;s
+              authentication server (powered by Supabase). An authentication token is returned and stored locally in the
+              extension. The token is used to identify your account on subsequent analysis requests.
+              Signed-in users have a shared daily usage limit across the extension and website.
+              Sign-up is available on the NeutralEye website only; the extension supports sign-in only.
             </p>
           </article>
 
           <article>
             <h2>Security</h2>
             <p>
-              We use reasonable technical and organizational safeguards designed to protect information processed by the
-              extension. Account data is protected using industry-standard authentication practices, and server-side data
-              is stored using encrypted, access-controlled cloud infrastructure. No online service can guarantee absolute
-              security.
+              All data transmitted between the extension and NeutralEye&apos;s servers is encrypted in transit using HTTPS/TLS.
+              Authentication tokens are stored locally using Chrome&apos;s extension storage API.
+              Server-side data is stored in access-controlled, encrypted cloud infrastructure provided by Supabase.
+              We use reasonable technical and organizational safeguards to protect user data.
+              No online service can guarantee absolute security.
             </p>
           </article>
 
           <article>
-            <h2>Your Choices</h2>
+            <h2>Your Choices And Rights</h2>
             <ul>
-              <li>You can choose when to run analysis.</li>
-              <li>You can avoid analyzing private, sensitive, or confidential pages.</li>
-              <li>You can use the extension without signing in.</li>
-              <li>You can sign out at any time to remove your authentication token from the extension.</li>
-              <li>You can uninstall the extension at any time.</li>
-              <li>You can use the NeutralEye website instead of the extension when you prefer to paste text manually.</li>
+              <li>You choose when to run an analysis — the extension never collects data without your action.</li>
+              <li>You can use the extension without signing in. No account is required.</li>
+              <li>You can sign out at any time to remove your authentication tokens from the extension.</li>
+              <li>You can uninstall the extension at any time to remove all locally stored data.</li>
+              <li>You can request deletion of your NeutralEye account and all associated data by contacting us at <a href="mailto:legal@tryneutraleye.com">legal@tryneutraleye.com</a>.</li>
+              <li>You can avoid analyzing pages containing private, sensitive, or confidential content.</li>
             </ul>
+          </article>
+
+          <article>
+            <h2>Changes To This Policy</h2>
+            <p>
+              We may update this policy as the extension or service changes. The updated policy will be posted on this
+              page with a new &ldquo;Last updated&rdquo; date. If we make material changes that affect how user data is
+              collected, used, or shared, we will update the Chrome Web Store listing accordingly.
+            </p>
           </article>
 
           <article>
@@ -183,7 +229,7 @@ export default function ExtensionPrivacyPage() {
           <article>
             <h2>Contact</h2>
             <p>
-              Questions about this extension policy can be sent to{" "}
+              Questions about this extension privacy policy or requests for data deletion can be sent to{" "}
               <a href="mailto:legal@tryneutraleye.com">legal@tryneutraleye.com</a>.
             </p>
           </article>
