@@ -1,165 +1,142 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./HeroSystemVisualization.module.css";
 
-const N = 12; // node half-size (24×24 squares)
+const CYCLE_MS = 9800;
+const SIGNAL_APPEAR_MS = 2000;
+const SIGNAL_STAGGER_MS = 1100;
 
-// All scenes are strict linear chains: a→b→c→d→e
-// Visual variety comes from each scene's distinct path through the space
 const SCENES = [
   {
-    // Mostly rising — gentle staircase with a dip at d
-    id: "flow",
-    nodes: [
-      { key: "a", x: 42,  y: 395, label: "Article input",    labelDx: 18, labelDy: 4,   accent: false },
-      { key: "b", x: 185, y: 288, label: "Text extracted",   labelDx: 18, labelDy: 4,   accent: false },
-      { key: "c", x: 328, y: 155, label: "Signals checked",  labelDx: 0,  labelDy: -22, accent: true  },
-      { key: "d", x: 462, y: 248, label: "Evidence linked",  labelDx: 18, labelDy: 4,   accent: false },
-      { key: "e", x: 572, y: 55,  label: "Bias verdict",     labelDx: 0,  labelDy: -22, accent: true  },
+    id: "tone",
+    kicker: "Politics · Senate",
+    headline: "Senate Committee Advances Border Security Package",
+    segments: [
+      { text: "After months of stalled negotiations, the committee voted 11–9 to advance the package — what its sponsors called " },
+      { text: "a decisive step toward long-overdue reform", signal: 0 },
+      { text: " after years of inaction in Washington." },
     ],
-    edges: [
-      { key: "ab", x1: 42,  y1: 395, x2: 185, y2: 288 },
-      { key: "bc", x1: 185, y1: 288, x2: 328, y2: 155 },
-      { key: "cd", x1: 328, y1: 155, x2: 462, y2: 248 },
-      { key: "de", x1: 462, y1: 248, x2: 572, y2: 55  },
+    signals: [
+      { label: "Loaded tone", detail: "Frames outcome as overdue progress before the policy is explained" },
     ],
   },
   {
-    // Sharp W — low→top→bottom→top→mid, dramatic oscillation
-    id: "branch",
-    nodes: [
-      { key: "a", x: 42,  y: 345, label: "Article URL",      labelDx: 18, labelDy: 4,   accent: false },
-      { key: "b", x: 172, y: 78,  label: "Text parsed",      labelDx: 18, labelDy: 4,   accent: false },
-      { key: "c", x: 322, y: 332, label: "Tone: loaded",     labelDx: 0,  labelDy: 28,  accent: true  },
-      { key: "d", x: 455, y: 72,  label: "Sources: sparse",  labelDx: 0,  labelDy: -22, accent: true  },
-      { key: "e", x: 568, y: 295, label: "Left-leaning",     labelDx: 0,  labelDy: 28,  accent: true  },
+    id: "framing",
+    kicker: "Economy · Trade",
+    headline: "Trade Deal Hailed as Historic Win for American Workers",
+    segments: [
+      { text: "Coverage centered on " },
+      { text: "the administration's revised inspection timeline", signal: 0 },
+      { text: ", framing the vote as procedural. Opposition members were " },
+      { text: "given a single sentence", signal: 1 },
+      { text: " near the close of the piece." },
     ],
-    edges: [
-      { key: "ab", x1: 42,  y1: 345, x2: 172, y2: 78  },
-      { key: "bc", x1: 172, y1: 78,  x2: 322, y2: 332 },
-      { key: "cd", x1: 322, y1: 332, x2: 455, y2: 72  },
-      { key: "de", x1: 455, y1: 72,  x2: 568, y2: 295 },
-    ],
-  },
-  {
-    // Rise then dramatic dip then spike — tension and release
-    id: "confidence",
-    nodes: [
-      { key: "a", x: 42,  y: 415, label: "Text input",       labelDx: 18, labelDy: 4,   accent: false },
-      { key: "b", x: 192, y: 305, label: "Framing detected", labelDx: 18, labelDy: 4,   accent: true  },
-      { key: "c", x: 338, y: 168, label: "Omission gap",     labelDx: 18, labelDy: 4,   accent: true  },
-      { key: "d", x: 482, y: 365, label: "Confidence: 77%",  labelDx: 0,  labelDy: 28,  accent: false },
-      { key: "e", x: 574, y: 58,  label: "Analysis ready",   labelDx: 0,  labelDy: -22, accent: true  },
-    ],
-    edges: [
-      { key: "ab", x1: 42,  y1: 415, x2: 192, y2: 305 },
-      { key: "bc", x1: 192, y1: 305, x2: 338, y2: 168 },
-      { key: "cd", x1: 338, y1: 168, x2: 482, y2: 365 },
-      { key: "de", x1: 482, y1: 365, x2: 574, y2: 58  },
+    signals: [
+      { label: "Framing", detail: "Procedural detail leads; policy impact buried in paragraph six" },
+      { label: "Source balance", detail: "One perspective across five paragraphs" },
     ],
   },
   {
-    // High→low→mid→very-low→high — starts at top, distinct phase from other scenes
-    id: "audit",
-    nodes: [
-      { key: "a", x: 42,  y: 145, label: "URL submitted",    labelDx: 18, labelDy: 4,   accent: false },
-      { key: "b", x: 185, y: 348, label: "Article scraped",  labelDx: 18, labelDy: 4,   accent: false },
-      { key: "c", x: 325, y: 178, label: "Attribution gap",  labelDx: 18, labelDy: 4,   accent: true  },
-      { key: "d", x: 462, y: 372, label: "Right-leaning",    labelDx: 0,  labelDy: 28,  accent: true  },
-      { key: "e", x: 564, y: 132, label: "Sources flagged",  labelDx: 0,  labelDy: -22, accent: true  },
+    id: "attribution",
+    kicker: "Health · Research",
+    headline: "Study Links Ultra-Processed Foods to Cognitive Decline",
+    segments: [
+      { text: "Researchers identified " },
+      { text: "a significant correlation", signal: 0 },
+      { text: " — though only " },
+      { text: "three unnamed committee aides", signal: 1 },
+      { text: " provided on-record comment. The CBO estimate went unmentioned." },
     ],
-    edges: [
-      { key: "ab", x1: 42,  y1: 145, x2: 185, y2: 348 },
-      { key: "bc", x1: 185, y1: 348, x2: 325, y2: 178 },
-      { key: "cd", x1: 325, y1: 178, x2: 462, y2: 372 },
-      { key: "de", x1: 462, y1: 372, x2: 564, y2: 132 },
+    signals: [
+      { label: "Attribution", detail: "Correlation claimed without citing the peer-reviewed paper" },
+      { label: "Omission", detail: "Same-day cost estimate absent from the piece" },
     ],
   },
 ];
 
-const CYCLE_MS = 6200;
-const STAGGER = 700;
-
-function nodeDelay(i) { return `${i * STAGGER}ms`; }
-function edgeDelay(i) { return `${i * STAGGER + 280}ms`; }
-
 export default function HeroSystemVisualization() {
-  const [idx, setIdx] = useState(0);
+  const [{ sceneIdx, activeSignals }, setState] = useState({ sceneIdx: 0, activeSignals: [] });
 
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % SCENES.length), CYCLE_MS);
-    return () => clearInterval(t);
-  }, []);
+    const scene = SCENES[sceneIdx];
 
-  const scene = SCENES[idx];
+    const timers = scene.signals.map((_, i) =>
+      setTimeout(
+        () => setState((prev) => ({ ...prev, activeSignals: [...prev.activeSignals, i] })),
+        SIGNAL_APPEAR_MS + i * SIGNAL_STAGGER_MS
+      )
+    );
+
+    const cycle = setTimeout(
+      () => setState((prev) => ({ sceneIdx: (prev.sceneIdx + 1) % SCENES.length, activeSignals: [] })),
+      CYCLE_MS
+    );
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(cycle);
+    };
+  }, [sceneIdx]);
+
+  const scene = SCENES[sceneIdx];
 
   return (
-    <section className={styles.system} aria-label="NeutralEye analysis graph">
-      <div className={styles.surface}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={scene.id}
-            className={styles.sceneLayer}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className={styles.field} aria-hidden="true" />
-            <div className={styles.fieldOverlay} aria-hidden="true" />
-            <svg className={styles.map} viewBox="0 0 640 430" aria-hidden="true">
-              {/* Edges */}
-              {scene.edges.map((edge, i) => (
-                <path
-                  key={edge.key}
-                  className={styles.edge}
-                  d={`M${edge.x1} ${edge.y1} L${edge.x2} ${edge.y2}`}
-                  pathLength="1"
-                  style={{ animationDelay: edgeDelay(i) }}
-                />
-              ))}
-
-              {/* Nodes */}
-              {scene.nodes.map((node, i) => (
-                <g
-                  key={node.key}
-                  className={styles.nodeGroup}
-                  style={{ animationDelay: nodeDelay(i) }}
-                >
-                  {node.accent && (
-                    <rect
-                      className={styles.nodeGlow}
-                      x={node.x - N - 5}
-                      y={node.y - N - 5}
-                      width={N * 2 + 10}
-                      height={N * 2 + 10}
-                      rx="5"
-                    />
-                  )}
-                  <rect
-                    className={`${styles.nodeRect} ${node.accent ? styles.nodeAccent : ""}`}
-                    x={node.x - N}
-                    y={node.y - N}
-                    width={N * 2}
-                    height={N * 2}
-                    rx="2.5"
-                  />
-                  <text
-                    className={`${styles.nodeLabel} ${node.accent ? styles.nodeLabelAccent : ""}`}
-                    x={node.x + node.labelDx}
-                    y={node.y + node.labelDy}
-                    textAnchor={node.labelDx === 0 ? "middle" : node.labelDx < 0 ? "end" : "start"}
+    <section className={styles.system} aria-label="NeutralEye analysis preview">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={scene.id}
+          className={styles.card}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className={styles.article}>
+            <p className={styles.kicker}>{scene.kicker}</p>
+            <h3 className={styles.headline}>{scene.headline}</h3>
+            <p className={styles.body}>
+              {scene.segments.map((seg, i) => {
+                if (seg.signal === undefined) {
+                  return <span key={i}>{seg.text}</span>;
+                }
+                const isActive = activeSignals.includes(seg.signal);
+                return (
+                  <mark
+                    key={i}
+                    className={`${styles.mark} ${isActive ? styles.markActive : ""}`}
                   >
-                    {node.label}
-                  </text>
-                </g>
-              ))}
-            </svg>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+                    {seg.text}
+                    {isActive && <sup className={styles.signalIndex}>{seg.signal + 1}</sup>}
+                  </mark>
+                );
+              })}
+            </p>
+          </div>
+
+          <div className={styles.signals}>
+            {scene.signals.map((sig, i) => (
+              <motion.div
+                key={`${scene.id}-sig-${i}`}
+                className={styles.signal}
+                initial={{ opacity: 0, x: -8 }}
+                animate={
+                  activeSignals.includes(i)
+                    ? { opacity: 1, x: 0 }
+                    : { opacity: 0, x: -8 }
+                }
+                transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <span className={styles.signalNum} aria-hidden="true">{i + 1}</span>
+                <span className={styles.signalLabel}>{sig.label}</span>
+                <span className={styles.signalDivider} aria-hidden="true">·</span>
+                <span className={styles.signalDetail}>{sig.detail}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }

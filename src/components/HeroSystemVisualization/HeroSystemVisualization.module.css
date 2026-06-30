@@ -1,172 +1,159 @@
 .system {
   height: 100%;
   min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
-.surface {
-  position: relative;
-  min-height: clamp(26rem, 40vw, 32rem);
-  height: 100%;
+.card {
+  width: 100%;
+  background: rgba(255, 252, 249, 0.94);
+  border: 1px solid rgba(93, 75, 53, 0.11);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 2px 24px rgba(93, 75, 53, 0.06),
+    0 0 0 1px rgba(93, 75, 53, 0.04);
   overflow: hidden;
-  isolation: isolate;
 }
 
-/* Circular dot grid — inset: -2rem so the outermost visible dots are always whole */
-/* Only the sweep mask lives here — no radial clipping */
-.field {
-  position: absolute;
-  inset: -2rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='2' fill='%235d4b35' fill-opacity='0.26'/%3E%3C/svg%3E");
-  background-size: 2rem 2rem;
-  mask-image: linear-gradient(to right, black 72%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black 72%, transparent 100%);
-  mask-size: 4% 100%;
-  -webkit-mask-size: 4% 100%;
-  mask-position: left;
-  -webkit-mask-position: left;
-  mask-repeat: no-repeat;
-  -webkit-mask-repeat: no-repeat;
-  animation: fieldSweep 3.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  z-index: 1;
+.article {
+  padding: 1.85rem 1.85rem 1.6rem;
+  border-bottom: 1px solid rgba(93, 75, 53, 0.09);
 }
 
-/* Rounded-square vignette — box-shadow inset traces border-radius, covering edge dots
-   with the background colour rather than clipping them. Dots stay complete, just fade. */
-.fieldOverlay {
-  position: absolute;
-  inset: 0;
-  border-radius: 2.5rem;
-  box-shadow: inset 0 0 4.5rem 2rem #f8f4ee;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Wraps field + overlay + SVG so they fade in/out together */
-.sceneLayer {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-/* SVG map — above the overlay */
-.map {
-  position: absolute;
-  inset: 1rem 0.25rem 1.5rem;
-  z-index: 3;
-  width: auto;
-  height: auto;
-  overflow: visible;
-}
-
-/* Edges */
-.edge {
-  fill: none;
-  stroke: rgba(32, 27, 22, 0.38);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  animation: edgeDraw 0.65s ease forwards;
-}
-
-/* Nodes */
-.nodeGroup {
-  opacity: 0;
-  animation: nodeAppear 0.5s ease forwards;
-}
-
-.nodeGlow {
-  fill: rgba(139, 103, 65, 0.08);
-}
-
-.nodeRect {
-  fill: #201c18;
-}
-
-.nodeAccent {
-  fill: #8b6741;
-}
-
-.nodeLabel {
-  fill: rgba(32, 27, 22, 0.62);
+.kicker {
   font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0;
-  paint-order: stroke fill;
-  stroke: #f8f4ee;
-  stroke-width: 5px;
-  stroke-linejoin: round;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(139, 103, 65, 0.72);
+  margin: 0 0 0.7rem;
 }
 
-.nodeLabelAccent {
-  fill: rgba(139, 103, 65, 0.88);
+.headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
   font-weight: 700;
-  stroke: #f8f4ee;
+  line-height: 1.22;
+  color: var(--text);
+  margin: 0 0 1.05rem;
+  letter-spacing: -0.01em;
 }
 
-
-/* Keyframes */
-@keyframes edgeDraw {
-  from { stroke-dashoffset: 1; opacity: 0; }
-  to   { stroke-dashoffset: 0; opacity: 1; }
+.body {
+  font-size: 0.875rem;
+  line-height: 1.68;
+  color: var(--secondary-text);
+  margin: 0;
 }
 
-@keyframes nodeAppear {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* Override browser default mark styles */
+.mark {
+  background-color: transparent;
+  border-bottom: 1.5px solid transparent;
+  border-radius: 2px;
+  color: var(--secondary-text);
+  padding: 0.05em 0.08em;
+  transition: background-color 0.42s ease, border-color 0.42s ease;
 }
 
-/* Dot field sweeps left-to-right: mask-size grows from 4% to 139% */
-/* Single gradient layer — 72% stop means full opacity once size reaches 100/0.72 ≈ 139% */
-@keyframes fieldSweep {
-  from {
-    mask-size: 4% 100%;
-    -webkit-mask-size: 4% 100%;
-  }
-  to {
-    mask-size: 139% 100%;
-    -webkit-mask-size: 139% 100%;
-  }
+.markActive {
+  background-color: rgba(139, 103, 65, 0.11);
+  border-bottom-color: rgba(139, 103, 65, 0.52);
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .field     { animation: none; mask-size: 139% 100%; -webkit-mask-size: 139% 100%; }
-  .edge      { animation: none; opacity: 1; stroke-dashoffset: 0; }
-  .nodeGroup { animation: none; opacity: 1; }
+.signalIndex {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: rgba(139, 103, 65, 0.85);
+  vertical-align: super;
+  margin-left: 1px;
+  line-height: 0;
 }
 
-/* Responsive */
+.signals {
+  padding: 1.05rem 1.85rem 1.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 5.5rem;
+}
+
+.signal {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.signalNum {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #f8f4ee;
+  background: rgba(139, 103, 65, 0.82);
+  border-radius: 50%;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+  line-height: 1;
+}
+
+.signalLabel {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.signalDivider {
+  font-size: 0.68rem;
+  color: rgba(93, 75, 53, 0.35);
+}
+
+.signalDetail {
+  font-size: 0.72rem;
+  color: var(--secondary-text);
+  line-height: 1.45;
+}
+
+/* ── Responsive ── */
+
 @media (max-width: 980px) {
-  .surface {
-    min-height: 30rem;
-    border-radius: var(--radius-lg);
-  }
-
-  .map {
-    inset: 2.55rem 1.2rem 3.9rem;
-    width: auto;
-  }
-
-  .nodeLabel {
-    font-size: 12px;
+  .system {
+    justify-content: center;
   }
 }
 
 @media (max-width: 640px) {
-  .surface {
-    min-height: 25rem;
+  .card {
+    border-radius: 1.1rem;
   }
 
-  .map {
-    inset: 2.7rem 0.4rem 3.4rem;
-    width: auto;
-    height: auto;
+  .article {
+    padding: 1.4rem 1.4rem 1.2rem;
   }
 
-  .nodeLabel {
-    font-size: 11px;
+  .signals {
+    padding: 0.85rem 1.4rem 1.15rem;
+    min-height: 4.5rem;
+  }
+
+  .headline {
+    font-size: 1.06rem;
+  }
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .mark {
+    transition: none;
   }
 }
