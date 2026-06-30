@@ -7,20 +7,33 @@ export default function WaitlistForm() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Enter a valid email address.");
       return;
     }
+    setLoading(true);
+    setError("");
     try {
-      const existing = JSON.parse(localStorage.getItem("ne.waitlist") || "[]");
-      if (!existing.includes(email)) {
-        localStorage.setItem("ne.waitlist", JSON.stringify([...existing, email]));
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
+        return;
       }
-    } catch {}
-    setDone(true);
+      setDone(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (done) {
@@ -44,9 +57,10 @@ export default function WaitlistForm() {
           onChange={(e) => { setEmail(e.target.value); setError(""); }}
           autoComplete="email"
           aria-label="Email address for Pro waitlist"
+          disabled={loading}
         />
-        <button type="submit" className={styles.btn}>
-          Notify me
+        <button type="submit" className={styles.btn} disabled={loading}>
+          {loading ? "..." : "Notify me"}
         </button>
       </div>
       {error && <p className={styles.error} role="alert">{error}</p>}
