@@ -123,10 +123,6 @@ function userInitial(user) {
   return name[0]?.toUpperCase() || "?";
 }
 
-function userAvatar(user) {
-  return user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
-}
-
 function LegalSub({ isDark }) {
   const [open, setOpen] = useState(false);
   const timer = useRef(null);
@@ -191,7 +187,6 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
   const pathname = usePathname();
   const isPro = user?.user_metadata?.plan === "pro";
   const showUpgradeCta = pathname !== "/pricing" && !isPro;
-  const isGoogleUser = user?.app_metadata?.provider === "google";
 
   useEffect(() => {
     setMobileOpen(false);
@@ -321,17 +316,9 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
         {!loading && user && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              {isGoogleUser ? (
-                <button className={`${styles.avatarButton} ${userAvatar(user) ? styles.avatarButtonImg : ""}`} aria-label="Account menu">
-                  {userAvatar(user) ? (
-                    <Image src={userAvatar(user)} alt="" width={36} height={36} className={styles.avatarImg} referrerPolicy="no-referrer" />
-                  ) : userInitial(user)}
-                </button>
-              ) : (
-                <button className={styles.avatarButton} aria-label="Account menu">
-                  {userInitial(user)}
-                </button>
-              )}
+              <button className={styles.avatarButton} aria-label="Account menu">
+                {userInitial(user)}
+              </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content className={`${styles.dropdownContent} ${isDark ? styles.dropdownContentDark : ""}`} align="end" sideOffset={8}>

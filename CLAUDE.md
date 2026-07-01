@@ -92,7 +92,7 @@ src/
     MarketingShell/         # Marketing/landing layout wrapper — includes `.canvasFrame` (position:fixed, 92rem max-width, z-index:200, visible at ≥1024px) with ::before/::after 1px vertical guide lines at rgba(128,128,128,0.12); `.shell` warm gradient background; `.ambientTop` top-edge fade overlay
     MediaBarrier/           # "Reads content from" publication ticker — 3-row marquee duplicate for seamless loop (-33.3333% keyframe); background rgba(139,103,65,0.03) matching About pull-quote; edge fades via ::before/::after gradients clipped at canvas-frame lines via overflow:hidden on .track
     HeaderBar/              # App header
-    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment. Avatar: Google users show photo or initial letter; email/password users show first initial in the same styled circle (determined by `user.app_metadata.provider === "google"`).
+    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment. Avatar: shows the user's first initial (from full_name or email) in a styled circle.
     SiteFooter/             # 4 columns: Product / Learn / Company / Legal; `.footer` is full-bleed (border-top, panel-strong bg); `.footerInner` (max-width:92rem; margin:0 auto; padding:2.15rem 2.25rem) aligns content to canvas-frame lines
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
@@ -186,7 +186,7 @@ When `bias_level === "none"`, every surface must show "No significant bias detec
   - `examples` stores `[{ quote, label, explanation, highlights }]` for website saves; `[{ quote, why }]` for extension saves.
 - `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
 
-**Auth:** Email + password, Google OAuth. Sign up on website only; extension supports sign in only.
+**Auth:** Email + password only. Sign up on website only; extension supports sign in only.
 
 **Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
 
@@ -310,6 +310,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
 - **Transactional email** — Resend is installed and used for the support form. Still needed: branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`
+- **Supabase Pro** — Upgrade to unlock custom auth domain (`auth.tryneutraleye.com`). Without it, Supabase auth emails and OAuth redirects show the raw `*.supabase.co` subdomain. Steps: upgrade plan in Supabase dashboard → Settings → Custom Domains → add `auth.tryneutraleye.com` → update DNS CNAME in Cloudflare. Similar to how Upstash replaced the in-memory rate limiter, this is an infrastructure upgrade with no code changes required.
 
 ## Infrastructure Status
 
@@ -323,6 +324,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 | OG / metadata URLs | ✅ Updated to `tryneutraleye.com` |
 | Sitemap | ✅ Updated to `tryneutraleye.com` |
 | Resend (support form) | ✅ Live |
+| Supabase Pro + custom auth domain | ⏸ Pending |
 | Stripe | ⏸ Paused |
 
 ---
