@@ -12,7 +12,7 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
+  "img-src 'self' data: https://images.unsplash.com",
   "font-src 'self' data:",
   `connect-src 'self' ${supabaseUrl} ${supabaseWsUrl} https://*.ingest.us.sentry.io${isDev ? " ws://localhost:*" : ""}`,
   "frame-ancestors 'none'",
@@ -27,8 +27,6 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      { protocol: "https", hostname: "avatars.githubusercontent.com" }
     ]
   },
   async headers() {

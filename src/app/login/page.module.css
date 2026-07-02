@@ -142,30 +142,6 @@
   background: var(--border-strong);
 }
 
-.googleBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: 0.65rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease;
-}
-
-.googleBtn:hover {
-  background: var(--panel);
-  border-color: var(--accent-strong);
-}
-
 .switchPrompt {
   font-size: 0.83rem;
   color: var(--secondary-text);
