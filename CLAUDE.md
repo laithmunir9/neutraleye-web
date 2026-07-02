@@ -105,7 +105,7 @@ src/
     AnalyzerCta/            # CTA heading + button — no card/box background
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
-      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on hover (mouse) or tap (touch) and closes 150ms after pointer leaves either element (mouse) or on second tap (touch).
+      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). Google OAuth button is temporarily absent (removed 2026-07-02) — see Roadmap for restore steps. LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on hover (mouse) or tap (touch) and closes 150ms after pointer leaves either element (mouse) or on second tap (touch).
 
   lib/
     api.js                  # Frontend → API route calls
@@ -310,7 +310,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
 - **Transactional email** — Resend is installed and used for the support form. Still needed: branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`
-- **Supabase Pro** — Upgrade to unlock custom auth domain (`auth.tryneutraleye.com`). Without it, Supabase auth emails and OAuth redirects show the raw `*.supabase.co` subdomain. Steps: upgrade plan in Supabase dashboard → Settings → Custom Domains → add `auth.tryneutraleye.com` → update DNS CNAME in Cloudflare. Similar to how Upstash replaced the in-memory rate limiter, this is an infrastructure upgrade with no code changes required.
+- **Supabase Pro + Google OAuth restore** — Google "Continue with Google" was temporarily removed (2026-07-02) because the OAuth consent screen showed `*.supabase.co` instead of `tryneutraleye.com`, which looks unprofessional. To restore: (1) upgrade Supabase to Pro, (2) set custom auth domain `auth.tryneutraleye.com` in Supabase dashboard → update DNS CNAME in Cloudflare, (3) update Google Cloud Console redirect URI, (4) re-add `GoogleIcon` + Google button to `sign-in.tsx` `SignUpPage`, (5) re-add `handleGoogleAuth` + `onGoogleSignIn` prop in `login/page.js`, (6) restore `lh3.googleusercontent.com` to CSP `img-src` and `next.config.mjs` `remotePatterns`, (7) restore `isGoogleUser` avatar branch in `SiteHeader.js`.
 
 ## Infrastructure Status
 
