@@ -29,6 +29,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 | Payments       | Stripe                            | Not yet set up                                               |
 | Security       | Cloudflare                        | Planned                                                      |
 | Monitoring     | Sentry                            | Set up — frontend + backend verified                         |
+| Analytics      | Vercel Web Analytics              | `<Analytics />` in layout.js — enable in Vercel dashboard → project → Analytics |
 
 ---
 
@@ -273,7 +274,7 @@ npm run test      # Jest tests
 - **Imports:** Use `@/` alias for `src/` imports
 - **Logging:** Always use `logEvent(level, event, meta)` in API routes — never raw `console.log`
 - **No secrets in code:** All keys and URLs via environment variables only
-- **Prompt changes:** Both `/api/analyze` and `/api/extension` share the same prompt structure — keep them in sync when editing either. Both also share the source-domain exclusion logic.
+- **Prompt changes:** The article-detection and bias-analysis prompts live in ONE place: `src/lib/analysis.js`. Both `/api/analyze` and `/api/extension` import from it (along with URL extraction, OpenAI calls, and `buildHumanResult`). Never re-add prompt text to a route file. Shared logging/Sentry helpers live in `src/lib/apiLog.js`.
 - **`driverLabelFromReason`** in `analyze/route.js`: maps "language" → "Loaded wording", "framing" → "Framing", "source" → "Source imbalance", "attribution" → "Attribution gaps". Any other value (e.g. AI returns "LOADED PHRASING") is title-cased and passed through rather than collapsed to a generic fallback.
 - **`storage.js` `saveAnalysis`**: always tags website Supabase saves with `requestMeta.source = "website"` before persisting. The extension API tags its own saves with `source: "extension"` server-side.
 
