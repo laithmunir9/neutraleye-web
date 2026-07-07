@@ -42,3 +42,10 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# local debug artifacts
+.playwright-mcp/
+*.png
+!public/*.png
+!src/app/icon.png
+.DS_Store
