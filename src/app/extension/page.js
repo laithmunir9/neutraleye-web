@@ -5,6 +5,12 @@ import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import { EXTENSION_URL } from "@/lib/content";
 import styles from "./page.module.css";
 
+export const metadata = {
+  title: "Chrome Extension | NeutralEye",
+  description: "Analyze any news article in one click. The NeutralEye Chrome extension shows how an article frames its story, with quoted evidence and suggested sources.",
+};
+
+
 const steps = [
   {
     number: "01",

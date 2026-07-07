@@ -3,6 +3,12 @@ import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "./page.module.css";
 
+export const metadata = {
+  title: "Methodology | NeutralEye",
+  description: "How to read a NeutralEye result: what the direction label, confidence score, and evidence quotes mean, and how to use them for closer reading.",
+};
+
+
 const directionItems = [
   {
     label: "Left-leaning",

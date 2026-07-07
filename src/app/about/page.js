@@ -3,6 +3,12 @@ import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "./page.module.css";
 
+export const metadata = {
+  title: "About | NeutralEye",
+  description: "Why NeutralEye exists: a tool that shows how an article frames a story so readers can see tone, sourcing, and omission for themselves.",
+};
+
+
 const principles = [
   {
     number: "01",

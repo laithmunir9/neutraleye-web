@@ -3,6 +3,12 @@ import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
 import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import styles from "../overview/page.module.css";
 
+export const metadata = {
+  title: "How It Works | NeutralEye",
+  description: "The NeutralEye pipeline: how article text is extracted, checked across tone, framing, sourcing, attribution, and omission, and turned into an evidence-backed result.",
+};
+
+
 const heroInputs = ["Article text", "Tone", "Source mix", "Framing", "Attribution"];
 const heroOutputs = ["Direction", "Summary", "Examples", "Confidence", "Next reads"];
 const heroRailY = [100, 200, 300, 400, 500];

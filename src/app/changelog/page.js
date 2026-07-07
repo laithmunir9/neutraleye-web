@@ -1,6 +1,12 @@
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import styles from "./page.module.css";
 
+export const metadata = {
+  title: "Changelog | NeutralEye",
+  description: "New features, improvements, and fixes across the NeutralEye website and Chrome extension.",
+};
+
+
 const ENTRIES = [
   {
     version: "1.4",

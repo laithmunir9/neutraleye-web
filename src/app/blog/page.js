@@ -4,6 +4,12 @@ import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { BLOG_POSTS } from "@/lib/content";
 import styles from "./page.module.css";
 
+export const metadata = {
+  title: "Blog | NeutralEye",
+  description: "Guides on media literacy, framing, sourcing, and reading the news critically.",
+};
+
+
 export default function BlogPage() {
   return (
     <MarketingShell>
