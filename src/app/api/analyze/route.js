@@ -3,6 +3,8 @@ import * as cheerio from "cheerio";
 import { randomUUID } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { DAILY_ANALYSIS_LIMIT, checkIpDailyLimit, getUserDailyCount, incrementUserDailyUsage } from "@/lib/dailyLimit";
+import { createClient } from "@/lib/supabase/server";
 import { assertUrlIsSafe, MAX_REDIRECTS } from "@/lib/ssrf";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
@@ -30,6 +32,7 @@ const MAX_EXTRACTED_TEXT_LENGTH = Number(process.env.MAX_EXTRACTED_TEXT_LENGTH |
 // In-memory stores — reset on cold start (acceptable for serverless)
 const inMemoryCache = new Map();
 const rateLimitStore = new Map();
+const dailyLimitStore = new Map();
 
 // ── Logging ────────────────────────────────────────────────────────────────
 
@@ -629,6 +632,34 @@ export async function POST(request) {
     );
   }
 
+  // Daily cap — checked before any OpenAI spend. Signed-in users are counted
+  // per account (daily_usage table); anonymous users per IP (rolling 24h).
+  const supabase = await createClient();
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (authUser) {
+    const dailyCount = await getUserDailyCount(supabase, authUser.id);
+    if (dailyCount >= DAILY_ANALYSIS_LIMIT) {
+      logEvent("warn", "daily_limit.reached", { requestId, userId: authUser.id, dailyCount });
+      return errResponse(
+        429,
+        `You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`,
+        "DAILY_LIMIT_REACHED"
+      );
+    }
+  } else {
+    const dailyRetryAfter = await checkIpDailyLimit(ip, dailyLimitStore);
+    if (dailyRetryAfter !== null) {
+      logEvent("warn", "daily_limit.reached", { requestId, ip, anonymous: true });
+      return Response.json(
+        {
+          error: `You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`,
+          code: "DAILY_LIMIT_REACHED",
+        },
+        { status: 429, headers: { "Retry-After": String(dailyRetryAfter) } }
+      );
+    }
+  }
+
   let body;
   try {
     body = await request.json();
@@ -659,6 +690,9 @@ export async function POST(request) {
       logEvent("info", "analysis.start", { requestId, mode: "text", inputLength: text.length, ip });
       const result = await runAnalysisPipeline(text, requestId);
       inMemoryCache.set(key, result);
+      if (authUser) {
+        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
+      }
       return Response.json(result);
     }
 
@@ -705,6 +739,9 @@ export async function POST(request) {
 
       const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle);
       inMemoryCache.set(key, result);
+      if (authUser) {
+        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
+      }
       return Response.json(result);
     }
 

@@ -78,7 +78,7 @@ const SECTIONS = [
     questions: [
       {
         q: "How many analyses can I run for free?",
-        a: "Unlimited — there is no daily cap during our beta. A rate limit of 5 requests per minute per IP applies to prevent abuse, but there is no per-day ceiling. No account is required to get started.",
+        a: "Everyone gets 10 free analyses per day during our beta, and a rate limit of 5 requests per minute applies to prevent abuse. The limit resets daily. No account is required to get started.",
       },
       {
         q: "What does a Pro plan include?",
@@ -86,11 +86,11 @@ const SECTIONS = [
       },
       {
         q: "Does the extension have the same limits as the website?",
-        a: "Both the extension and website use a rate limit of 5 requests per minute per IP. There is no daily quota on either. Signing in links both to your account so history saves across both.",
+        a: "Both the extension and website share the same limits: 10 analyses per day and a rate limit of 5 requests per minute. Signing in links both to your account so history saves across both.",
       },
       {
         q: "Do I need an account to use NeutralEye?",
-        a: "No. You can run unlimited analyses on the website without an account. An account is needed to save history across devices and to access upcoming Pro features like Compare Analyses.",
+        a: "No. You can run analyses on the website without an account. An account is needed to save history across devices and to access upcoming Pro features like Compare Analyses.",
       },
     ],
   },

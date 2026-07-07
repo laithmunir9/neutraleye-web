@@ -30,17 +30,12 @@ export function useAnalysisLimit() {
 
   const increment = useCallback(async () => {
     if (user) {
-      try {
-        const res = await fetch("/api/usage", { method: "POST" });
-        if (res.ok) {
-          const data = await res.json();
-          setState({ ...data, ready: true });
-        }
-      } catch {}
+      // The server increments daily_usage during /api/analyze — just refetch.
+      await fetchRemote();
     } else {
       setState({ ...incrementLocalUsage(), ready: true });
     }
-  }, [user]);
+  }, [user, fetchRemote]);
 
   return { ...state, increment };
 }

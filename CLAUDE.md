@@ -45,7 +45,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 - **Scraping:** `cheerio` for URL article extraction
 - **Database:** `@supabase/ssr` + `@supabase/supabase-js`
 - **Rate limiting:** `@upstash/ratelimit` + `@upstash/redis` — persistent sliding window, falls back to in-memory when env vars absent
-- **Error monitoring:** `@sentry/nextjs` — tracing + logs enabled, session replay disabled (privacy)
+- **Error monitoring:** `@sentry/nextjs` — logs enabled, traces sampled at 10%, `sendDefaultPii: false` (no user IPs), session replay disabled (privacy)
 - **Testing:** Jest + React Testing Library
 - **Linting:** ESLint (Next.js config)
 
@@ -131,6 +131,7 @@ src/
 ### `POST /api/analyze` — Web bias analysis
 - Accepts `text` or `url` (URL mode requires `x-client: web` header)
 - Rate limit: 5 req/min per IP (env-configurable via `RATE_LIMIT_WINDOW_MS` / `RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:web` key prefix)
+- Daily cap (`DAILY_ANALYSIS_LIMIT`, default 10, shared logic in `src/lib/dailyLimit.js`): signed-in users (cookie session) checked against `daily_usage` and incremented server-side after success; anonymous users capped per IP via Upstash rolling 24h window (`ne:day` prefix). Exceeding returns 429 with code `DAILY_LIMIT_REACHED`.
 - Returns structured JSON: `{ directionLabel, score, confidence, drivers, summary, examples, sources, recommendations, result, json, extractedText }`
 - In-memory cache keyed by text hash or URL
 - Kill switch: `NEUTRALEYE_KILL_SWITCH=true` → 503
@@ -139,7 +140,7 @@ src/
 ### `POST /api/extension` — Extension bias analysis
 - Accepts `text` (plain), `url`, `headline` from extension popup
 - Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:ext` key prefix), applies to ALL requests including authenticated
-- Additional daily limit for authenticated users: 10/day via Supabase `daily_usage` table
+- Daily cap (`DAILY_ANALYSIS_LIMIT`, default 10): authenticated users via `daily_usage` table; anonymous users per IP via Upstash rolling 24h window. Enforced server-side before any OpenAI call. Returned as HTTP 200 with a friendly `result` message (+ `code: "DAILY_LIMIT_REACHED"`, `limited: true`) so the currently shipped popup renders it correctly.
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
 - Returns `{ result: "<markdown>", saved: boolean, tokenExpired: boolean }` — `tokenExpired: true` signals the extension to clear its stored token and force re-login
 - Authenticated requests always bypass the in-memory cache so the Supabase save always runs
@@ -158,7 +159,9 @@ src/
 - Called silently by the extension when the access token is within 5 minutes of expiry (`expiresAt` is a Unix timestamp in seconds)
 
 ### `GET /api/usage` — Check daily usage (authenticated)
+- Returns `{ count, remaining, limited }` computed against `DAILY_ANALYSIS_LIMIT`
 ### `POST /api/usage` — Increment daily usage (authenticated)
+- Legacy: the web frontend no longer calls this — `/api/analyze` increments server-side and `useAnalysisLimit.increment()` just refetches GET
 
 ### `POST /api/support` — Contact form
 - Accepts `{ name, email, subject, message }` from the support page
@@ -221,6 +224,9 @@ OPENAI_API_KEY=              # Fallback for both routes
 
 AI_ANALYSIS_ENABLED=true
 NEUTRALEYE_KILL_SWITCH=false
+
+# Daily analysis cap — per signed-in user (daily_usage) and per anonymous IP (Upstash)
+DAILY_ANALYSIS_LIMIT=10
 
 # Web analyze rate limit
 RATE_LIMIT_WINDOW_MS=60000

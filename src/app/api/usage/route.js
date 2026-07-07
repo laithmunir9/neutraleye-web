@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { DAILY_ANALYSIS_LIMIT } from "@/lib/dailyLimit";
+
+function usagePayload(count) {
+  return {
+    count,
+    remaining: Math.max(0, DAILY_ANALYSIS_LIMIT - count),
+    limited: count >= DAILY_ANALYSIS_LIMIT,
+  };
+}
 
 export async function GET() {
   const supabase = await createClient();
@@ -17,7 +26,7 @@ export async function GET() {
     .maybeSingle();
 
   const count = data?.count ?? 0;
-  return NextResponse.json({ count, remaining: null, limited: false });
+  return NextResponse.json(usagePayload(count));
 }
 
 export async function POST() {
@@ -51,5 +60,5 @@ export async function POST() {
       .insert({ user_id: user.id, usage_date: today, count: 1 });
   }
 
-  return NextResponse.json({ count: newCount, remaining: null, limited: false });
+  return NextResponse.json(usagePayload(newCount));
 }

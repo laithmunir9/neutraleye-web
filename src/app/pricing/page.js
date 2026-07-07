@@ -56,7 +56,7 @@ const INCLUDED_FEATURES = [
 ];
 
 const FREE_FEATURES = [
-  "Unlimited analyses",
+  "10 analyses per day",
   "Tone, framing & sourcing analysis",
   "Quoted evidence with every result",
   "Source recommendations",
@@ -72,7 +72,7 @@ const PRO_FEATURES = [
 
 export const metadata = {
   title: "Pricing — NeutralEye",
-  description: "Analyze any article for free with unlimited analyses. Pro brings cloud history and Compare Analyses — coming soon.",
+  description: "Analyze any article for free with 10 analyses per day. Pro brings cloud history and Compare Analyses, coming soon.",
 };
 
 export default function PricingPage() {
@@ -106,7 +106,7 @@ export default function PricingPage() {
             <div className={styles.cardInner}>
               <div className={styles.planName}>Free</div>
               <p className={styles.planDesc}>
-                Unlimited analyses during beta. Full results — direction, evidence, and sources — every time.
+                10 free analyses every day during beta. Full results with direction, evidence, and sources every time.
               </p>
               <div className={styles.price}>
                 <span className={styles.priceAmount}>$0</span>

@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { randomUUID } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { DAILY_ANALYSIS_LIMIT, checkIpDailyLimit, getUserDailyCount, incrementUserDailyUsage } from "@/lib/dailyLimit";
 import { assertUrlIsSafe, MAX_REDIRECTS } from "@/lib/ssrf";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
@@ -28,6 +29,7 @@ const MAX_ANALYSIS_TEXT_LENGTH = Number(process.env.MAX_ANALYSIS_TEXT_LENGTH || 
 // In-memory stores — reset on cold start (acceptable for serverless)
 const inMemoryCache = new Map();
 const rateLimitStore = new Map();
+const dailyLimitStore = new Map();
 
 // ── Logging ────────────────────────────────────────────────────────────────
 
@@ -84,21 +86,6 @@ async function resolveAuthUser(token) {
   } catch (e) {
     logEvent("warn", "auth.getUser.exception", { message: String(e?.message || e) });
     return null;
-  }
-}
-
-async function incrementUserDailyUsage(supabase, userId) {
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: existing } = await supabase
-    .from("daily_usage")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("usage_date", today)
-    .maybeSingle();
-  if (existing) {
-    await supabase.from("daily_usage").update({ count: existing.count + 1 }).eq("user_id", userId).eq("usage_date", today);
-  } else {
-    await supabase.from("daily_usage").insert({ user_id: userId, usage_date: today, count: 1 });
   }
 }
 
@@ -460,6 +447,38 @@ export async function POST(request) {
   const tokenExpired = Boolean(token && !authUser);
   logEvent("info", "auth.resolved", { requestId, hasToken: Boolean(token), userId: authUser?.id || null, tokenExpired });
 
+  // Daily cap — checked before any OpenAI spend. Returned as a normal result
+  // (HTTP 200) so the currently shipped popup renders it as a readable message.
+  if (authUser) {
+    const dailyCount = await getUserDailyCount(authedSupabase, authUser.id);
+    if (dailyCount >= DAILY_ANALYSIS_LIMIT) {
+      logEvent("warn", "daily_limit.reached", { requestId, userId: authUser.id, dailyCount });
+      return Response.json(
+        {
+          result: `⚠️ You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`,
+          code: "DAILY_LIMIT_REACHED",
+          limited: true,
+          saved: false,
+          tokenExpired,
+        },
+        { headers }
+      );
+    }
+  } else {
+    const dailyRetryAfter = await checkIpDailyLimit(ip, dailyLimitStore);
+    if (dailyRetryAfter !== null) {
+      logEvent("warn", "daily_limit.reached", { requestId, ip, anonymous: true });
+      return Response.json(
+        {
+          result: `⚠️ You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`,
+          code: "DAILY_LIMIT_REACHED",
+          limited: true,
+        },
+        { headers }
+      );
+    }
+  }
+
   let body;
   try {
     body = await request.json();
@@ -535,15 +554,24 @@ export async function POST(request) {
     const payload = { result: humanResult, contentType };
     inMemoryCache.set(cacheKey, payload);
 
-    // Save to cloud history and track usage for authenticated users
+    // Save to cloud history and track usage for authenticated users.
+    // A failed save must not discard the analysis the user already paid the
+    // wait (and we paid the OpenAI cost) for — return the result with saved: false.
+    let saved = false;
     if (authUser) {
-      await Promise.all([
-        saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null),
-        incrementUserDailyUsage(authedSupabase, authUser.id),
-      ]);
+      try {
+        await Promise.all([
+          saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null),
+          incrementUserDailyUsage(authedSupabase, authUser.id),
+        ]);
+        saved = true;
+      } catch (error) {
+        logEvent("error", "save.analysis.nonfatal", { requestId, userId: authUser.id, message: String(error?.message || error) });
+        reportToSentry(error, "INTERNAL_ERROR");
+      }
     }
 
-    return Response.json({ ...payload, saved: Boolean(authUser), tokenExpired }, { headers });
+    return Response.json({ ...payload, saved, tokenExpired }, { headers });
   } catch (error) {
     const errorCode = error?.code || "INTERNAL_ERROR";
     logEvent("error", "analysis.failure", {
