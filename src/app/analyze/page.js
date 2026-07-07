@@ -50,6 +50,16 @@ const UNREADABLE_TEXT_MESSAGE = "Please paste a real article body and try again.
 const INVALID_URL_TITLE = "Could not analyze this URL";
 const INVALID_URL_MESSAGE = "Please enter a full article URL and try again.";
 
+function isHistorySavingEnabled() {
+  if (typeof window === "undefined") return true;
+  try {
+    const settings = JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || "{}") || {};
+    return settings.saveHistory !== false;
+  } catch {
+    return true;
+  }
+}
+
 function isNoBiasResult(result) {
   const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
 
@@ -293,7 +303,9 @@ function AnalyzePageContent() {
         response = await analyzeText(text.trim());
       }
 
-      saveAnalysis(response, user);
+      if (isHistorySavingEnabled()) {
+        saveAnalysis(response, user);
+      }
       increment();
       setResult(response);
       setHasAnalysis(true);

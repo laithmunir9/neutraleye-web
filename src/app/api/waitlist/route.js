@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkRedisRateLimit } from "@/lib/ratelimit";
+
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 5);
+
+// In-memory store — reset on cold start (acceptable for serverless)
+const rateLimitStore = new Map();
+
+function getClientIp(request) {
+  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+}
 
 function logEvent(level, event, meta = {}) {
   const line = JSON.stringify({ timestamp: new Date().toISOString(), event, ...meta });
@@ -8,6 +19,21 @@ function logEvent(level, event, meta = {}) {
 }
 
 export async function POST(req) {
+  const ip = getClientIp(req);
+  const retryAfter = await checkRedisRateLimit(ip, {
+    prefix: "ne:waitlist",
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    fallbackStore: rateLimitStore,
+  });
+  if (retryAfter !== null) {
+    logEvent("info", "rate_limit.exceeded", { ip, route: "waitlist", retryAfter });
+    return NextResponse.json(
+      { error: "Too many requests. Please retry shortly.", code: "RATE_LIMITED" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   let body;
   try {
     body = await req.json();

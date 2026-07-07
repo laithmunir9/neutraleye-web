@@ -1,7 +1,18 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { checkRedisRateLimit } from "@/lib/ratelimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 5);
+
+// In-memory store — reset on cold start (acceptable for serverless)
+const rateLimitStore = new Map();
+
+function getClientIp(request) {
+  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+}
 
 function nowIso() { return new Date().toISOString(); }
 
@@ -15,6 +26,21 @@ const MAX_MESSAGE_LENGTH = 5000;
 const MAX_NAME_LENGTH = 100;
 
 export async function POST(req) {
+  const ip = getClientIp(req);
+  const retryAfter = await checkRedisRateLimit(ip, {
+    prefix: "ne:support",
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    fallbackStore: rateLimitStore,
+  });
+  if (retryAfter !== null) {
+    logEvent("warn", "rate_limit.exceeded", { ip, route: "support", retryAfter });
+    return NextResponse.json(
+      { error: "Too many requests. Please retry shortly.", code: "RATE_LIMITED" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   let body;
   try {
     body = await req.json();

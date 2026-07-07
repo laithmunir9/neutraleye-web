@@ -1,32 +1,43 @@
-# NeutralEye — Web Frontend
+# NeutralEye — Web
 
-## Overview
-The NeutralEye Web Frontend is the user-facing website that allows users to analyze articles for potential bias via URL input or pasted text.
+The NeutralEye website: users submit an article URL or pasted text and get a structured analysis of how the article frames its story (direction, confidence, evidence quotes, suggested sources).
 
-## Role in the System
-This repository handles all UI and user interaction for the web product.  
-It communicates with the NeutralEye Web Backend for all analysis operations.
+Live at [tryneutraleye.com](https://tryneutraleye.com), deployed on Vercel.
 
-## How It Works
-- User inputs a URL or text
-- The frontend sends a request to the backend API
-- The backend processes the request using AI
-- The frontend displays structured bias analysis results
+## Architecture
 
-## Tech Stack
-- Next.js
-- React
-- CSS Modules
+There is no separate backend server. All backend logic lives as Next.js API routes in `src/app/api/`:
+
+- `POST /api/analyze` — website analysis (text or URL mode)
+- `POST /api/extension` — analysis endpoint for the Chrome extension
+- `POST /api/extension-auth` / `POST /api/extension-refresh` — extension login and token refresh
+- `GET|POST /api/usage` — daily usage tracking (authenticated)
+- `POST /api/support` — contact form (Resend)
+- `POST /api/waitlist` — Pro waitlist signups
+
+**Companion repo:** `neutraleye-extension` — the Chrome extension frontend that calls this repo's API routes.
+
+## Stack
+
+- Next.js (App Router), React
+- Supabase — auth, `analyses` + `daily_usage` + `waitlist` tables, RLS enabled
+- OpenAI — `gpt-4o` analysis, `gpt-4o-mini` article detection
+- Upstash Redis — rate limiting (in-memory fallback for local dev)
+- Sentry — error monitoring
+- Resend — transactional email
+- Tailwind CSS v4 + CSS Modules, shadcn/ui, Framer Motion
 
 ## Setup
-Create `.env.local`:
-NEXT_PUBLIC_NEUTRALEYE_API_URL=http://localhost:3000
 
-Run locally:
+Copy the environment variables listed in `CLAUDE.md` into `.env.local` (Supabase URL + publishable key, OpenAI keys, Upstash, Resend, Sentry).
+
+```bash
 npm install
-npm run dev
+npm run dev    # localhost:3000
+npm run lint
+npm run test
+```
 
-## Notes
-- Must point to `neutraleye-web-backend`
-- Does not interact with extension backend
-- Backend URL is controlled via environment variable
+Note: `npm run build` may fail locally due to missing `@next/swc` native bindings; Vercel builds work fine.
+
+See `CLAUDE.md` for the full project reference (conventions, design system, API details).
