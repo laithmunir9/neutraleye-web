@@ -43,6 +43,18 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Collapse the www duplicate into the apex so Google indexes one canonical
+    // host (fixes Search Console "Duplicate without user-selected canonical").
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.tryneutraleye.com" }],
+        destination: "https://tryneutraleye.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {
