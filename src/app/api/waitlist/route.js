@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { getClientIp } from "@/lib/apiLog";
 
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 5);
 
 // In-memory store — reset on cold start (acceptable for serverless)
 const rateLimitStore = new Map();
-
-function getClientIp(request) {
-  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
-}
 
 function logEvent(level, event, meta = {}) {
   const line = JSON.stringify({ timestamp: new Date().toISOString(), event, ...meta });

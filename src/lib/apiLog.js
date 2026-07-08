@@ -10,7 +10,18 @@ export function logEvent(level, event, meta = {}) {
 }
 
 export function getClientIp(request) {
-  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+  // Vercel sets x-real-ip to the true connecting IP; a client cannot forge it.
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp && realIp.trim()) return realIp.trim();
+  // Fall back to the RIGHTMOST x-forwarded-for entry — the hop appended by the
+  // trusted proxy. The leftmost entry is client-controlled and spoofable, so
+  // using it would let anyone reset their own rate-limit / daily-cap bucket.
+  const forwarded = String(request.headers.get("x-forwarded-for") || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (forwarded.length) return forwarded[forwarded.length - 1];
+  return "unknown";
 }
 
 // Genuine bugs/operational failures worth alerting on — excludes expected,

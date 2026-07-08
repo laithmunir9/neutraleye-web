@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { getClientIp } from "@/lib/apiLog";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -9,10 +10,6 @@ const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 5);
 
 // In-memory store — reset on cold start (acceptable for serverless)
 const rateLimitStore = new Map();
-
-function getClientIp(request) {
-  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
-}
 
 function nowIso() { return new Date().toISOString(); }
 

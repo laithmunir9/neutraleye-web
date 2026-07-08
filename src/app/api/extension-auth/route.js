@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
+import { getClientIp } from "@/lib/apiLog";
 
 const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
@@ -17,10 +18,6 @@ function logEvent(level, event, meta = {}) {
   if (level === "error") { console.error(line); return; }
   if (level === "warn") { console.warn(line); return; }
   console.info(line);
-}
-
-function getClientIp(request) {
-  return String(request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
 }
 
 function checkRateLimit(ip) {
