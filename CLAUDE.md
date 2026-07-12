@@ -279,9 +279,9 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 `npm run verify` runs, in order (fastest first, build last since it's the slowest at ~1 min): `typecheck && lint && test && build`.
 
 - **Typecheck** only covers `.ts`/`.tsx` files (tsconfig `include`) — the API routes and most components are `.js` and aren't type-checked. This is a known gap, not a bug.
-- **Lint baseline — 2 rules relaxed, everything else unchanged (verify fails on any lint error):**
+- **Lint baseline — 1 rule relaxed, everything else at its default (verify fails on any lint error):**
   - `react/no-unescaped-entities`: **off**. Cosmetic noise only — 37 hits, all apostrophes/quotes in JSX marketing copy, not real bugs.
-  - `react-hooks/set-state-in-effect`: **warn** (not off). 4 real occurrences, each tracked with file+line in Known Issues below — this is deferred debt, not silenced noise. Restore to `"error"` once fixed.
+  - `react-hooks/set-state-in-effect` was briefly downgraded to `warn` for 4 occurrences, then fixed and restored to its default `error` on 2026-07-12 — see the "Adjusting state without an effect" patterns below if this comes up again.
 - **Tests** cover the highest-risk logic: the analysis pipeline's prompt contract (`promptContract.test.js`), AI-JSON → response-shape normalization (`normalizeAiResult.test.js`), and human-readable result building (`analysis.test.js`) — see Testing below.
 
 ---
@@ -297,6 +297,10 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 - **Prompt changes:** The article-detection and bias-analysis prompts live in ONE place: `src/lib/analysis.js`. Both `/api/analyze` and `/api/extension` import from it (along with URL extraction, OpenAI calls, and `buildHumanResult`). Never re-add prompt text to a route file. Shared logging/Sentry helpers live in `src/lib/apiLog.js`.
 - **`driverLabelFromReason`** in `analyze/route.js`: maps "language" → "Loaded wording", "framing" → "Framing", "source" → "Source imbalance", "attribution" → "Attribution gaps". Any other value (e.g. AI returns "LOADED PHRASING") is title-cased and passed through rather than collapsed to a generic fallback.
 - **`storage.js` `saveAnalysis`**: always tags website Supabase saves with `requestMeta.source = "website"` before persisting. The extension API tags its own saves with `source: "extension"` server-side.
+- **Avoiding `react-hooks/set-state-in-effect`:** don't call `setState` directly, synchronously, in an effect's top-level body — this rule is at `error`. Three patterns used in this codebase, pick based on the case:
+  - **Syncing from a browser API (localStorage, media queries, etc.):** use `useSyncExternalStore` instead of `useState` + effect (see `saveHistory` in `history/page.js` for the SSR-safe pattern: real getSnapshot, a fixed `getServerSnapshot`, and a subscribe function that no-ops when `window` is undefined).
+  - **Resetting/adjusting state when a dependency changes (e.g. close a menu on route change):** compare against a previous value tracked via `useState`, and call `setState` conditionally directly in the render body (not inside `useEffect`) — see `prevPathname` in `SiteHeader.js`. This is React's own recommended pattern (https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes) and isn't flagged since it's not inside an effect.
+  - **Data fetching / async work that legitimately belongs in an effect:** split "resolve the value" (a plain async function with no `setState` calls in its own body) from "commit the value" (`.then((next) => setState(...))`). The linter only flags a *direct* top-level `setState` call inside the effect's own body — a callback passed to `.then()`/`.catch()` is a separate closure and isn't scanned. See `resolveLimit` in `useAnalysisLimit.js`.
 
 ---
 
@@ -330,12 +334,6 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
-- **`react-hooks/set-state-in-effect` — 4 tracked occurrences, rule downgraded to `warn` in `eslint.config.mjs` pending a deliberate fix (each calls `setState` synchronously in an effect body, which can cascade renders):**
-  - `src/app/history/page.js:82` — storage-event listener calls `setSaveHistory(...)` directly in the effect.
-  - `src/app/history/page.js:92` — auth-state effect resets `setSupabaseItems(null)` / `setSupabaseError(null)` synchronously when `user` is absent.
-  - `src/components/SiteHeader/SiteHeader.js:192` — pathname-change effect calls `setMobileOpen(false)` directly.
-  - `src/lib/supabase/useAnalysisLimit.js:25` — effect calls `fetchRemote()` (which sets state) or `setState(...)` synchronously based on auth status.
-  - Restore the rule to `"error"` once these are restructured (e.g. moving the setState into an event handler or deriving the value instead of syncing it).
 
 ---
 

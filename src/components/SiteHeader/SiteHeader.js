@@ -188,9 +188,14 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
   const isPro = user?.user_metadata?.plan === "pro";
   const showUpgradeCta = pathname !== "/pricing" && !isPro;
 
-  useEffect(() => {
+  // Close the mobile menu on route change. Adjusted during render (React's
+  // recommended pattern for resetting state when a dependency changes)
+  // instead of an effect, so it happens before paint with no extra render.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";

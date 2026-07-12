@@ -27,6 +27,16 @@ function readSaveHistorySetting() {
   }
 }
 
+function subscribeToSaveHistorySetting(callback) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getServerSaveHistorySnapshot() {
+  return true;
+}
+
 function subscribeToHistory(callback) {
   if (typeof window === "undefined") return () => {};
   window.addEventListener(HISTORY_CHANGE_EVENT, callback);
@@ -76,26 +86,21 @@ export default function HistoryPage() {
   const { user, loading: authLoading } = useAuth();
   const [supabaseItems, setSupabaseItems] = useState(null);
   const [supabaseError, setSupabaseError] = useState(null);
-  const [saveHistory, setSaveHistory] = useState(true);
-
-  useEffect(() => {
-    setSaveHistory(readSaveHistorySetting());
-    function onStorage() { setSaveHistory(readSaveHistorySetting()); }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  const saveHistory = useSyncExternalStore(
+    subscribeToSaveHistorySetting,
+    readSaveHistorySetting,
+    getServerSaveHistorySnapshot
+  );
 
   const localItems = useSyncExternalStore(subscribeToHistory, getHistorySnapshot, getServerHistorySnapshot);
 
   useEffect(() => {
-    if (!user) {
-      setSupabaseItems(null);
-      setSupabaseError(null);
-      return;
-    }
-    setSupabaseError(null);
+    if (!user) return;
     listAnalysesFromSupabase()
-      .then(setSupabaseItems)
+      .then((data) => {
+        setSupabaseItems(data);
+        setSupabaseError(null);
+      })
       .catch((err) => {
         setSupabaseError(err);
         setSupabaseItems(null);
@@ -150,7 +155,7 @@ export default function HistoryPage() {
                 <p className={styles.support}>{storageSupport}</p>
               </ResultCard>
             </section>
-            {supabaseError && (
+            {user && supabaseError && (
               <p className={styles.errorNote}>Could not load cloud history. Showing local analyses.</p>
             )}
             <HistoryTable items={items} onDelete={handleDelete} />

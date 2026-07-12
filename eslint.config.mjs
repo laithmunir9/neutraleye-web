@@ -15,8 +15,6 @@ const eslintConfig = defineConfig([
     rules: {
       // Apostrophes/quotes in JSX marketing copy are intentional.
       "react/no-unescaped-entities": "off",
-      // TODO: restructure the 4 flagged hooks (useAnalysisLimit etc.), then restore to "error".
-      "react-hooks/set-state-in-effect": "warn",
     },
   },
 ]);
