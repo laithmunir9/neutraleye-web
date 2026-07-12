@@ -45,7 +45,7 @@ export default function SiteFooter({ compact = false }) {
       <div className={styles.footerInner}>
         <div className={styles.footerBrand}>
           <Link href="/" className={styles.footerBrandLink} aria-label="NeutralEye home">
-            <Image src="/neutraleye-logo-128.png" alt="" width={30} height={30} className={styles.footerLogo} />
+            <Image src="/neutraleye-logo-transparent.png" alt="" width={30} height={30} className={styles.footerLogo} />
             <span>NeutralEye</span>
           </Link>
           <div className={styles.footerMeta}>
