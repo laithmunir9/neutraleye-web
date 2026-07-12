@@ -255,14 +255,30 @@ SENTRY_AUTH_TOKEN=
 ## Dev Commands
 
 ```bash
-npm run dev       # Start dev server (localhost:3000)
-npm run build     # Production build
-npm run start     # Start production server
-npm run lint      # ESLint
-npm run test      # Jest tests
+npm run dev         # Start dev server (localhost:3000)
+npm run build       # Production build
+npm run start       # Start production server
+npm run lint        # ESLint
+npm run test        # Jest tests
+npm run typecheck   # tsc --noEmit (checks .ts/.tsx only — see Verify Loop)
+npm run verify      # typecheck && lint && test && build, fail-fast in that order
 ```
 
-**Note:** `npm run build` may fail locally due to missing `@next/swc` native bindings (WASM fallback doesn't support `turbo.createProject`). Vercel builds work fine. Use `npm run lint` and `npm run test` for local validation.
+`npm run build` works fine locally (~1 min) — an earlier note here claiming it failed due to missing `@next/swc` bindings was stale.
+
+---
+
+## Verify Loop
+
+There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net, and Vercel's deploy build is the only other implicit check.
+
+**After making any code change, run `npm run verify` and fix whatever it flags before reporting the change as done.** Only surface the work once verify passes, or if stuck and a decision from the user is needed. This is a solo pre-revenue project — the goal is a fast, honest signal, not enterprise-grade CI.
+
+`npm run verify` runs, in order (fastest first, build last since it's the slowest at ~1 min): `typecheck && lint && test && build`.
+
+- **Typecheck** only covers `.ts`/`.tsx` files (tsconfig `include`) — the API routes and most components are `.js` and aren't type-checked. This is a known gap, not a bug.
+- **Lint baseline:** `react/no-unescaped-entities` is off (apostrophes in JSX marketing copy are intentional, not real bugs). `react-hooks/set-state-in-effect` is downgraded to `warn` for 4 known occurrences (`history/page.js` x2, `SiteHeader.js`, `useAnalysisLimit.js`) pending a deliberate restructure — see the TODO in `eslint.config.mjs`. Everything else is unchanged; verify fails on any lint **error**.
+- **Tests** cover the highest-risk logic: the analysis pipeline's prompt contract (`promptContract.test.js`), AI-JSON → response-shape normalization (`normalizeAiResult.test.js`), and human-readable result building (`analysis.test.js`) — see Testing below.
 
 ---
 
@@ -341,7 +357,17 @@ When building new UI, prefer extending existing components in `src/components/ui
 ```
 src/lib/__tests__/normalizeResponse.test.js
 src/lib/__tests__/resolveApiBase.test.js
+src/lib/__tests__/score.test.js
+src/lib/__tests__/getClientIp.test.js
+src/lib/__tests__/dailyLimit.test.js
+src/lib/__tests__/ratelimit.test.js
+src/lib/__tests__/ssrf.test.js
+src/lib/__tests__/analysis.test.js        # buildHumanResult, contentTypeFromAiJson
+src/lib/__tests__/promptContract.test.js  # pins load-bearing rules in the bias-analysis prompt (quote exclusion, content-type classification, minimum-impact threshold, JSON schema, response_format, source-domain exclusion)
+src/lib/__tests__/normalizeAiResult.test.js  # AI JSON -> response shape, no-bias case, malformed JSON fallback, driverLabelFromReason, scoreFromBiasLevel
 src/app/analyze/__tests__/page.test.js
 ```
 
-Run with `npm run test`.
+`analysis.test.js`, `promptContract.test.js`, and `normalizeAiResult.test.js` run under `@jest-environment node` (not the default jsdom) — `analysis.js` imports `cheerio`, which only ships browser/ESM exports that jsdom's export-condition resolution can't `require()`.
+
+Run with `npm run test`, or `npm run verify` for the full typecheck + lint + test + build pass.
