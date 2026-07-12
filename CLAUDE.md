@@ -184,6 +184,8 @@ When `bias_level === "none"`, every surface must show "No significant bias detec
 
 ## Supabase
 
+**Project:** `hkxtymihsyegrmqnvdvn.supabase.co` (matches `NEXT_PUBLIC_SUPABASE_URL` in `.env.local`).
+
 **Tables:**
 - `analyses` — user analysis history (`id`, `user_id`, `created_at`, `input_type`, `url`, `title`, `direction`, `direction_label`, `confidence`, `score`, `summary`, `drivers`, `examples`, `sources`, `recommendations`, `request_meta`)
   - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. HistoryTable reads this to show source badges and hide the Inspect button for extension rows.
@@ -277,7 +279,9 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 `npm run verify` runs, in order (fastest first, build last since it's the slowest at ~1 min): `typecheck && lint && test && build`.
 
 - **Typecheck** only covers `.ts`/`.tsx` files (tsconfig `include`) — the API routes and most components are `.js` and aren't type-checked. This is a known gap, not a bug.
-- **Lint baseline:** `react/no-unescaped-entities` is off (apostrophes in JSX marketing copy are intentional, not real bugs). `react-hooks/set-state-in-effect` is downgraded to `warn` for 4 known occurrences (`history/page.js` x2, `SiteHeader.js`, `useAnalysisLimit.js`) pending a deliberate restructure — see the TODO in `eslint.config.mjs`. Everything else is unchanged; verify fails on any lint **error**.
+- **Lint baseline — 2 rules relaxed, everything else unchanged (verify fails on any lint error):**
+  - `react/no-unescaped-entities`: **off**. Cosmetic noise only — 37 hits, all apostrophes/quotes in JSX marketing copy, not real bugs.
+  - `react-hooks/set-state-in-effect`: **warn** (not off). 4 real occurrences, each tracked with file+line in Known Issues below — this is deferred debt, not silenced noise. Restore to `"error"` once fixed.
 - **Tests** cover the highest-risk logic: the analysis pipeline's prompt contract (`promptContract.test.js`), AI-JSON → response-shape normalization (`normalizeAiResult.test.js`), and human-readable result building (`analysis.test.js`) — see Testing below.
 
 ---
@@ -326,6 +330,12 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
+- **`react-hooks/set-state-in-effect` — 4 tracked occurrences, rule downgraded to `warn` in `eslint.config.mjs` pending a deliberate fix (each calls `setState` synchronously in an effect body, which can cascade renders):**
+  - `src/app/history/page.js:82` — storage-event listener calls `setSaveHistory(...)` directly in the effect.
+  - `src/app/history/page.js:92` — auth-state effect resets `setSupabaseItems(null)` / `setSupabaseError(null)` synchronously when `user` is absent.
+  - `src/components/SiteHeader/SiteHeader.js:192` — pathname-change effect calls `setMobileOpen(false)` directly.
+  - `src/lib/supabase/useAnalysisLimit.js:25` — effect calls `fetchRemote()` (which sets state) or `setState(...)` synchronously based on auth status.
+  - Restore the rule to `"error"` once these are restructured (e.g. moving the setState into an event handler or deriving the value instead of syncing it).
 
 ---
 
