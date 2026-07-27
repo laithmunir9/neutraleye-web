@@ -50,16 +50,15 @@ export async function POST(req) {
 
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from("waitlist")
-    .insert({ email: email.trim().toLowerCase() });
+  // Inserts go through the join_waitlist RPC (SECURITY DEFINER) rather than a
+  // direct table insert — the table has no anon INSERT policy anymore. The
+  // function itself de-dupes via ON CONFLICT DO NOTHING, so a repeat email is
+  // just a normal success, not an error to catch here.
+  const { error } = await supabase.rpc("join_waitlist", {
+    p_email: email.trim().toLowerCase(),
+  });
 
   if (error) {
-    // Unique violation — already on the list, treat as success
-    if (error.code === "23505") {
-      logEvent("info", "waitlist.duplicate", { email: email.trim().toLowerCase() });
-      return NextResponse.json({ ok: true });
-    }
     logEvent("error", "waitlist.insert.error", { error: error.message });
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }

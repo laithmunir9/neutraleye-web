@@ -191,14 +191,16 @@ When `bias_level === "none"`, every surface must show "No significant bias detec
   - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. HistoryTable reads this to show source badges and hide the Inspect button for extension rows.
   - `examples` stores `[{ quote, label, explanation, highlights }]` for website saves; `[{ quote, why }]` for extension saves.
 - `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
+- `waitlist` — Pro-launch email waitlist (`id`, `email` unique, `created_at`). No `user_id` — signups are anonymous, from the Pro waitlist form on `/pricing` (`WaitlistForm.js` → `POST /api/waitlist`).
 
 **Auth:** Email + password only. Sign up on website only; extension supports sign in only.
 
 **Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
 
-**RLS:** Enabled on both tables. Policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`). Migration SQL is at `supabase/migrations/20260601000000_rls_policies.sql`.
+**RLS:** Enabled on all three tables. `analyses`/`daily_usage` policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`) — migration SQL at `supabase/migrations/20260601000000_rls_policies.sql`. `waitlist` has **no** anon INSERT policy at all — inserts go only through `public.join_waitlist(p_email text)`, a `SECURITY DEFINER` function (validates email format, `ON CONFLICT DO NOTHING` for dedup) called via `supabase.rpc("join_waitlist", ...)` from `/api/waitlist/route.js`. This gives that one public, unauthenticated write path a privileged route without needing a service-role key — migration SQL at `supabase/migrations/20260727000000_waitlist_rls_tighten.sql`. (Fixed 2026-07-27: the previous `waitlist` INSERT policy was `WITH CHECK (true)`, letting any unauthenticated caller insert arbitrary rows directly — the weekly ops-check flagged it three times before this was closed.)
+  - **Expected advisories, not regressions:** `get_advisors` (security) now shows `anon_security_definer_function_executable` and `authenticated_security_definer_function_executable` for `join_waitlist`. That's inherent to this pattern — a `SECURITY DEFINER` function callable by `anon`/`authenticated` is exactly the intended design for a public signup RPC without a service-role key — and does not need fixing. Don't let these two read as new problems in a weekly ops-check report. `rls_policy_always_true` on `waitlist` was the actual bug; if that specific one ever reappears, that's the one to investigate.
 
-**Client keys:** Publishable key only — no service role key. RLS must be correctly configured in Supabase dashboard.
+**Client keys:** Publishable key only — no service role key. RLS must be correctly configured in Supabase dashboard. `join_waitlist` (see above) is how `waitlist` gets a privileged write path without introducing one.
 
 **Important:** The extension API route passes the Bearer token as a global `Authorization` header when creating the Supabase client, so `auth.uid()` resolves correctly for RLS. Do not call `makeSupabase()` without the token for authenticated writes.
 
