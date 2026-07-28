@@ -61,18 +61,17 @@ const FREE_FEATURES = [
   "Quoted evidence with every result",
   "Source recommendations",
   "Browser extension access",
-  "Local history (this device only)",
+  "Cloud history, synced across devices (sign in required)",
 ];
 
 const PRO_FEATURES = [
   "Everything in Free, plus:",
-  "Cloud history — synced across devices",
   "Compare Analyses — side-by-side bias comparison",
 ];
 
 export const metadata = {
   title: "Pricing — NeutralEye",
-  description: "Analyze any article for free with 10 analyses per day. Pro brings cloud history and Compare Analyses, coming soon.",
+  description: "Analyze any article for free with 10 analyses per day and cloud history. Pro brings Compare Analyses, coming soon.",
 };
 
 export default function PricingPage() {

@@ -82,7 +82,7 @@ const SECTIONS = [
       },
       {
         q: "What does a Pro plan include?",
-        a: "Pro brings cloud history synced across all your devices and Compare Analyses — which lets you run two articles side by side and see where framing diverges. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
+        a: "Pro brings Compare Analyses — which lets you run two articles side by side and see where framing diverges. Cloud history synced across your devices is already included free when you sign in. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
       },
       {
         q: "Does the extension have the same limits as the website?",
