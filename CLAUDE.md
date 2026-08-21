@@ -197,7 +197,7 @@ When `bias_level === "none"`, every surface must show "No significant bias detec
 
 **Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
 
-**Auth email:** Supabase Auth already sends through **custom SMTP wired to Resend**. Verified 2026-08-20 from the Resend sent log, not inferred from docs. Sender is `"NeutralEye" <contact@tryneutraleye.com>`; domain `tryneutraleye.com` is verified in `us-east-1` with **sending enabled and receiving disabled**, so never invite a reply in email copy because it lands nowhere anyone reads. Branded HTML for Confirm signup and Reset password lives in `supabase/email-templates/`. Those files are the source of truth, but they are applied by hand in the dashboard (Auth → Email Templates); no migration or MCP tool can push them. Only those two flows are in use: magic link, change email, and invite are not.
+**Auth email:** Supabase Auth already sends through **custom SMTP wired to Resend**. Verified 2026-08-20 from the Resend sent log, not inferred from docs. Sender is `"NeutralEye" <contact@tryneutraleye.com>`; domain `tryneutraleye.com` is verified in `us-east-1` with **sending enabled and receiving disabled**, so never invite a reply in email copy because it lands nowhere anyone reads. Branded HTML for Confirm signup and Reset password lives in `supabase/email-templates/`. **Both are applied and live in production, verified 2026-08-21** by fetching the actual sent HTML from the Resend log for a real signup and a real reset and diffing it against these files. Those files remain the source of truth, but they are applied by hand in the dashboard (Auth → Email Templates); no migration or MCP tool can push them, so any edit to these files must be re-pasted there or production keeps sending the old version. Only those two flows are in use: magic link, change email, and invite are not.
 
 **Email OTP expiry is 3600 seconds (1 hour)**, confirmed from the dashboard 2026-08-20. It covers both the signup confirmation link and the password recovery link, and both templates state the hour explicitly.
 
@@ -352,7 +352,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 ## Roadmap
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
-- **Transactional email** — Done except for one manual step. Auth email already sends from `contact@tryneutraleye.com` through Resend SMTP. Branded templates for signup confirm and password reset are written in `supabase/email-templates/` and just need pasting into the dashboard.
+- **Transactional email** — Done. Auth email sends from `contact@tryneutraleye.com` through Resend SMTP, and the branded signup-confirm and password-reset templates are pasted into the dashboard and confirmed live (2026-08-21). Nothing outstanding; re-paste only if `supabase/email-templates/` changes.
 - **Supabase Pro + Google OAuth restore** — Google "Continue with Google" was temporarily removed (2026-07-02) because the OAuth consent screen showed `*.supabase.co` instead of `tryneutraleye.com`, which looks unprofessional. To restore: (1) upgrade Supabase to Pro, (2) set custom auth domain `auth.tryneutraleye.com` in Supabase dashboard → update DNS CNAME in Cloudflare, (3) update Google Cloud Console redirect URI, (4) re-add `GoogleIcon` + Google button to `sign-in.tsx` `SignUpPage`, (5) re-add `handleGoogleAuth` + `onGoogleSignIn` prop in `login/page.js`, (6) restore `lh3.googleusercontent.com` to CSP `img-src` and `next.config.mjs` `remotePatterns`, (7) restore `isGoogleUser` avatar branch in `SiteHeader.js`.
 
 ## Infrastructure Status
@@ -367,7 +367,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 | OG / metadata URLs | ✅ Updated to `tryneutraleye.com` |
 | Sitemap | ✅ Updated to `tryneutraleye.com` |
 | Resend (support form + Auth SMTP) | ✅ Live |
-| Branded auth email templates | ⏸ Written, pending paste into Supabase dashboard |
+| Branded auth email templates | ✅ Applied and verified live (2026-08-21) |
 | Supabase Pro + custom auth domain | ⏸ Pending |
 | Stripe | ⏸ Paused |
 
