@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
@@ -25,10 +26,15 @@ export async function GET(request) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await safeAuthCall("code_exchange", () =>
+      supabase.auth.exchangeCodeForSession(code)
+    );
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+    // Otherwise a confirmation link that failed only because the backend was down
+    // is indistinguishable from an expired or tampered link.
+    reportAuthError(error, "code_exchange", { route: "auth-callback" });
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_failed`);

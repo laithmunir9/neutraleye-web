@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetNewPasswordPage } from "@/components/ui/sign-in";
 import { createClient } from "@/lib/supabase/client";
+import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -13,8 +14,15 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
+    // A transport failure here must not look like "no recovery session" — that would
+    // bounce the user back to /login mid-reset with no explanation.
+    safeAuthCall("get_session", () => supabase.auth.getSession()).then(({ data, error }) => {
+      if (error) {
+        setError(reportAuthError(error, "get_session"));
+        setReady(true);
+        return;
+      }
+      if (!data?.session) {
         router.replace("/login");
       } else {
         setReady(true);
@@ -35,9 +43,11 @@ export default function ResetPasswordPage() {
     setError("");
     setLoading(true);
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.updateUser({ password });
+    const { error: authError } = await safeAuthCall("password_update", () =>
+      supabase.auth.updateUser({ password })
+    );
     if (authError) {
-      setError(authError.message);
+      setError(reportAuthError(authError, "password_update"));
       setLoading(false);
     } else {
       router.push("/login?reset=success");

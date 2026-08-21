@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage } from "@/components/ui/sign-in";
 import { createClient } from "@/lib/supabase/client";
+import { classifySignUpResult, reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 import styles from "./page.module.css";
 
 
@@ -35,38 +36,6 @@ function AuthForm() {
     setForgotSent(false);
   }
 
-  async function handleEmailAuth(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    const supabase = createClient();
-
-    if (isSignup) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
-        },
-      });
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-      } else {
-        setConfirmed(true);
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-      } else {
-        router.push(callbackUrl);
-        router.refresh();
-      }
-    }
-  }
-
   async function handleForgotPassword(e) {
     e.preventDefault();
     setError("");
@@ -75,12 +44,14 @@ function AuthForm() {
     const emailValue = String(formData.get("email") || "");
     setEmail(emailValue);
     const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(emailValue, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
-    });
+    const { error } = await safeAuthCall("password_reset_request", () =>
+      supabase.auth.resetPasswordForEmail(emailValue, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      })
+    );
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(reportAuthError(error, "password_reset_request"));
     } else {
       setForgotSent(true);
     }
@@ -122,19 +93,25 @@ function AuthForm() {
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
-      email: String(formData.get("email") || ""),
-      password: String(formData.get("password") || ""),
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
-      },
-    });
-    if (authError) {
-      setError(authError.message);
+    const emailValue = String(formData.get("email") || "");
+    const result = await safeAuthCall("signup", () =>
+      supabase.auth.signUp({
+        email: emailValue,
+        password: String(formData.get("password") || ""),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+        },
+      })
+    );
+
+    const { showConfirmationScreen, message } = classifySignUpResult(result);
+    if (!showConfirmationScreen) {
+      setError(message);
       setLoading(false);
-    } else {
-      setConfirmed(true);
+      return;
     }
+    setEmail(emailValue);
+    setConfirmed(true);
   }
 
   if (isSignup) {
@@ -154,12 +131,14 @@ function AuthForm() {
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: String(formData.get("email") || ""),
-      password: String(formData.get("password") || ""),
-    });
+    const { error: authError } = await safeAuthCall("signin", () =>
+      supabase.auth.signInWithPassword({
+        email: String(formData.get("email") || ""),
+        password: String(formData.get("password") || ""),
+      })
+    );
     if (authError) {
-      setError(authError.message);
+      setError(reportAuthError(authError, "signin"));
       setLoading(false);
     } else {
       router.push(callbackUrl);

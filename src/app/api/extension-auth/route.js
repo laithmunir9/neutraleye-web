@@ -1,24 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
-import { getClientIp } from "@/lib/apiLog";
+import { getClientIp, logEvent } from "@/lib/apiLog";
+import {
+  AUTH_UNAVAILABLE_MESSAGE,
+  isAuthTransportError,
+  reportAuthError,
+  safeAuthCall,
+} from "@/lib/supabase/authErrors";
 
 const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
 
 // In-memory store — reset on cold start (acceptable for serverless)
 const rateLimitStore = new Map();
-
-function nowIso() {
-  return new Date().toISOString();
-}
-
-function logEvent(level, event, meta = {}) {
-  const line = JSON.stringify({ timestamp: nowIso(), event, ...meta });
-  if (level === "error") { console.error(line); return; }
-  if (level === "warn") { console.warn(line); return; }
-  console.info(line);
-}
 
 function checkRateLimit(ip) {
   return checkRedisRateLimit(ip, {
@@ -77,9 +72,22 @@ export async function POST(request) {
   }
 
   const supabase = makeSupabase();
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await safeAuthCall("extension_signin", () =>
+    supabase.auth.signInWithPassword({ email, password })
+  );
 
-  if (error || !data.session) {
+  // An unreachable auth service is not a wrong password. Saying so sends users to
+  // reset a password that was never the problem, and hides the outage from us.
+  if (isAuthTransportError(error)) {
+    reportAuthError(error, "extension_signin", { route: "extension-auth" });
+    logEvent("error", "auth.transport_failure", { route: "extension-auth", ip });
+    return NextResponse.json(
+      { error: AUTH_UNAVAILABLE_MESSAGE, code: "AUTH_UNAVAILABLE" },
+      { status: 503, headers }
+    );
+  }
+
+  if (error || !data?.session) {
     return NextResponse.json(
       { error: "Incorrect email or password." },
       { status: 401, headers }

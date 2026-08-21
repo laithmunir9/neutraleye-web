@@ -1,4 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
+import { logEvent } from "@/lib/apiLog";
+import {
+  AUTH_UNAVAILABLE_MESSAGE,
+  isAuthTransportError,
+  reportAuthError,
+  safeAuthCall,
+} from "@/lib/supabase/authErrors";
 
 function makeSupabase() {
   return createServerClient(
@@ -38,9 +45,23 @@ export async function POST(request) {
   }
 
   const supabase = makeSupabase();
-  const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+  const { data, error } = await safeAuthCall("token_refresh", () =>
+    supabase.auth.refreshSession({ refresh_token: refreshToken })
+  );
 
-  if (error || !data.session) {
+  // Returning 401 here would tell the extension to discard a perfectly valid refresh
+  // token and force a re-login, purely because our backend was unreachable. 503 says
+  // "try again later" instead of destroying the session.
+  if (isAuthTransportError(error)) {
+    reportAuthError(error, "token_refresh", { route: "extension-refresh" });
+    logEvent("error", "auth.transport_failure", { route: "extension-refresh" });
+    return Response.json(
+      { error: AUTH_UNAVAILABLE_MESSAGE, code: "AUTH_UNAVAILABLE" },
+      { status: 503, headers }
+    );
+  }
+
+  if (error || !data?.session) {
     return Response.json({ error: "Session expired. Please sign in again." }, { status: 401, headers });
   }
 

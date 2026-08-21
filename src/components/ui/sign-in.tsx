@@ -477,7 +477,8 @@ export const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ email, onBack })
             className="animate-element animate-delay-300 text-xs leading-relaxed px-3 py-2.5 rounded-lg"
             style={{ color: '#7b6a58', background: 'rgba(93,75,53,0.07)', border: '1px solid rgba(93,75,53,0.1)' }}
           >
-            Didn&apos;t receive it? Check your spam folder, or wait a moment and try again.
+            Didn&apos;t receive it? Check your spam folder first. If this address already has a
+            NeutralEye account, no new link is sent, so sign in below or reset your password instead.
           </p>
 
           {/* Back link */}

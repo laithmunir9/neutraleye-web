@@ -25,7 +25,7 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 | API Routes     | `src/app/api/` → Vercel           | All backend logic lives here, no separate server             |
 | Database       | Supabase                          | Auth + analyses + daily_usage tables, RLS active             |
 | Rate limiting  | Upstash Redis                     | Sliding window via `@upstash/ratelimit`; falls back to in-memory locally |
-| Email          | Resend                            | Support form + future transactional email                    |
+| Email          | Resend                            | Support form + Supabase Auth email via custom SMTP           |
 | Payments       | Stripe                            | Not yet set up                                               |
 | Security       | Cloudflare                        | Planned                                                      |
 | Monitoring     | Sentry                            | Set up — frontend + backend verified                         |
@@ -197,6 +197,16 @@ When `bias_level === "none"`, every surface must show "No significant bias detec
 
 **Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
 
+**Auth email:** Supabase Auth already sends through **custom SMTP wired to Resend**. Verified 2026-08-20 from the Resend sent log, not inferred from docs. Sender is `"NeutralEye" <contact@tryneutraleye.com>`; domain `tryneutraleye.com` is verified in `us-east-1` with **sending enabled and receiving disabled**, so never invite a reply in email copy because it lands nowhere anyone reads. Branded HTML for Confirm signup and Reset password lives in `supabase/email-templates/`. Those files are the source of truth, but they are applied by hand in the dashboard (Auth → Email Templates); no migration or MCP tool can push them. Only those two flows are in use: magic link, change email, and invite are not.
+
+**Email OTP expiry is 3600 seconds (1 hour)**, confirmed from the dashboard 2026-08-20. It covers both the signup confirmation link and the password recovery link, and both templates state the hour explicitly.
+
+**Two different email limits, do not conflate them:**
+- **Per address, 60 seconds** (`smtp_max_frequency`). Retrying signup inside that window returns 429 `over_email_send_rate_limit` carrying "For security purposes, you can only request this after 56 seconds." This is the limit `SIGNUP_RESEND_WAIT_MESSAGE` is worded for, which is why it says "about a minute".
+- **Per project, 30 emails per hour** (dashboard: Auth → Rate Limits). A ceiling across all addresses, independent of the 60s per-address interval.
+
+Neither is an SMTP-provider limit, so switching email provider moves neither one. An earlier assumption that leaving Supabase's built-in sender would relax these was wrong on both counts.
+
 **RLS:** Enabled on all three tables. `analyses`/`daily_usage` policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`) — migration SQL at `supabase/migrations/20260601000000_rls_policies.sql`. `waitlist` has **no** anon INSERT policy at all — inserts go only through `public.join_waitlist(p_email text)`, a `SECURITY DEFINER` function (validates email format, `ON CONFLICT DO NOTHING` for dedup) called via `supabase.rpc("join_waitlist", ...)` from `/api/waitlist/route.js`. This gives that one public, unauthenticated write path a privileged route without needing a service-role key — migration SQL at `supabase/migrations/20260727000000_waitlist_rls_tighten.sql`. (Fixed 2026-07-27: the previous `waitlist` INSERT policy was `WITH CHECK (true)`, letting any unauthenticated caller insert arbitrary rows directly — the weekly ops-check flagged it three times before this was closed.)
   - **Expected advisories, not regressions:** `get_advisors` (security) now shows `anon_security_definer_function_executable` and `authenticated_security_definer_function_executable` for `join_waitlist`. That's inherent to this pattern — a `SECURITY DEFINER` function callable by `anon`/`authenticated` is exactly the intended design for a public signup RPC without a service-role key — and does not need fixing. Don't let these two read as new problems in a weekly ops-check report. `rls_policy_always_true` on `waitlist` was the actual bug; if that specific one ever reappears, that's the one to investigate.
 
@@ -342,7 +352,7 @@ When building new UI, prefer extending existing components in `src/components/ui
 ## Roadmap
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
-- **Transactional email** — Resend is installed and used for the support form. Still needed: branded auth emails (signup confirm, password reset) from `contact@tryneutraleye.com`
+- **Transactional email** — Done except for one manual step. Auth email already sends from `contact@tryneutraleye.com` through Resend SMTP. Branded templates for signup confirm and password reset are written in `supabase/email-templates/` and just need pasting into the dashboard.
 - **Supabase Pro + Google OAuth restore** — Google "Continue with Google" was temporarily removed (2026-07-02) because the OAuth consent screen showed `*.supabase.co` instead of `tryneutraleye.com`, which looks unprofessional. To restore: (1) upgrade Supabase to Pro, (2) set custom auth domain `auth.tryneutraleye.com` in Supabase dashboard → update DNS CNAME in Cloudflare, (3) update Google Cloud Console redirect URI, (4) re-add `GoogleIcon` + Google button to `sign-in.tsx` `SignUpPage`, (5) re-add `handleGoogleAuth` + `onGoogleSignIn` prop in `login/page.js`, (6) restore `lh3.googleusercontent.com` to CSP `img-src` and `next.config.mjs` `remotePatterns`, (7) restore `isGoogleUser` avatar branch in `SiteHeader.js`.
 
 ## Infrastructure Status
@@ -356,7 +366,8 @@ When building new UI, prefer extending existing components in `src/components/ui
 | Sentry | ✅ Done |
 | OG / metadata URLs | ✅ Updated to `tryneutraleye.com` |
 | Sitemap | ✅ Updated to `tryneutraleye.com` |
-| Resend (support form) | ✅ Live |
+| Resend (support form + Auth SMTP) | ✅ Live |
+| Branded auth email templates | ⏸ Written, pending paste into Supabase dashboard |
 | Supabase Pro + custom auth domain | ⏸ Pending |
 | Stripe | ⏸ Paused |
 
