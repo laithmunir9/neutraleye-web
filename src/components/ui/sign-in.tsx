@@ -8,7 +8,7 @@ import { Eye, EyeOff, ArrowLeft, Mail } from 'lucide-react';
 
 const RESULT_STEPS = [
   { title: 'Bias direction',   detail: 'Moderate lean toward Senate leadership',       badge: 'Direction', time: '14:22:14' },
-  { title: 'Confidence score', detail: '0.74 — signals appeared consistently',         badge: '0.74',      time: '14:22:14' },
+  { title: 'Confidence score', detail: '0.74, signals appeared consistently',         badge: '0.74',      time: '14:22:14' },
   { title: 'Tone example',     detail: '"decisive step toward long-overdue…"',         badge: 'Language',  time: '14:22:14' },
   { title: 'Framing example',  detail: 'Selective emphasis on committee position',     badge: 'Framing',   time: '14:22:14' },
   { title: 'Source gap',       detail: 'Opposition given one sentence of four',        badge: 'Sourcing',  time: '14:22:14' },

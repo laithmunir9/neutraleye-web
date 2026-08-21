@@ -102,7 +102,7 @@ src/
     ConfidenceRing/         # Animated confidence score ring
     DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
-    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows "No significant bias detected"; Confidence shows "—" when no bias
+    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows "No significant bias detected"; Confidence shows "N/A" when no bias
     AnalyzerCta/            # CTA heading + button — no card/box background
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
@@ -173,12 +173,12 @@ src/
 
 ## No-Bias Result Consistency
 
-When `bias_level === "none"`, every surface must show "No significant bias detected" (not "No bias detected") and hide or dash out the confidence score:
+When `bias_level === "none"`, every surface must show "No significant bias detected" (not "No bias detected") and replace the confidence score with "N/A":
 - **Extension API** (`buildDirectionLabel`): returns `"No significant bias detected"` — not `"unknown"`
-- **HistoryTable**: `isNoBiasRecord()` checks for `"unknown"`, empty, or `"no significant bias"` — confidence shows "—"
-- **Analyze page**: confidence section shows `"--"` with a no-bias-specific message instead of the score/bar
+- **HistoryTable**: `isNoBiasRecord()` checks for `"unknown"`, empty, or `"no significant bias"` — confidence shows "N/A"
+- **Analyze page**: confidence section shows `"N/A"` with a no-bias-specific message instead of the score/bar
 - **ResultsHeader**: confidence ring and percentage are hidden entirely
-- **Compare page**: confidence shows "—" for no-bias items
+- **Compare page**: confidence shows "N/A" for no-bias items
 
 ---
 

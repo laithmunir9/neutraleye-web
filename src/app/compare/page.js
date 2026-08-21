@@ -165,12 +165,12 @@ export default function ComparePage() {
               <div className={styles.previewSelector}>
                 <div className={styles.previewSelect}>
                   <span className={styles.previewSelectLabel}>Left</span>
-                  <div className={styles.previewSelectBox}>Climate bill coverage — AP News</div>
+                  <div className={styles.previewSelectBox}>Climate bill coverage, AP News</div>
                 </div>
                 <div className={styles.previewDivider} aria-hidden="true">vs</div>
                 <div className={styles.previewSelect}>
                   <span className={styles.previewSelectLabel}>Right</span>
-                  <div className={styles.previewSelectBox}>Climate bill coverage — Fox News</div>
+                  <div className={styles.previewSelectBox}>Climate bill coverage, Fox News</div>
                 </div>
               </div>
               <div className={styles.previewSummaryRow}>
@@ -262,7 +262,7 @@ export default function ComparePage() {
                           <p className={styles.directionLine}>
                             <strong>{displayDirection(item)}</strong>
                           </p>
-                          <p className={styles.meta}>Confidence: {isNoBiasResult(item) ? "—" : `${Math.round((item.confidence || 0) * 100)}%`}</p>
+                          <p className={styles.meta}>Confidence: {isNoBiasResult(item) ? "N/A" : `${Math.round((item.confidence || 0) * 100)}%`}</p>
                           <p className={styles.summary}>{displaySummary(item)}</p>
                         </div>
                       ) : (

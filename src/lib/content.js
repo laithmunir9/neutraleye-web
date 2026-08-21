@@ -97,7 +97,7 @@ export const BLOG_POSTS = [
       {
         title: "Low confidence has more than one cause",
         paragraphs: [
-          "A low confidence score often gets misread as a good sign — as if the article passed inspection. But low confidence can mean several different things.",
+          "A low confidence score often gets misread as a good sign, as if the article passed inspection. But low confidence can mean several different things.",
           "It can mean the article is genuinely balanced and the signals genuinely cancel out. It can also mean the text was too short for a reliable read, the writing mixed tones inconsistently, or the article covered a fast-moving story where sourcing was necessarily thin.",
           "In those cases, low confidence is a flag for caution, not a clean bill of health. The right response is the same as with high confidence: read the evidence, check a second source, and decide what weight the analysis deserves given the context."
         ]
@@ -107,7 +107,7 @@ export const BLOG_POSTS = [
         paragraphs: [
           "The most useful way to read confidence is in combination with the direction label and the evidence section, not in isolation.",
           "A high-confidence left-leaning result with multiple quoted examples of loaded phrasing is a stronger finding than a high-confidence label with no supporting evidence. The confidence score compresses a lot of information into a single number. The examples and summary are where the reasoning lives.",
-          "Think of confidence as a volume dial, not a pass/fail gate. It tells you how strongly the signal was present. What you do with that signal is still a judgment call — and NeutralEye is designed to keep that judgment with the reader."
+          "Think of confidence as a volume dial, not a pass/fail gate. It tells you how strongly the signal was present. What you do with that signal is still a judgment call, and NeutralEye is designed to keep that judgment with the reader."
         ]
       }
     ]
@@ -133,9 +133,9 @@ export const BLOG_POSTS = [
       {
         title: "Attribution terms shape perceived credibility",
         paragraphs: [
-          "Equal time is not always equal treatment. The terms on which a source is introduced — their title, their affiliation, the length of their quote — all shape how seriously readers take what follows.",
+          "Equal time is not always equal treatment. The terms on which a source is introduced, including their title, their affiliation, and the length of their quote, all shape how seriously readers take what follows.",
           "A think tank researcher introduced with full institutional context reads differently from an unnamed official or an anonymous source. Both may be telling the truth. But the reader's ability to evaluate the claim is very different in each case.",
-          "NeutralEye flags attribution patterns partly because they reveal the implicit hierarchy of the story — whose voice carries authority, and whose carries doubt."
+          "NeutralEye flags attribution patterns partly because they reveal the implicit hierarchy of the story, showing whose voice carries authority, and whose carries doubt."
         ]
       },
       {

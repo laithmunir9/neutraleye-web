@@ -12,19 +12,19 @@ const SECTIONS = [
     questions: [
       {
         q: "What does 'Left-leaning,' 'Center,' or 'Right-leaning' mean?",
-        a: "The direction label describes the dominant pattern of signals found in that specific article — tone, framing, source selection, and omission — not a political judgment about the outlet, author, or subject matter. The same publication can receive different labels across different articles depending on how a story is assembled.",
+        a: "The direction label describes the dominant pattern of signals found in that specific article, covering tone, framing, source selection, and omission. It is not a political judgment about the outlet, author, or subject matter. The same publication can receive different labels across different articles depending on how a story is assembled.",
       },
       {
         q: "What is the confidence score (0.00–1.00)?",
-        a: "The confidence score reflects how clearly and consistently the directional signal appeared. A score of 0.85 means the signals were clear and repeated across the article. A score of 0.30 means signals were present but faint or mixed. Read it alongside the direction label — 0.70 on a Center result means something different from 0.70 on a Left-leaning result.",
+        a: "The confidence score reflects how clearly and consistently the directional signal appeared. A score of 0.85 means the signals were clear and repeated across the article. A score of 0.30 means signals were present but faint or mixed. Read it alongside the direction label, since 0.70 on a Center result means something different from 0.70 on a Left-leaning result.",
       },
       {
         q: "Can a left-leaning article still be accurate and well-reported?",
-        a: "Yes. Bias direction describes framing patterns, not factual accuracy. A well-reported article can still use language, sourcing, or emphasis that leans in one direction. NeutralEye is not a fact-checker — it analyzes how a story is constructed, not whether its claims are true.",
+        a: "Yes. Bias direction describes framing patterns, not factual accuracy. A well-reported article can still use language, sourcing, or emphasis that leans in one direction. NeutralEye is not a fact-checker. It analyzes how a story is constructed, not whether its claims are true.",
       },
       {
         q: "Why does the same outlet get different labels on different articles?",
-        a: "Because NeutralEye analyzes the text you submit, not the outlet's overall reputation. A wire report and an opinion column from the same publication can produce very different results. That's intentional — labeling by outlet would be a shortcut that ignores how individual stories are actually written.",
+        a: "Because NeutralEye analyzes the text you submit, not the outlet's overall reputation. A wire report and an opinion column from the same publication can produce very different results. That's intentional. Labeling by outlet would be a shortcut that ignores how individual stories are actually written.",
       },
     ],
   },
@@ -38,10 +38,10 @@ const SECTIONS = [
       },
       {
         q: "Does high confidence mean the article is dishonest or wrong?",
-        a: "No. A well-written opinion column can score high confidence because its rhetorical structure is deliberately consistent — that's not a flaw. High confidence means the pattern was clear, not that the article is manipulative. What matters is reading the direction, the score, and the evidence together.",
+        a: "No. A well-written opinion column can score high confidence because its rhetorical structure is deliberately consistent, and that's not a flaw. High confidence means the pattern was clear, not that the article is manipulative. What matters is reading the direction, the score, and the evidence together.",
       },
       {
-        q: "What does a low confidence score mean — did the article pass?",
+        q: "What does a low confidence score mean, and did the article pass?",
         a: "Not exactly. Low confidence can mean the article is genuinely balanced and signals cancel out. But it can also mean the text was too short, the writing was inconsistent, or the story was still developing when filed. A low score is a flag for caution, not a clean bill of health.",
       },
       {
@@ -56,7 +56,7 @@ const SECTIONS = [
     questions: [
       {
         q: "Is my article text stored when I run an analysis?",
-        a: "Article text submitted for analysis is processed to generate a result and is not permanently stored by default. Signed-in users can opt in to saving their analysis history — this stores the result and metadata, not the full article text.",
+        a: "Article text submitted for analysis is processed to generate a result and is not permanently stored by default. Signed-in users can opt in to saving their analysis history. This stores the result and metadata, not the full article text.",
       },
       {
         q: "What data does NeutralEye collect?",
@@ -64,7 +64,7 @@ const SECTIONS = [
       },
       {
         q: "Does the Chrome extension have access to everything I browse?",
-        a: "No. The extension only activates when you click the NeutralEye icon. It reads the current tab's content only at that moment — it does not run in the background, track your browsing, or access tabs you haven't explicitly submitted for analysis.",
+        a: "No. The extension only activates when you click the NeutralEye icon. It reads the current tab's content only at that moment. It does not run in the background, track your browsing, or access tabs you haven't explicitly submitted for analysis.",
       },
       {
         q: "Do you use my article text to train AI models?",
@@ -82,7 +82,7 @@ const SECTIONS = [
       },
       {
         q: "What does a Pro plan include?",
-        a: "Pro brings Compare Analyses — which lets you run two articles side by side and see where framing diverges. Cloud history synced across your devices is already included free when you sign in. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
+        a: "Pro brings Compare Analyses, which lets you run two articles side by side and see where framing diverges. Cloud history synced across your devices is already included free when you sign in. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
       },
       {
         q: "Does the extension have the same limits as the website?",
@@ -100,7 +100,7 @@ const SECTIONS = [
     questions: [
       {
         q: "How does NeutralEye determine bias direction?",
-        a: "It checks five signal families together in one pass: tone (emotional loading, verb choices), framing (what the article centers vs. backgrounds), attribution (who gets quoted and how), source balance (distribution and credibility of sources), and omission (context that's missing). The direction emerges from the pattern across all five — not any single signal in isolation.",
+        a: "It checks five signal families together in one pass: tone (emotional loading, verb choices), framing (what the article centers vs. backgrounds), attribution (who gets quoted and how), source balance (distribution and credibility of sources), and omission (context that's missing). The direction emerges from the pattern across all five, not any single signal in isolation.",
       },
       {
         q: "Can NeutralEye analyze any article or web page?",
@@ -108,11 +108,11 @@ const SECTIONS = [
       },
       {
         q: "How accurate is the analysis?",
-        a: "NeutralEye surfaces patterns — it doesn't claim certainty. Satire, irony, and unusual writing styles can resemble bias signals. The analysis should be treated as a structured second opinion that prompts closer reading, not as a definitive verdict. The evidence section exists precisely so you can check the reasoning yourself.",
+        a: "NeutralEye surfaces patterns. It doesn't claim certainty. Satire, irony, and unusual writing styles can resemble bias signals. The analysis should be treated as a structured second opinion that prompts closer reading, not as a definitive verdict. The evidence section exists precisely so you can check the reasoning yourself.",
       },
       {
         q: "Does NeutralEye work on paywalled articles?",
-        a: "For URL submissions, the system attempts to extract article text. Paywalled pages that block extraction will return an error. You can always paste the article text directly if you have access — that bypasses extraction entirely.",
+        a: "For URL submissions, the system attempts to extract article text. Paywalled pages that block extraction will return an error. You can always paste the article text directly if you have access, and that bypasses extraction entirely.",
       },
     ],
   },

@@ -200,7 +200,7 @@ export default function ExtensionPrivacyPage() {
           <article>
             <h2>Your Choices And Rights</h2>
             <ul>
-              <li>You choose when to run an analysis — the extension never collects data without your action.</li>
+              <li>You choose when to run an analysis, and the extension never collects data without your action.</li>
               <li>You can use the extension without signing in. No account is required.</li>
               <li>You can sign out at any time to remove your authentication tokens from the extension.</li>
               <li>You can uninstall the extension at any time to remove all locally stored data.</li>

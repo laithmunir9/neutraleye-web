@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "NeutralEye — See How an Article Frames the Story";
+export const alt = "See How an Article Frames the Story with NeutralEye";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

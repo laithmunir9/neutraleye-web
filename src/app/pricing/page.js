@@ -66,11 +66,11 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Everything in Free, plus:",
-  "Compare Analyses — side-by-side bias comparison",
+  "Compare Analyses, side-by-side bias comparison",
 ];
 
 export const metadata = {
-  title: "Pricing — NeutralEye",
+  title: "Pricing | NeutralEye",
   description: "Analyze any article for free with 10 analyses per day and cloud history. Pro brings Compare Analyses, coming soon.",
 };
 
@@ -82,7 +82,7 @@ export default function PricingPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>See how the story was built, not just what it says</h1>
           <p className={styles.subtitle}>
-            NeutralEye checks tone, framing, and sourcing on any article — and returns what it finds, with the evidence behind it.
+            NeutralEye checks tone, framing, and sourcing on any article, and returns what it finds, with the evidence behind it.
           </p>
         </div>
 

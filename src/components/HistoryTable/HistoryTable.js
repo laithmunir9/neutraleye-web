@@ -11,7 +11,7 @@ function domainOrTitle(record) {
     try { domain = new URL(record.url).hostname; } catch { domain = null; }
   }
   const title = record.title && record.title !== record.url ? record.title : null;
-  if (domain && title) return `${domain} — ${title}`;
+  if (domain && title) return `${domain}: ${title}`;
   if (title) return title;
   if (domain) return domain;
   return "Direct text input";
@@ -28,7 +28,7 @@ function directionLabel(record) {
 }
 
 function confidenceDisplay(record) {
-  if (isNoBiasRecord(record)) return "—";
+  if (isNoBiasRecord(record)) return "N/A";
   return `${Math.round((record.confidence || 0) * 100)}%`;
 }
 

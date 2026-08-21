@@ -24,7 +24,7 @@ const CONTEXT_ITEMS = [
   },
   {
     title: "Have a general question?",
-    body: "Check the FAQ first — most common questions about scores, confidence, and privacy are answered there.",
+    body: "Check the FAQ first, most common questions about scores, confidence, and privacy are answered there.",
   },
 ];
 
@@ -98,7 +98,7 @@ export default function SupportPage() {
               <p className={styles.contextLinksHeading}>Before you write</p>
               <Link href="/faq" className={styles.contextLink}>
                 <span className={styles.contextLinkArrow}>→</span>
-                FAQ — common questions answered
+                FAQ, common questions answered
               </Link>
               <Link href="/methodology" className={styles.contextLink}>
                 <span className={styles.contextLinkArrow}>→</span>
@@ -106,7 +106,7 @@ export default function SupportPage() {
               </Link>
               <Link href="/changelog" className={styles.contextLink}>
                 <span className={styles.contextLinkArrow}>→</span>
-                Changelog — known recent fixes
+                Changelog, known recent fixes
               </Link>
             </div>
 

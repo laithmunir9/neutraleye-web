@@ -20,7 +20,7 @@ const steps = [
   {
     number: "02",
     title: "Click the icon",
-    body: "Hit the NeutralEye icon in your browser toolbar. Analysis starts instantly — no copy-paste needed.",
+    body: "Hit the NeutralEye icon in your browser toolbar. Analysis starts instantly, no copy-paste needed.",
   },
   {
     number: "03",
@@ -33,7 +33,7 @@ const features = [
   {
     eyebrow: "Any site",
     title: "Works wherever you read",
-    body: "News sites, blogs, opinion columns, editorials — if it's an article in a browser tab, NeutralEye can read it.",
+    body: "News sites, blogs, opinion columns, editorials. If it's an article in a browser tab, NeutralEye can read it.",
   },
   {
     eyebrow: "Evidence",
@@ -43,12 +43,12 @@ const features = [
   {
     eyebrow: "Context",
     title: "Where to read next",
-    body: "Each analysis ends with publications covering the same story from a different vantage point — so you can compare across frames.",
+    body: "Each analysis ends with publications covering the same story from a different vantage point, so you can compare across frames.",
   },
   {
     eyebrow: "History",
     title: "Your analyses, saved",
-    body: "Signed-in users can revisit every article they've analyzed. Only articles you run through NeutralEye are saved — nothing else.",
+    body: "Signed-in users can revisit every article they've analyzed. Only articles you run through NeutralEye are saved, nothing else.",
   },
 ];
 
@@ -111,7 +111,7 @@ function ExtensionMockup() {
             </div>
             <div className={styles.mockupBody}>
               <p>
-                <strong>WASHINGTON</strong> — The Senate Finance Committee voted 12–9 Tuesday to advance a sweeping infrastructure package, as Republican critics warned the $420 billion measure lacked adequate fiscal safeguards and had not undergone sufficient review.
+                <strong>WASHINGTON</strong>. The Senate Finance Committee voted 12–9 Tuesday to advance a sweeping infrastructure package, as Republican critics warned the $420 billion measure lacked adequate fiscal safeguards and had not undergone sufficient review.
               </p>
               <p>
                 Committee Chair Eleanor Voss called the bill "a decisive step toward the long-overdue rebuilding of America's infrastructure," while opposition members characterized the vote as a rushed process that sidesteps serious scrutiny.
@@ -174,7 +174,7 @@ export default function ExtensionPage() {
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                   </svg>
-                  Add to Chrome — it's free
+                  Add to Chrome, it's free
                 </a>
                 <Link href="/analyze" className={styles.webLink}>
                   Try the web version instead
@@ -260,7 +260,7 @@ export default function ExtensionPage() {
                 </div>
                 <div>
                   <strong>Runs in seconds, right from the article</strong>
-                  <p>No copy-paste, no tab switching. Click the icon, get the result — without leaving what you're reading.</p>
+                  <p>No copy-paste, no tab switching. Click the icon, get the result, without leaving what you're reading.</p>
                 </div>
               </article>
             </div>
@@ -273,7 +273,7 @@ export default function ExtensionPage() {
             <h2>Start reading with a second opinion</h2>
             <p>One click on any article. No setup, no account needed to get started.</p>
             <a href={EXTENSION_URL} target="_blank" rel="noopener noreferrer" className={styles.ctaBtn}>
-              Add to Chrome — it's free
+              Add to Chrome, it's free
             </a>
             <p className={styles.ctaNote}>
               Prefer the browser?{" "}

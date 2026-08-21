@@ -289,7 +289,7 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
 
       <div className={styles.headerActions}>
         {showUpgradeCta && (
-          <Link href="/pricing" className={styles.upgradeCta}>Pro — Coming Soon</Link>
+          <Link href="/pricing" className={styles.upgradeCta}>Pro: Coming Soon</Link>
         )}
 
         {!loading && !user && (
@@ -394,7 +394,7 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
           <div className={styles.mobileDivider} />
 
           {showUpgradeCta && (
-            <Link href="/pricing" className={styles.mobileLink}>Pro — Coming Soon</Link>
+            <Link href="/pricing" className={styles.mobileLink}>Pro: Coming Soon</Link>
           )}
 
           {!loading && !user && (

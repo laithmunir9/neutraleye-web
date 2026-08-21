@@ -18,12 +18,12 @@ const principles = [
   {
     number: "02",
     title: "Separate confidence from truth",
-    body: "A high confidence score means the signals were consistent — not that the article was dishonest, or that we're certain about a political judgment. Confidence describes pattern strength. What you do with that pattern is still your call.",
+    body: "A high confidence score means the signals were consistent, not that the article was dishonest, or that we're certain about a political judgment. Confidence describes pattern strength. What you do with that pattern is still your call.",
   },
   {
     number: "03",
     title: "Keep the reader in control",
-    body: "NeutralEye is designed to be a prompt, not a verdict. It surfaces what it found. It suggests what to read next. The conclusion belongs to you — and we think that's exactly how it should be.",
+    body: "NeutralEye is designed to be a prompt, not a verdict. It surfaces what it found. It suggests what to read next. The conclusion belongs to you, and we think that's exactly how it should be.",
   },
 ];
 
@@ -44,19 +44,19 @@ export default function AboutPage() {
             <div className={styles.essayBody}>
               <p className={styles.dropcap}>
                 The problem isn't that biased reporting exists. It always has. The problem is that most of it
-                doesn't look like bias — it looks like news. The same event, covered by two outlets on the same
+                doesn't look like bias, it looks like news. The same event, covered by two outlets on the same
                 day, can leave readers with completely different understandings of what happened, who was
                 responsible, and what it means. Neither reader is lying to themselves. They just read different
                 versions of the same story.
               </p>
               <p>
-                We kept running into this. Reading an article and feeling like something was slightly off — a
+                We kept running into this. Reading an article and feeling like something was slightly off. A
                 phrase that loaded a bit too much weight, a source list that all pointed one way, a counterargument
                 that got one sentence while the main claim got six paragraphs. The signals were there. But
                 catching them consistently, while reading quickly, is genuinely hard.
               </p>
               <p>
-                So we built something to do it systematically — not to form opinions for readers, but to make the
+                So we built something to do it systematically, not to form opinions for readers, but to make the
                 structure of a story visible enough that they could form their own.
               </p>
             </div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
             <div className={styles.missionIntro}>
               <h2>What we believe</h2>
               <p>
-                Media literacy isn't about avoiding bias — it's about seeing it clearly enough
+                Media literacy isn't about avoiding bias. It's about seeing it clearly enough
                 to make your own judgment. NeutralEye is built on three commitments that shape
                 every design decision we make.
               </p>
@@ -106,9 +106,9 @@ export default function AboutPage() {
             <div className={styles.essayBody}>
               <h2 className={styles.essayHeading}>Why it matters now</h2>
               <p>
-                Trust in media has been falling for years. But the response to that — avoiding news
-                altogether, dismissing outlets wholesale, or only reading sources that already confirm
-                what you believe — trades one problem for three worse ones.
+                Trust in media has been falling for years. But the response to that is often to avoid news
+                altogether, dismiss outlets wholesale, or only read sources that already confirm
+                what you believe. That trades one problem for three worse ones.
               </p>
               <p>
                 We think the better response is to read more carefully, not less. To ask how a story
@@ -131,7 +131,7 @@ export default function AboutPage() {
                 </div>
                 <div className={styles.notItem}>
                   <span className={styles.notLabel}>Not a ratings agency</span>
-                  <p>We don't score outlets or maintain a list of "biased" publications. Every result is specific to the text submitted — the same outlet can read very differently across different articles.</p>
+                  <p>We don't score outlets or maintain a list of "biased" publications. Every result is specific to the text submitted, and the same outlet can read very differently across different articles.</p>
                 </div>
                 <div className={styles.notItem}>
                   <span className={styles.notLabel}>Not a substitute for judgment</span>

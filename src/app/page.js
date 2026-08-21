@@ -13,8 +13,8 @@ const EASE = [0.22, 1, 0.36, 1];
 
 const TRACE_STEPS = [
   { type: "setup",  title: "Article submitted",        badge: "URL",        desc: "thenationalstandard.com/politics/senate-vote",           time: "14:22:01" },
-  { type: "setup",  title: "Content extracted",        badge: "2,847 words", desc: "Article confirmed — news report",                        time: "14:22:02" },
-  { type: "signal", title: "Tone analyzed",            badge: "Signal",     desc: "Loaded phrasing detected — 2 instances",                  time: "14:22:04" },
+  { type: "setup",  title: "Content extracted",        badge: "2,847 words", desc: "Article confirmed, news report",                        time: "14:22:02" },
+  { type: "signal", title: "Tone analyzed",            badge: "Signal",     desc: "Loaded phrasing detected, 2 instances",                  time: "14:22:04" },
   { type: "signal", title: "Framing checked",          badge: "Signal",     desc: "Selective emphasis on committee position",                 time: "14:22:06" },
   { type: "signal", title: "Attribution reviewed",     badge: "Signal",     desc: "3 claims presented without clear sourcing",                time: "14:22:08" },
   { type: "signal", title: "Source balance checked",   badge: "Signal",     desc: "Single-perspective sourcing throughout",                   time: "14:22:10" },
@@ -25,23 +25,23 @@ const TRACE_STEPS = [
 const ANNOTATIONS = [
   {
     signal: "Tone",
-    body: "Loaded phrasing — “a decisive step toward long-overdue reform” frames the outcome as overdue progress before the policy itself is explained.",
+    body: "Loaded phrasing. “a decisive step toward long-overdue reform” frames the outcome as overdue progress before the policy itself is explained.",
   },
   {
     signal: "Framing",
-    body: "Selective emphasis — the procedural detail leads the story; the policy change itself is three paragraphs down.",
+    body: "Selective emphasis. The procedural detail leads the story; the policy change itself is three paragraphs down.",
   },
   {
     signal: "Attribution",
-    body: "Unnamed sourcing — “three committee aides” is the only attribution offered for a contested figure.",
+    body: "Unnamed sourcing. “three committee aides” is the only attribution offered for a contested figure.",
   },
   {
     signal: "Sources",
-    body: "One-sided sourcing — the opposing view gets one sentence out of five paragraphs.",
+    body: "One-sided sourcing. The opposing view gets one sentence out of five paragraphs.",
   },
   {
     signal: "Omission",
-    body: "Missing context — the CBO’s same-day cost estimate isn’t referenced anywhere in the piece.",
+    body: "Missing context. The CBO’s same-day cost estimate isn’t referenced anywhere in the piece.",
   },
 ];
 
@@ -126,7 +126,7 @@ export default function Home() {
               </motion.div>
               <motion.h1 variants={heroItem}>See how an article moves the reader</motion.h1>
               <motion.p className={styles.lead} variants={heroItem}>
-                Checks tone, framing, sourcing, and omission — with the evidence behind every call.
+                Checks tone, framing, sourcing, and omission, with the evidence behind every call.
               </motion.p>
             </div>
             <motion.div className={styles.actions} variants={heroItem}>
@@ -148,7 +148,7 @@ export default function Home() {
           <div className={styles.traceIntro}>
             <p className={styles.featureEyebrow}>The analysis</p>
             <h2>The same five checks, every article</h2>
-            <p>Tone, framing, attribution, source balance, and omission — reviewed together in a single pass. Every article gets the same sequence, and every result arrives with the specific evidence that produced it.</p>
+            <p>Tone, framing, attribution, source balance, and omission, reviewed together in a single pass. Every article gets the same sequence, and every result arrives with the specific evidence that produced it.</p>
           </div>
           <div className={styles.traceCard}>
             {TRACE_STEPS.map((step) => (
@@ -177,7 +177,7 @@ export default function Home() {
           <div className={styles.annotatedIntro}>
             <p className={styles.featureEyebrow}>How it reads</p>
             <h2>Read between the lines</h2>
-            <p>NeutralEye marks up an article the way a sharp editor would — five signals, found in context, each tied to the exact language that triggered it.</p>
+            <p>NeutralEye marks up an article the way a sharp editor would, using five signals, found in context, each tied to the exact language that triggered it.</p>
           </div>
 
           <div className={styles.spread}>
@@ -189,7 +189,7 @@ export default function Home() {
               <div className={styles.body}>
                 <p>
                   After months of stalled negotiations, the Senate Judiciary Committee voted 11–9 along
-                  party lines Tuesday to advance the border security package — what its sponsors called{" "}
+                  party lines Tuesday to advance the border security package, what its sponsors called{" "}
                   <Mark index={1} active={active} onActivate={setActive}>a decisive step toward long-overdue reform</Mark>{" "}
                   after years of inaction.
                 </p>

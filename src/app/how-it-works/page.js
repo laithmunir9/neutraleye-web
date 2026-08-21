@@ -17,7 +17,7 @@ const pipelineSteps = [
   {
     number: "01",
     title: "Submit",
-    body: "Paste article text or provide a URL. NeutralEye accepts both — URL submissions extract the article body automatically.",
+    body: "Paste article text or provide a URL. NeutralEye accepts both, and URL submissions extract the article body automatically.",
   },
   {
     number: "02",
@@ -27,7 +27,7 @@ const pipelineSteps = [
   {
     number: "03",
     title: "Analyze",
-    body: "Tone, framing, attribution, source balance, and omission are reviewed together in one pass — not as five independent checks.",
+    body: "Tone, framing, attribution, source balance, and omission are reviewed together in one pass, not as five independent checks.",
   },
   {
     number: "04",
@@ -37,18 +37,18 @@ const pipelineSteps = [
   {
     number: "05",
     title: "Return",
-    body: "The result comes back with a direction label, confidence score, quoted evidence, and sources to read alongside — everything needed to check the reasoning yourself.",
+    body: "The result comes back with a direction label, confidence score, quoted evidence, and sources to read alongside, everything needed to check the reasoning yourself.",
   },
 ];
 
 const principleCards = [
   {
     title: "One pipeline",
-    body: "Article intake, content extraction, signal review, and evidence packaging run as a single sequence — not independent steps stitched together.",
+    body: "Article intake, content extraction, signal review, and evidence packaging run as a single sequence, not independent steps stitched together.",
   },
   {
     title: "Structured output",
-    body: "Every result uses the same schema: direction, confidence, summary, examples, sources, and recommendations — making results comparable across runs.",
+    body: "Every result uses the same schema: direction, confidence, summary, examples, sources, and recommendations, making results comparable across runs.",
   },
   {
     title: "No black box",
@@ -101,7 +101,7 @@ function FeatureVisual({ visual }) {
             <div className={styles.confHeaderLabel}>Confidence report</div>
             <div className={styles.confDirectionBlock}>
               <span className={styles.confDirectionKey}>Direction</span>
-              <span className={styles.confDirectionVal}>Moderate bias — toward government sources</span>
+              <span className={styles.confDirectionVal}>Moderate bias, toward government sources</span>
             </div>
             <div className={styles.confScoreBlock}>
               <div className={styles.confScoreRow}>
@@ -217,7 +217,7 @@ export default function HowItWorksPage() {
             <div className={styles.heroCopy}>
               <h1>How NeutralEye Works</h1>
               <p className={styles.lead}>
-                Article text goes in. A structured bias analysis — direction, evidence, confidence, and next reads — comes out.
+                Article text goes in. A structured bias analysis comes out, with direction, evidence, confidence, and next reads.
               </p>
               <div className={styles.heroActions}>
                 <a className={styles.heroButton} href="/analyze">Open Analyzer</a>
@@ -259,7 +259,7 @@ export default function HowItWorksPage() {
             <div className={styles.featureCopy}>
               <span className={styles.featureEyebrow}>Processing</span>
               <h2>One pass, five signals</h2>
-              <p>Every article goes through tone, framing, attribution, source balance, and omission in a single sequence — not as independent checks stitched together. The output stays tied to what was actually in the text.</p>
+              <p>Every article goes through tone, framing, attribution, source balance, and omission in a single sequence, not as independent checks stitched together. The output stays tied to what was actually in the text.</p>
             </div>
             <FeatureVisual visual="pipeline" />
           </section>
@@ -271,7 +271,7 @@ export default function HowItWorksPage() {
             <div className={styles.featureCopy}>
               <span className={styles.featureEyebrow}>Output</span>
               <h2>Evidence exits with the result</h2>
-              <p>Every result includes the direction label, a confidence score, quoted examples of the signals that shaped it, and sources to read alongside — so the analysis is a starting point, not a final word.</p>
+              <p>Every result includes the direction label, a confidence score, quoted examples of the signals that shaped it, and sources to read alongside, so the analysis is a starting point, not a final word.</p>
             </div>
             <FeatureVisual visual="result" />
           </section>
@@ -283,7 +283,7 @@ export default function HowItWorksPage() {
             <div className={styles.featureCopy}>
               <span className={styles.featureEyebrow}>Confidence</span>
               <h2>A score, not just a label</h2>
-              <p>Every result includes a confidence score reflecting how consistently the detected signals appeared across the article. When evidence is sparse or ambiguous, the score drops — so you know when to read the analysis with more caution.</p>
+              <p>Every result includes a confidence score reflecting how consistently the detected signals appeared across the article. When evidence is sparse or ambiguous, the score drops, so you know when to read the analysis with more caution.</p>
             </div>
             <FeatureVisual visual="confidence" />
           </section>

@@ -80,7 +80,7 @@ export default function SettingsPage() {
               <div className={styles.row}>
                 <span>
                   <strong>Save analysis history</strong>
-                  <small>Only articles you run through NeutralEye are saved — nothing else. Disable to stop saving new analyses.</small>
+                  <small>Only articles you run through NeutralEye are saved, nothing else. Disable to stop saving new analyses.</small>
                 </span>
                 <Toggle
                   checked={settings.saveHistory}

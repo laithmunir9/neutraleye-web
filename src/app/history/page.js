@@ -141,12 +141,12 @@ export default function HistoryPage() {
           <>
             <section className={styles.stats}>
               <ResultCard title="Saved runs">
-                <p className={styles.metric}>{isLoading ? "—" : items.length}</p>
+                <p className={styles.metric}>{isLoading ? "…" : items.length}</p>
                 <p className={styles.support}>Analyses currently saved{user ? " to your account" : " in this browser"}.</p>
               </ResultCard>
               <ResultCard title="Latest activity">
                 <p className={styles.metricSmall}>
-                  {isLoading ? "—" : items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
+                  {isLoading ? "…" : items[0] ? new Date(items[0].createdAt).toLocaleString() : "No analyses yet"}
                 </p>
                 <p className={styles.support}>Most recent time an article was reviewed in this workspace.</p>
               </ResultCard>

@@ -115,7 +115,7 @@ function neutralSummaryText(result) {
 
 function formatConfidenceScore(value) {
   const confidence = Number(value);
-  if (!Number.isFinite(confidence)) return "--";
+  if (!Number.isFinite(confidence)) return "N/A";
   return confidence.toFixed(2);
 }
 
@@ -565,7 +565,7 @@ function AnalyzePageContent() {
                 <span>Analysis Confidence</span>
               </div>
               <div className={styles.confidenceScore}>
-                <strong>{hasAnalysis && !isNoBiasResult(result) ? formatConfidenceScore(result.confidence) : "--"}</strong>
+                <strong>{hasAnalysis && !isNoBiasResult(result) ? formatConfidenceScore(result.confidence) : "N/A"}</strong>
                 {hasAnalysis && !isNoBiasResult(result) ? (
                   <div className={styles.confBar}>
                     <div className={styles.confTrack}>

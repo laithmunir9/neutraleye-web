@@ -7,11 +7,11 @@ import { AuthProvider } from "@/lib/supabase/AuthProvider";
 
 export const metadata = {
   title: "NeutralEye | See How an Article Frames the Story",
-  description: "NeutralEye shows how an article frames a story — tone, sourcing, and omission — with quoted evidence and suggested sources to read next.",
+  description: "NeutralEye shows how an article frames a story, checking tone, sourcing, and omission, with quoted evidence and suggested sources to read next.",
   metadataBase: new URL("https://tryneutraleye.com"),
   openGraph: {
     title: "NeutralEye | See How an Article Frames the Story",
-    description: "NeutralEye shows how an article frames a story — tone, sourcing, and omission — with quoted evidence and suggested sources.",
+    description: "NeutralEye shows how an article frames a story, checking tone, sourcing, and omission, with quoted evidence and suggested sources.",
     url: "https://tryneutraleye.com",
     siteName: "NeutralEye",
     type: "website",
@@ -19,7 +19,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NeutralEye | See How an Article Frames the Story",
-    description: "NeutralEye shows how an article frames a story — tone, sourcing, and omission — in any article."
+    description: "NeutralEye shows how any article frames a story, checking tone, sourcing, and omission."
   },
   icons: {
     icon: "/neutraleye-logo-48.png",

@@ -14,7 +14,7 @@ const ENTRIES = [
     date: "June 2026",
     summary: "Compare Analyses, extension history sync, and UX improvements.",
     changes: [
-      { type: "New",      text: "Compare Analyses — submit two articles side-by-side and see where framing diverges (Pro)." },
+      { type: "New",      text: "Compare Analyses, submit two articles side-by-side and see where framing diverges (Pro)." },
       { type: "New",      text: "Extension now saves analyses to account history when signed in." },
       { type: "Improved", text: "Confidence score explanation added inline to every result." },
       { type: "Improved", text: "Source recommendations now automatically exclude the outlet being analyzed." },
@@ -30,7 +30,7 @@ const ENTRIES = [
     changes: [
       { type: "New",      text: "Chrome extension published to the Chrome Web Store." },
       { type: "New",      text: "Per-user daily quota (10/day) for authenticated extension users via Supabase." },
-      { type: "New",      text: "Extension supports URL submission — paste a link directly into the popup." },
+      { type: "New",      text: "Extension supports URL submission, paste a link directly into the popup." },
       { type: "Improved", text: "Analysis prompt restructured for cleaner signal separation across tone, framing, and omission." },
       { type: "Improved", text: "Extension popup result layout redesigned for faster scanning." },
       { type: "Fixed",    text: "Rate limiter not resetting correctly between days on the extension route." },
@@ -43,11 +43,11 @@ const ENTRIES = [
     summary: "Authentication, saved history, and mobile polish.",
     changes: [
       { type: "New",      text: "Email and Google OAuth authentication via Supabase." },
-      { type: "New",      text: "Analysis history saved per user — browse and revisit past results." },
+      { type: "New",      text: "Analysis history saved per user, browse and revisit past results." },
       { type: "New",      text: "Password reset flow with Supabase recovery email." },
       { type: "New",      text: "Settings page for account management." },
       { type: "Improved", text: "Mobile layout redesigned across all marketing and app pages." },
-      { type: "Improved", text: "Site header now theme-aware — flips to light text over dark hero sections." },
+      { type: "Improved", text: "Site header now theme-aware, flips to light text over dark hero sections." },
     ],
   },
   {
@@ -56,7 +56,7 @@ const ENTRIES = [
     date: "March 2026",
     summary: "URL mode, article extraction, and omission analysis.",
     changes: [
-      { type: "New",      text: "URL submission mode — paste a link and NeutralEye extracts the article automatically." },
+      { type: "New",      text: "URL submission mode, paste a link and NeutralEye extracts the article automatically." },
       { type: "New",      text: "Article extraction using Cheerio with source-domain exclusion for recommendations." },
       { type: "Improved", text: "Bias summary now includes an explicit omission analysis section." },
       { type: "Improved", text: "Examples section surfaces more specific quoted language rather than general observations." },
@@ -70,7 +70,7 @@ const ENTRIES = [
     date: "February 2026",
     summary: "Initial launch of the NeutralEye web analyzer.",
     changes: [
-      { type: "New", text: "Web analyzer — paste article text and receive a structured bias analysis." },
+      { type: "New", text: "Web analyzer, paste article text and receive a structured bias analysis." },
       { type: "New", text: "Direction label (Left-leaning, Center, Right-leaning) with 0–100 score." },
       { type: "New", text: "Confidence score reflecting signal consistency across the submitted text." },
       { type: "New", text: "Summary, examples of bias, sourcing analysis, and read-alongside recommendations." },
@@ -99,7 +99,7 @@ export default function ChangelogPage() {
               <p className={styles.eyebrow}>Product</p>
               <h1>Changelog</h1>
               <p className={styles.lead}>
-                Every update to NeutralEye — new features, improvements, and fixes —
+                Every update to NeutralEye, including new features, improvements, and fixes,
                 in the order they shipped.
               </p>
             </div>

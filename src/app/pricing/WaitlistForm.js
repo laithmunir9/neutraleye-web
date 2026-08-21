@@ -40,7 +40,7 @@ export default function WaitlistForm() {
     return (
       <div className={styles.success}>
         <span className={styles.successMark} aria-hidden="true">✓</span>
-        <span>You&apos;re on the list — we&apos;ll reach out when Pro launches.</span>
+        <span>You&apos;re on the list, we&apos;ll reach out when Pro launches.</span>
       </div>
     );
   }

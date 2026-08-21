@@ -14,7 +14,7 @@ const SCENES = [
     kicker: "Politics · Senate",
     headline: "Senate Committee Advances Border Security Package",
     segments: [
-      { text: "After months of stalled negotiations, the committee voted 11–9 to advance the package — what its sponsors called " },
+      { text: "After months of stalled negotiations, the committee voted 11–9 to advance the package, what its sponsors called " },
       { text: "a decisive step toward long-overdue reform", signal: 0 },
       { text: " after years of inaction in Washington." },
     ],
@@ -45,7 +45,7 @@ const SCENES = [
     segments: [
       { text: "Researchers identified " },
       { text: "a significant correlation", signal: 0 },
-      { text: " — though only " },
+      { text: ", though only " },
       { text: "three unnamed committee aides", signal: 1 },
       { text: " provided on-record comment. The CBO estimate went unmentioned." },
     ],
