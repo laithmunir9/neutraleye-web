@@ -386,9 +386,10 @@ src/lib/__tests__/ssrf.test.js
 src/lib/__tests__/analysis.test.js        # buildHumanResult, contentTypeFromAiJson
 src/lib/__tests__/promptContract.test.js  # pins load-bearing rules in the bias-analysis prompt (quote exclusion, content-type classification, minimum-impact threshold, JSON schema, response_format, source-domain exclusion)
 src/lib/__tests__/normalizeAiResult.test.js  # AI JSON -> response shape, no-bias case, malformed JSON fallback, driverLabelFromReason, scoreFromBiasLevel
+src/lib/__tests__/modelPins.test.js        # pins the OpenAI model IDs to the bare gpt-4o / gpt-4o-mini aliases — fails on a dated snapshot (gpt-4o-2024-05-13), a "-latest" rolling alias, or a "-preview" model
 src/app/analyze/__tests__/page.test.js
 ```
 
-`analysis.test.js`, `promptContract.test.js`, and `normalizeAiResult.test.js` run under `@jest-environment node` (not the default jsdom) — `analysis.js` imports `cheerio`, which only ships browser/ESM exports that jsdom's export-condition resolution can't `require()`.
+`analysis.test.js`, `promptContract.test.js`, `normalizeAiResult.test.js`, and `modelPins.test.js` run under `@jest-environment node` (not the default jsdom) — `analysis.js` imports `cheerio`, which only ships browser/ESM exports that jsdom's export-condition resolution can't `require()`.
 
 Run with `npm run test`, or `npm run verify` for the full typecheck + lint + test + build pass.
