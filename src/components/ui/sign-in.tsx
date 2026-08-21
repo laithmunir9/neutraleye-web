@@ -611,7 +611,9 @@ export const PasswordResetSentPage: React.FC<PasswordResetSentPageProps> = ({ em
           className="animate-element animate-delay-300 text-xs leading-relaxed px-3 py-2.5 rounded-lg"
           style={{ color: '#7b6a58', background: 'rgba(93,75,53,0.07)', border: '1px solid rgba(93,75,53,0.1)' }}
         >
-          Didn&apos;t receive it? Check your spam folder, or wait a moment and try again.
+          Didn&apos;t receive it? Check your spam folder first. If this address has no NeutralEye
+          account, no email is sent, so you may need to create one. Requesting another link takes
+          about a minute between tries.
         </p>
 
         <button
