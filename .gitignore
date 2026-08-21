@@ -49,3 +49,6 @@ next-env.d.ts
 !public/*.png
 !src/app/icon.png
 .DS_Store
+
+# claude code local machine-specific settings (shared config in .claude/ stays tracked)
+.claude/settings.local.json
