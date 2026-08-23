@@ -140,6 +140,7 @@ src/
 
 ### `POST /api/extension` — Extension bias analysis
 - Accepts `text` (plain), `url`, `headline` from extension popup
+- `headline` is prepended to the analyzed text via `composeAnalysisText()` (`src/lib/analysis.js`) — the extension's `content.js` extracts `<p>` only, so the headline never appears in `text`, whereas the web's `extractArticleTextFromUrl` pulls `h1,h2,h3,p,li` and already opens with the `<h1>`. Without this the extension analyzed articles blind to their headline. Applied only when the client sent `text` directly; the URL branch already has the `<h1>` and would otherwise double it.
 - Rate limit: 5 req/min per IP (env-configurable via `EXT_RATE_LIMIT_WINDOW_MS` / `EXT_RATE_LIMIT_MAX`) — backed by Upstash Redis (`ne:ext` key prefix), applies to ALL requests including authenticated
 - Daily cap (`DAILY_ANALYSIS_LIMIT`, default 10): authenticated users via `daily_usage` table; anonymous users per IP via Upstash rolling 24h window. Enforced server-side before any OpenAI call. Returned as HTTP 200 with a friendly `result` message (+ `code: "DAILY_LIMIT_REACHED"`, `limited: true`) so the currently shipped popup renders it correctly.
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works

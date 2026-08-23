@@ -24,6 +24,26 @@ export function cleanWhitespace(s) {
     .trim();
 }
 
+// A headline is one of the densest framing devices in a story, so it has to reach
+// the model. The web path gets this for free: extractArticleTextFromUrl pulls
+// h1,h2,h3,p,li, so the <h1> is already the first block of the extracted text.
+// The extension's content.js extracts <p> only, so its headline arrives as a
+// separate field and would otherwise be dropped before analysis. Prepending it
+// here makes both paths present the model with the same shape.
+export const MAX_HEADLINE_LENGTH = 300;
+
+export function composeAnalysisText(headline, text) {
+  const body = String(text || "");
+  const cleanHeadline = safeTrim(cleanWhitespace(headline), MAX_HEADLINE_LENGTH);
+  if (!cleanHeadline) return body;
+
+  // Don't double up if the headline is already the opening line — true for the web
+  // path today, and for the extension too if content.js ever starts including h1.
+  if (body.trimStart().toLowerCase().startsWith(cleanHeadline.toLowerCase())) return body;
+
+  return `${cleanHeadline}\n\n${body}`;
+}
+
 export function extractDomain(url) {
   try {
     return new URL(url).hostname.replace(/^www\./, "");

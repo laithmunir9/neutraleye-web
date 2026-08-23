@@ -10,6 +10,7 @@ import {
   extractArticleTextFromUrl,
   buildHumanResult,
   contentTypeFromAiJson,
+  composeAnalysisText,
 } from "@/lib/analysis";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
@@ -264,6 +265,12 @@ export async function POST(request) {
     }
 
     text = text.trim();
+
+    // Only for client-supplied text (the extension). In the URL branch above, text
+    // came from extractArticleTextFromUrl, which already opens with the <h1> —
+    // prepending there would duplicate the headline. hasText is captured before
+    // that branch reassigns text, so it still reflects what the client actually sent.
+    if (hasText) text = composeAnalysisText(headline, text);
 
     const cacheKey = hasUrl ? `url:${url}` : `text:${text.slice(0, 500)}`;
     if (!authUser && inMemoryCache.has(cacheKey)) {
