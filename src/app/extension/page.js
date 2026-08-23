@@ -136,7 +136,7 @@ function ExtensionMockup() {
           <div className={styles.extLabel}>Bias Level</div>
           <p className={styles.extBiasVerdict}>Moderate bias toward Senate leadership.</p>
 
-          <div className={styles.extLabel}>Summary of Bias</div>
+          <div className={styles.extLabel}>Summary</div>
           <p className={styles.extSummaryText}>
             The article consistently frames the committee vote as a decisive success, amplifying the chair's language while relegating opposition concerns to brief, criticism-only soundbites without substantive counterweight.
           </p>

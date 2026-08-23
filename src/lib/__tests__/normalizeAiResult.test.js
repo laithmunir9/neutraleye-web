@@ -31,7 +31,7 @@ describe("parseAiResponse + normalizeAiResult", () => {
     const normalized = normalizeAiResult(parseAiResponse(aiResponse));
 
     expect(normalized.contentType).toBe("news");
-    expect(normalized.directionLabel).toBe("Moderate bias against the senator");
+    expect(normalized.directionLabel).toBe("Moderate framing against the senator");
     expect(normalized.score).toBeCloseTo(-0.52);
     expect(normalized.confidence).toBeCloseTo(0.68);
     expect(normalized.drivers).toEqual(expect.arrayContaining(["Loaded wording", "Source imbalance"]));
@@ -56,7 +56,7 @@ describe("parseAiResponse + normalizeAiResult", () => {
     const normalized = normalizeAiResult(parseAiResponse(aiResponse));
 
     expect(normalized.score).toBe(0);
-    expect(normalized.directionLabel).toBe("No significant bias detected");
+    expect(normalized.directionLabel).toBe("No significant framing detected");
     expect(normalized.examples).toEqual([]);
   });
 
@@ -79,7 +79,7 @@ describe("parseAiResponse + normalizeAiResult", () => {
     });
 
     const normalized = normalizeAiResult(parseAiResponse(aiResponse));
-    expect(normalized.directionLabel).toBe("Uncertain bias (non-directional)");
+    expect(normalized.directionLabel).toBe("Unclear framing (non-directional)");
     expect(normalized.score).toBe(0);
   });
 });
@@ -97,7 +97,7 @@ describe("driverLabelFromReason", () => {
   });
 
   test("falls back to a generic label when empty", () => {
-    expect(driverLabelFromReason("")).toBe("Bias signal");
+    expect(driverLabelFromReason("")).toBe("Framing signal");
   });
 });
 

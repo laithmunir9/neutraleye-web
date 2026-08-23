@@ -38,7 +38,7 @@ describe("buildHumanResult", () => {
       summary: "should not appear",
       biased_phrases: [{ quote: "x", why: "framing" }],
     });
-    expect(result).toBe("✅ No significant bias detected. Please feel free to continue reading.");
+    expect(result).toBe("✅ No significant framing detected. Please feel free to continue reading.");
   });
 
   it("assembles bias level, direction, and summary sections", () => {
@@ -48,14 +48,14 @@ describe("buildHumanResult", () => {
       summary: "The piece frames the mayor unfavorably.",
       analysis_confidence: 0.72,
     });
-    expect(result).toContain("**Bias Level**\nModerate bias against the mayor.");
-    expect(result).toContain("**Summary of Bias**\nThe piece frames the mayor unfavorably.");
+    expect(result).toContain("**Framing**\nModerate framing against the mayor.");
+    expect(result).toContain("**Summary**\nThe piece frames the mayor unfavorably.");
     expect(result).toContain("**Analysis Confidence**\n0.72");
   });
 
   it("omits direction text when direction is 'unknown'", () => {
     const result = buildHumanResult({ bias_level: "slight", direction: "unknown" });
-    expect(result).toContain("Slight bias.");
+    expect(result).toContain("Slight framing.");
     expect(result).not.toContain("unknown");
   });
 
@@ -72,7 +72,7 @@ describe("buildHumanResult", () => {
       bias_level: "heavy",
       biased_phrases: [{ quote: "the reckless plan", why: "language" }],
     });
-    expect(result).toContain('**Examples of Bias**\n- "the reckless plan" — language');
+    expect(result).toContain('**Examples**\n- "the reckless plan" — language');
   });
 
   it("renders suggested_sources with title, outlet, and url", () => {
@@ -80,7 +80,7 @@ describe("buildHumanResult", () => {
       bias_level: "slight",
       suggested_sources: [{ title: "Some Article", outlet: "Outlet", url: "https://example.com/a" }],
     });
-    expect(result).toContain("**Suggested Unbiased Sources**\n- Some Article — Outlet — https://example.com/a");
+    expect(result).toContain("**Other Coverage**\n- Some Article — Outlet — https://example.com/a");
   });
 
   it("renders recommendations as a bullet list", () => {

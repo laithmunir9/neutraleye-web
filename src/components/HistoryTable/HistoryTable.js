@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./HistoryTable.module.css";
+import { isNoBiasRecord, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 function domainOrTitle(record) {
   let domain = null;
@@ -17,13 +18,8 @@ function domainOrTitle(record) {
   return "Direct text input";
 }
 
-function isNoBiasRecord(record) {
-  const d = String(record.directionLabel || record.direction || "").toLowerCase();
-  return !d || d === "unknown" || d.includes("no significant bias");
-}
-
 function directionLabel(record) {
-  if (isNoBiasRecord(record)) return "No significant bias detected";
+  if (isNoBiasRecord(record)) return NO_BIAS_LABEL;
   return record.directionLabel || record.direction;
 }
 

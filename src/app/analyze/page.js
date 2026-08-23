@@ -13,15 +13,16 @@ import { resolveAnalysis } from "@/lib/supabase/analyses";
 import { useAuth } from "@/lib/supabase/AuthProvider";
 import { useAnalysisLimit } from "@/lib/supabase/useAnalysisLimit";
 import styles from "./page.module.css";
+import { isNoBiasRecord, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 const STAGES = ["Reading", "Checking framing", "Reviewing tone", "Writing analysis"];
 const SETTINGS_KEY = "neutraleye.settings.v1";
-const DEFAULT_SUMMARY = "A focused summary of the detected bias will appear here after analysis.";
+const DEFAULT_SUMMARY = "A focused summary of the detected framing will appear here after analysis.";
 const NEUTRAL_SUMMARY_TEMPLATE =
-  "This read stayed below the threshold for a meaningful bias flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as biased.";
+  "This read stayed below the threshold for a meaningful framing flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as slanted.";
 const NEUTRAL_NOTE_ITEMS = [
   "No strong directional pattern repeated across wording, framing, and attribution.",
-  "Visible signals stayed below the threshold required for a meaningful bias flag.",
+  "Visible signals stayed below the threshold required for a meaningful framing flag.",
   "This result reflects the current text only and is not a guarantee that every relevant context is present."
 ];
 const CONTENT_TYPE_LABELS = {
@@ -60,11 +61,9 @@ function isHistorySavingEnabled() {
   }
 }
 
-function isNoBiasResult(result) {
-  const label = String(result?.directionLabel || result?.direction || "").toLowerCase();
-
-  return label.includes("no significant bias") || label === "neutral";
-}
+// Keyed off the model's enum in requestMeta; the display label is a fallback for
+// pre-rename records only. Never match on display copy.
+const isNoBiasResult = (result) => isNoBiasRecord(result);
 
 function contentTypeLabel(result, hasAnalysis) {
   if (!hasAnalysis) return "";
@@ -73,7 +72,7 @@ function contentTypeLabel(result, hasAnalysis) {
 
 function resultTitle(result, hasAnalysis) {
   if (!hasAnalysis) return "Ready to analyze";
-  if (isNoBiasResult(result)) return "No significant bias detected.";
+  if (isNoBiasResult(result)) return `${NO_BIAS_LABEL}.`;
   return result.directionLabel || result.direction;
 }
 
@@ -97,8 +96,8 @@ function neutralNoteItems(result) {
   if (!customDrivers.length) return NEUTRAL_NOTE_ITEMS;
 
   return [
-    `No strong bias signal repeated consistently across ${customDrivers.slice(0, 3).join(", ").toLowerCase()}.`,
-    "Visible signals stayed below the threshold required for a meaningful bias flag.",
+    `No strong framing signal repeated consistently across ${customDrivers.slice(0, 3).join(", ").toLowerCase()}.`,
+    "Visible signals stayed below the threshold required for a meaningful framing flag.",
     "This result reflects the current text only and is not a guarantee that every relevant context is present."
   ];
 }
@@ -110,7 +109,7 @@ function neutralSummaryText(result) {
 
   if (!drivers.length) return NEUTRAL_SUMMARY_TEMPLATE;
 
-  return `This read stayed below the threshold for a meaningful bias flag. The review did not find a repeated bias signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
+  return `This read stayed below the threshold for a meaningful framing flag. The review did not find a repeated framing signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
 }
 
 function formatConfidenceScore(value) {
@@ -334,7 +333,7 @@ function AnalyzePageContent() {
 
       if (status === 503 || code === "AI_DISABLED") {
         title = "Analysis unavailable";
-        message = "Failed to check bias. Please try again later.";
+        message = "Failed to analyze framing. Please try again later.";
       }
 
       if (code === "VALIDATION_ERROR") {
@@ -371,12 +370,12 @@ function AnalyzePageContent() {
 
       if (code === "TIMEOUT") {
         title = "Analysis timed out";
-        message = "Failed to check bias. Please try again later.";
+        message = "Failed to analyze framing. Please try again later.";
       }
 
       if (code === "NETWORK_ERROR") {
         title = "Analysis unavailable";
-        message = "Failed to check bias. Please try again later.";
+        message = "Failed to analyze framing. Please try again later.";
       }
 
       if (mode === "url") {
@@ -463,7 +462,7 @@ function AnalyzePageContent() {
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
-                <span>Summary of Bias</span>
+                <span>Summary</span>
               </div>
               <p className={`${styles.bodyText} ${!hasAnalysis ? styles.placeholderText : ""}`}>
                 {summaryText(result, hasAnalysis)}
@@ -485,7 +484,7 @@ function AnalyzePageContent() {
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
-                <span>Examples of Bias</span>
+                <span>Examples</span>
               </div>
               {result.examples.length ? (
                 <div className={styles.examplesList}>
@@ -502,7 +501,7 @@ function AnalyzePageContent() {
               ) : (
                 <p className={`${styles.bodyText} ${styles.placeholderText}`}>
                   {hasAnalysis && isNoBiasResult(result)
-                    ? "No strong language or framing examples crossed the threshold for a meaningful bias flag in this pass."
+                    ? "No strong language or framing examples crossed the threshold for a meaningful framing flag in this pass."
                     : "Quoted language and framing examples will appear here."}
                 </p>
               )}
@@ -510,7 +509,7 @@ function AnalyzePageContent() {
 
             <section className={styles.outputCard}>
               <div className={styles.sectionHeader}>
-                <span>Suggested Unbiased Sources</span>
+                <span>Other Coverage</span>
               </div>
               {result.sources.length ? (
                 <ul className={styles.simpleList}>

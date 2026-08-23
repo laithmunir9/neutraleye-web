@@ -1,14 +1,14 @@
 import ConfidenceRing from "../ConfidenceRing/ConfidenceRing";
 import DriverChips from "../DriverChips/DriverChips";
 import styles from "./ResultsHeader.module.css";
-
-function isNoBias(direction) {
-  const d = String(direction || "").toLowerCase();
-  return !d || d.includes("no significant bias") || d === "neutral";
-}
+import { isNoBiasRecord } from "@/lib/biasLevel";
 
 export default function ResultsHeader({ direction, confidence, drivers }) {
-  const noBias = isNoBias(direction);
+  // This component receives only a display string, so it necessarily takes the
+  // legacy label path inside isNoBiasRecord rather than the enum path. Sharing
+  // the helper still removes the duplicated matcher; it does not give this
+  // surface enum coverage. Pass a record here if it is ever wired up.
+  const noBias = isNoBiasRecord({ directionLabel: direction });
   return (
     <section className={styles.card}>
       <div className={styles.top}>

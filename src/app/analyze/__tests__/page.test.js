@@ -92,11 +92,11 @@ describe("AnalyzePage – NETWORK_ERROR", () => {
       expect(screen.getByText("Moderate framing signal")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Summary of Bias")).toBeInTheDocument();
+    expect(screen.getByText("Summary")).toBeInTheDocument();
     expect(screen.getByText(/repeated selective emphasis/i)).toBeInTheDocument();
-    expect(screen.getByText("Examples of Bias")).toBeInTheDocument();
+    expect(screen.getByText("Examples")).toBeInTheDocument();
     expect(screen.getByText(/reckless and chaotic/i)).toBeInTheDocument();
-    expect(screen.getByText("Suggested Unbiased Sources")).toBeInTheDocument();
+    expect(screen.getByText("Other Coverage")).toBeInTheDocument();
     expect(screen.getByText("Associated Press")).toBeInTheDocument();
     expect(screen.getByText("Recommendations")).toBeInTheDocument();
     expect(screen.getByText("Compare with wire-service reporting.")).toBeInTheDocument();
@@ -133,11 +133,11 @@ describe("AnalyzePage – NETWORK_ERROR", () => {
     await user.click(screen.getByRole("button", { name: "Analyze" }));
 
     await waitFor(() => {
-      expect(screen.getAllByText("No significant bias detected.").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("No significant framing detected.").length).toBeGreaterThan(0);
     });
 
     expect(screen.getByText("Please feel free to continue reading.")).toBeInTheDocument();
-    expect(screen.getByText(/stayed below the threshold for a meaningful bias flag/i)).toBeInTheDocument();
+    expect(screen.getByText(/stayed below the threshold for a meaningful framing flag/i)).toBeInTheDocument();
     expect(screen.getByText("Why this was judged low-bias")).toBeInTheDocument();
     expect(screen.getByText(/visible signals stayed below the threshold/i)).toBeInTheDocument();
     expect(screen.getByText(/no strong language or framing examples crossed the threshold/i)).toBeInTheDocument();
@@ -202,7 +202,7 @@ describe("AnalyzePage – NETWORK_ERROR", () => {
     const alert = screen.getByRole("alert");
 
     expect(alert).toHaveTextContent("Analysis unavailable");
-    expect(alert).toHaveTextContent("Failed to check bias. Please try again later.");
+    expect(alert).toHaveTextContent("Failed to analyze framing. Please try again later.");
     expect(alert).not.toHaveTextContent("NETWORK_ERROR");
     expect(alert).not.toHaveTextContent("NEXT_PUBLIC");
   });

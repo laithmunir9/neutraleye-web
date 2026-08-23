@@ -13,6 +13,7 @@ import {
   composeAnalysisText,
 } from "@/lib/analysis";
 import { analysisMetaFields } from "@/lib/analysisMeta";
+import { isNoBiasLevel, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -74,11 +75,11 @@ function buildDirectionLabel(parsedJson) {
   const biasLevel = String(parsedJson?.bias_level || "").trim().toLowerCase();
   const direction = String(parsedJson?.direction || "").trim();
   const nd = direction.toLowerCase();
-  if (biasLevel === "none") return "No significant bias detected";
+  if (isNoBiasLevel(biasLevel)) return NO_BIAS_LABEL;
   if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown") return direction || "unknown";
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  if (biasLevel && direction) return `${cap(biasLevel)} bias ${direction}`;
-  if (biasLevel) return `${cap(biasLevel)} bias detected`;
+  if (biasLevel && direction) return `${cap(biasLevel)} framing ${direction}`;
+  if (biasLevel) return `${cap(biasLevel)} framing detected`;
   return direction || "unknown";
 }
 
@@ -321,6 +322,6 @@ export async function POST(request) {
       message: String(error?.message || error),
     });
     reportToSentry(error, errorCode);
-    return Response.json({ error: "Error checking bias.", code: "INTERNAL_ERROR" }, { status: 500, headers });
+    return Response.json({ error: "Error analyzing framing.", code: "INTERNAL_ERROR" }, { status: 500, headers });
   }
 }

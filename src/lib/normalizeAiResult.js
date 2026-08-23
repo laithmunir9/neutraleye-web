@@ -1,4 +1,5 @@
 import { buildHumanResult, contentTypeFromAiJson } from "./analysis";
+import { isNoBiasLevel, textLooksNoBias, NO_BIAS_LABEL, NO_BIAS_RESULT_TEXT } from "./biasLevel";
 
 // AI-response → website result-shape normalization, shared home so it can be
 // unit-tested (Next.js route files may only export HTTP handlers).
@@ -10,8 +11,7 @@ export function standardizeOutput(rawText) {
   text = text.replace(/\(\s*(?:start_char|end_char)[^)]+\)/gi, "");
   text = text.replace(/\|\s*null/gi, "");
   text = text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").replace(/[ \t]{2,}/g, " ").trim();
-  if (text.toLowerCase().includes("no significant bias detected"))
-    return "✅ No significant bias detected. Please feel free to continue reading.";
+  if (textLooksNoBias(text)) return NO_BIAS_RESULT_TEXT;
   return text;
 }
 
@@ -22,7 +22,7 @@ function listFromBlock(text) {
 function sectionValue(markdown, heading, fallbackHeading) {
   const titles = [heading, fallbackHeading].filter(Boolean).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   if (!titles.length) return "";
-  const allHeadings = ["Bias Level","Direction","Summary of Bias","Summary","Examples of Bias","Examples","Suggested Unbiased Sources","Suggested unbiased sources","Recommendations","Recommendations to look up","Analysis Confidence","Confidence level"].map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const allHeadings = ["Framing","Bias Level","Direction","Summary","Summary of Bias","Examples","Examples of Bias","Other Coverage","Suggested Unbiased Sources","Recommendations","Recommendations to look up","Analysis Confidence","Confidence level"].map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const pattern = new RegExp(`(?:^|\\s)\\*\\*(?:${titles.join("|")})\\*\\*\\s*([\\s\\S]*?)(?=(?:\\s|\\n)\\*\\*(?:${allHeadings.join("|")})\\*\\*|$)`, "i");
   const match = String(markdown || "").match(pattern);
   return match ? match[1].trim() : "";
@@ -31,13 +31,13 @@ function sectionValue(markdown, heading, fallbackHeading) {
 export function parseHumanReadableSections(humanText) {
   const human = String(humanText || "").trim();
   if (!human) return { directionLabel: "", summary: "", examples: [], sources: [], recommendations: [], confidence: null };
-  const directionLabel = sectionValue(human, "Bias Level", "Direction");
-  const summary = sectionValue(human, "Summary of Bias", "Summary");
-  const examples = listFromBlock(sectionValue(human, "Examples of Bias", "Examples"))
+  const directionLabel = sectionValue(human, "Framing", "Bias Level");
+  const summary = sectionValue(human, "Summary", "Summary of Bias");
+  const examples = listFromBlock(sectionValue(human, "Examples", "Examples of Bias"))
     .map((item) => item.replace(/\s*\(start_char:\s*[^)]*\)/gi, "").trim())
     .filter(Boolean)
-    .map((quote) => ({ quote, label: "Bias signal", explanation: "Model-detected bias signal.", highlights: [] }));
-  const sources = listFromBlock(sectionValue(human, "Suggested Unbiased Sources", "Suggested unbiased sources"))
+    .map((quote) => ({ quote, label: "Framing signal", explanation: "Model-detected framing signal.", highlights: [] }));
+  const sources = listFromBlock(sectionValue(human, "Other Coverage", "Suggested Unbiased Sources"))
     .filter((item) => !/^no verified specific urls available/i.test(item))
     .map((item) => {
       const urlMatch = item.match(/https?:\/\/\S+/i);
@@ -68,7 +68,7 @@ export function driverLabelFromReason(reason) {
   // AI sometimes returns descriptive labels (e.g. "LOADED PHRASING") — title-case them
   const raw = String(reason || "").trim();
   if (raw) return raw.split(/[\s_-]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
-  return "Bias signal";
+  return "Framing signal";
 }
 
 export function explanationFromReason(reason) {
@@ -77,7 +77,7 @@ export function explanationFromReason(reason) {
   if (n === "framing") return "Selective emphasis or omission changes the reader's interpretation.";
   if (n === "source") return "The sourcing appears one-sided or lacks meaningful counterbalance.";
   if (n === "attribution") return "Claims are presented with weak attribution or unclear sourcing.";
-  return "Model-detected bias signal.";
+  return "Model-detected framing signal.";
 }
 
 export function scoreFromBiasLevel(biasLevel, direction) {
@@ -94,12 +94,12 @@ export function directionLabelFromAiJson(aiJson, humanText) {
   const biasLevel = String(aiJson?.bias_level || "").trim().toLowerCase();
   const direction = String(aiJson?.direction || "").trim();
   const nd = direction.toLowerCase();
-  if (biasLevel === "none" || String(humanText || "").toLowerCase().includes("no significant bias detected"))
-    return "No significant bias detected";
+  if (isNoBiasLevel(biasLevel) || textLooksNoBias(humanText))
+    return NO_BIAS_LABEL;
   if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown")
-    return "Uncertain bias (non-directional)";
-  if (biasLevel && direction) return `${titleCase(biasLevel)} bias ${direction}`;
-  if (biasLevel) return `${titleCase(biasLevel)} bias detected`;
+    return "Unclear framing (non-directional)";
+  if (biasLevel && direction) return `${titleCase(biasLevel)} framing ${direction}`;
+  if (biasLevel) return `${titleCase(biasLevel)} framing detected`;
   return "Analysis complete";
 }
 
@@ -137,7 +137,7 @@ export function normalizeAiResult(parsed) {
   const confidence = Number.isFinite(confidenceValue)
     ? Math.max(0, Math.min(confidenceValue > 1 ? confidenceValue / 100 : confidenceValue, 1))
     : humanSections.confidence !== null ? humanSections.confidence
-    : human.toLowerCase().includes("no significant bias detected") ? 0.65
+    : textLooksNoBias(human) ? 0.65
     : 0.5;
   const directionLabel = aiJson ? directionLabelFromAiJson(aiJson, human) : humanSections.directionLabel || directionLabelFromAiJson(aiJson, human);
   return {

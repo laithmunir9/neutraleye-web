@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { logEvent, reportToSentry } from "./apiLog";
 import { assertUrlIsSafe, MAX_REDIRECTS } from "./ssrf";
+import { isNoBiasLevel, NO_BIAS_RESULT_TEXT } from "./biasLevel";
 
 // Shared analysis pipeline used by both /api/analyze and /api/extension.
 // This is the single home of the article-detection and bias-analysis prompts —
@@ -317,21 +318,21 @@ export function buildHumanResult(json) {
   const sources = Array.isArray(json.suggested_sources) ? json.suggested_sources : [];
   const recs = Array.isArray(json.recommendations) ? json.recommendations : [];
 
-  if (biasLevel === "none") {
-    return "✅ No significant bias detected. Please feel free to continue reading.";
+  if (isNoBiasLevel(biasLevel)) {
+    return NO_BIAS_RESULT_TEXT;
   }
 
   const parts = [];
-  const levelLabel = biasLevel ? `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} bias` : "Bias detected";
+  const levelLabel = biasLevel ? `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} framing` : "Framing detected";
   const directionText = direction && direction !== "unknown" ? ` ${direction}` : "";
-  parts.push(`**Bias Level**\n${levelLabel}${directionText}.`);
+  parts.push(`**Framing**\n${levelLabel}${directionText}.`);
 
-  if (summary) parts.push(`**Summary of Bias**\n${summary}`);
+  if (summary) parts.push(`**Summary**\n${summary}`);
   if (explanation && explanation !== summary) parts.push(explanation);
 
   if (phrases.length) {
     const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n");
-    parts.push(`**Examples of Bias**\n${exLines}`);
+    parts.push(`**Examples**\n${exLines}`);
   }
 
   if (sources.length) {
@@ -341,7 +342,7 @@ export function buildHumanResult(json) {
       const outlet = String(s.outlet || "").trim();
       return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
     }).join("\n");
-    parts.push(`**Suggested Unbiased Sources**\n${srcLines}`);
+    parts.push(`**Other Coverage**\n${srcLines}`);
   }
 
   if (recs.length) parts.push(`**Recommendations**\n${recs.map((r) => `- ${r}`).join("\n")}`);

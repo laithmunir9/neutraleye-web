@@ -44,14 +44,15 @@ function listFromBlock(text) {
 function sectionValue(markdown, heading, fallbackHeading) {
   const titles = [heading, fallbackHeading].filter(Boolean).map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const knownHeadings = [
+    "Framing",
     "Bias Level",
     "Direction",
-    "Summary of Bias",
     "Summary",
-    "Examples of Bias",
+    "Summary of Bias",
     "Examples",
+    "Examples of Bias",
+    "Other Coverage",
     "Suggested Unbiased Sources",
-    "Suggested unbiased sources",
     "Recommendations",
     "Recommendations to look up",
     "Analysis Confidence",
@@ -69,14 +70,14 @@ function parseLegacyMarkdown(raw) {
   const markdown = String(raw || "").trim();
   if (!markdown) return {};
 
-  const direction = sectionValue(markdown, "Bias Level", "Direction");
-  const summary = sectionValue(markdown, "Summary of Bias", "Summary");
-  const examples = listFromBlock(sectionValue(markdown, "Examples of Bias", "Examples")).map((item) => ({
+  const direction = sectionValue(markdown, "Framing", "Bias Level");
+  const summary = sectionValue(markdown, "Summary", "Summary of Bias");
+  const examples = listFromBlock(sectionValue(markdown, "Examples", "Examples of Bias")).map((item) => ({
     quote: item,
-    label: "Bias signal",
+    label: "Framing signal",
     explanation: "Legacy response item."
   }));
-  const sources = listFromBlock(sectionValue(markdown, "Suggested Unbiased Sources", "Suggested unbiased sources"))
+  const sources = listFromBlock(sectionValue(markdown, "Other Coverage", "Suggested Unbiased Sources"))
     .filter((item) => !/^no verified specific urls available/i.test(item));
   const recommendations = listFromBlock(sectionValue(markdown, "Recommendations", "Recommendations to look up"));
 
@@ -146,7 +147,7 @@ function firstTextBlock(markdown) {
 function compactSummaryFromMixedResult(markdown) {
   const text = String(markdown || "").trim();
   if (!text) return "";
-  const fromSection = sectionValue(text, "Summary of Bias", "Summary");
+  const fromSection = sectionValue(text, "Summary", "Summary of Bias");
   if (fromSection) return fromSection;
 
   return text
