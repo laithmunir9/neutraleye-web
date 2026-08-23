@@ -1,4 +1,5 @@
 import { normalizeConfidence, normalizeScore, scoreToDirection } from "./score.js";
+import { analysisMetaFields } from "./analysisMeta.js";
 
 const IS_DEV = process.env.NODE_ENV !== "production";
 
@@ -216,7 +217,8 @@ function normalizeResponse(data, inputType, requestMeta = {}) {
       requestStartedAt: requestTimestamp,
       requestCompletedAt: createdAt,
       status: Number(requestMeta.status || 200),
-      endpoint: String(requestMeta.endpoint || "")
+      endpoint: String(requestMeta.endpoint || ""),
+      ...analysisMetaFields(raw.json)
     }
   };
 

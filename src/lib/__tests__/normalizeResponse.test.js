@@ -68,3 +68,49 @@ describe("normalizeResponse", () => {
     expect(normalized.confidence).toBe(0.75);
   });
 });
+
+describe("normalizeResponse measurement fields", () => {
+  beforeEach(() => {
+    jest.resetModules();
+    process.env.NEXT_PUBLIC_NEUTRALEYE_API_URL = "http://localhost:8000";
+  });
+
+  test("carries biasLevel and contentType into requestMeta for the Supabase save", () => {
+    const { normalizeResponse } = require("@/lib/api");
+    const normalized = normalizeResponse(
+      { summary: "x", json: { bias_level: "moderate", content_type: "opinion" } },
+      "text",
+      {}
+    );
+    expect(normalized.requestMeta.biasLevel).toBe("moderate");
+    expect(normalized.requestMeta.contentType).toBe("opinion");
+  });
+
+  test("records null rather than \"news\" when the AI JSON is absent", () => {
+    const { normalizeResponse } = require("@/lib/api");
+    const normalized = normalizeResponse({ summary: "x" }, "text", {});
+    expect(normalized.requestMeta.biasLevel).toBeNull();
+    expect(normalized.requestMeta.contentType).toBeNull();
+    expect(normalized.requestMeta.contentType).not.toBe("news");
+  });
+
+  test("does not disturb the existing requestMeta fields", () => {
+    const { normalizeResponse } = require("@/lib/api");
+    const normalized = normalizeResponse(
+      { summary: "x", json: { bias_level: "none", content_type: "news" } },
+      "text",
+      { requestId: "abc", status: 200, endpoint: "/api/analyze" }
+    );
+    expect(normalized.requestMeta.requestId).toBe("abc");
+    expect(normalized.requestMeta.status).toBe(200);
+    expect(normalized.requestMeta.endpoint).toBe("/api/analyze");
+    expect(normalized.requestMeta.biasLevel).toBe("none");
+  });
+
+  test("the displayed contentType still coerces to news, unlike the logged one", () => {
+    const { normalizeResponse } = require("@/lib/api");
+    const normalized = normalizeResponse({ summary: "x", json: {} }, "text", {});
+    expect(normalized.contentType).toBe("news");      // display: coerced
+    expect(normalized.requestMeta.contentType).toBeNull(); // measurement: raw
+  });
+});

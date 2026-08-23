@@ -12,6 +12,7 @@ import {
   contentTypeFromAiJson,
   composeAnalysisText,
 } from "@/lib/analysis";
+import { analysisMetaFields } from "@/lib/analysisMeta";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -100,7 +101,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     examples: (parsedJson.biased_phrases || []).map((p) => ({ quote: p.quote, why: p.why })),
     sources: parsedJson.suggested_sources || [],
     recommendations: parsedJson.recommendations || [],
-    request_meta: { source: "extension" },
+    request_meta: { source: "extension", ...analysisMetaFields(parsedJson) },
   });
   if (error) {
     logEvent("error", "save.analysis.error", { userId, message: error.message, code: error.code });
