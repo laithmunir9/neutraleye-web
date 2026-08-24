@@ -98,7 +98,6 @@ src/
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
     ResultCard/             # Bias result display card
-    ResultsHeader/          # Results page header
     ConfidenceRing/         # Animated confidence score ring
     DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
@@ -174,12 +173,14 @@ src/
 
 ## No-Bias Result Consistency
 
-When `bias_level === "none"`, every surface must show "No significant bias detected" (not "No bias detected") and replace the confidence score with "N/A":
-- **Extension API** (`buildDirectionLabel`): returns `"No significant bias detected"` — not `"unknown"`
-- **HistoryTable**: `isNoBiasRecord()` checks for `"unknown"`, empty, or `"no significant bias"` — confidence shows "N/A"
+When the model returns `bias_level === "none"`, every surface must show `NO_BIAS_LABEL` ("No significant framing detected") and replace the confidence score with "N/A".
+
+**Never decide this by matching display copy.** `src/lib/biasLevel.js` is the single source of truth: `isNoBiasRecord()` keys off the `bias_level` enum stored in `request_meta`, and consults a label only for pre-rename rows that have no enum. All display strings live in that module too, so a copy change can never break the check.
+
+- **Extension API** (`buildDirectionLabel`): returns `NO_BIAS_LABEL` — not `"unknown"`
+- **HistoryTable**: uses the shared `isNoBiasRecord()`; confidence shows "N/A"
 - **Analyze page**: confidence section shows `"N/A"` with a no-bias-specific message instead of the score/bar
-- **ResultsHeader**: confidence ring and percentage are hidden entirely
-- **Compare page**: confidence shows "N/A" for no-bias items
+- **Compare page**: uses the shared `isNoBiasRecord()`; confidence shows "N/A" for no-bias items
 
 ---
 

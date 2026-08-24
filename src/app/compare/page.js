@@ -10,6 +10,7 @@ import { useProAccess } from "@/lib/supabase/useProAccess";
 import { normalizeResponse } from "@/lib/api";
 import { listAnalyses } from "@/lib/storage";
 import styles from "./page.module.css";
+import { isNoBiasRecord, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 const LOCK_ICON = (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -26,7 +27,7 @@ function ProGate({ user }) {
         <span className={styles.gateBadge}>Coming Soon</span>
         <h2 className={styles.gateTitle}>Compare Analyses</h2>
         <p className={styles.gateDesc}>
-          Side-by-side bias comparison is a Pro feature launching soon. Join the waitlist to be notified.
+          Side-by-side framing comparison is a Pro feature launching soon. Join the waitlist to be notified.
         </p>
         <Link href="/pricing" className={styles.gateBtn}>Join the Waitlist</Link>
         {!user && (
@@ -66,14 +67,13 @@ function confidencePercent(item) {
   return Math.round((item?.confidence || 0) * 100);
 }
 
-function isNoBiasResult(item) {
-  const label = String(item?.directionLabel || item?.direction || "").toLowerCase();
-  return label.includes("no significant bias") || label === "neutral";
-}
+// Keyed off the model's enum in requestMeta; the display label is a fallback for
+// pre-rename records only. Never match on display copy.
+const isNoBiasResult = (item) => isNoBiasRecord(item);
 
 function displayDirection(item) {
   if (!item) return "";
-  if (isNoBiasResult(item)) return "No significant bias detected.";
+  if (isNoBiasResult(item)) return `${NO_BIAS_LABEL}.`;
   return item.directionLabel || item.direction || "Analysis result";
 }
 
@@ -91,10 +91,10 @@ function neutralSummaryText(item) {
     : [];
 
   if (!drivers.length) {
-    return "This read stayed below the threshold for a meaningful bias flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as biased.";
+    return "This read stayed below the threshold for a meaningful framing flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as slanted.";
   }
 
-  return `This read stayed below the threshold for a meaningful bias flag. The review did not find a repeated bias signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
+  return `This read stayed below the threshold for a meaningful framing flag. The review did not find a repeated framing signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
 }
 
 function displaySummary(item) {
@@ -127,14 +127,14 @@ function comparisonSummary(leftItem, rightItem) {
   }
 
   if (isNoBiasResult(leftItem) && !isNoBiasResult(rightItem)) {
-    return `The left analysis did not find a significant bias signal, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and bias signals.`;
+    return `The left analysis did not find a significant framing signal, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and framing signals.`;
   }
 
   if (!isNoBiasResult(leftItem) && isNoBiasResult(rightItem)) {
-    return `The left analysis reads as ${leftDirection}, while the right analysis did not find a significant bias signal. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and bias signals.`;
+    return `The left analysis reads as ${leftDirection}, while the right analysis did not find a significant framing signal. ${confidenceLine} The main difference is how strongly each result flags directional framing, emphasis, and framing signals.`;
   }
 
-  return `The left analysis reads as ${leftDirection}, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how each result frames the article's tone, emphasis, and bias signals.`;
+  return `The left analysis reads as ${leftDirection}, while the right analysis reads as ${rightDirection}. ${confidenceLine} The main difference is how each result frames the article's tone, emphasis, and framing signals.`;
 }
 
 export default function ComparePage() {
