@@ -101,7 +101,7 @@ src/
     ConfidenceRing/         # Animated confidence score ring
     DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
-    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows "No significant bias detected"; Confidence shows "N/A" when no bias
+    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows `NO_BIAS_LABEL`; Confidence shows "N/A" when no bias
     AnalyzerCta/            # CTA heading + button — no card/box background
     HeroSystemVisualization/ # Animated graph on home hero
     ui/                     # shadcn/ui + custom animated components
@@ -145,7 +145,7 @@ src/
 - Auth: `Authorization: Bearer <token>` — resolves user, passes token through to Supabase client so RLS works
 - Returns `{ result: "<markdown>", saved: boolean, tokenExpired: boolean }` — `tokenExpired: true` signals the extension to clear its stored token and force re-login
 - Authenticated requests always bypass the in-memory cache so the Supabase save always runs
-- Saves to `analyses` with `request_meta: { source: "extension" }` and `direction_label` built as `"${TitleCase(bias_level)} bias ${direction}"`
+- Saves to `analyses` with `request_meta: { source: "extension", biasLevel, contentType }` and `direction_label` built as `"${TitleCase(bias_level)} framing ${direction}"` (see Measurement fields below)
 - CORS: accepts any `chrome-extension://` origin — the extension ID differs between unpacked and published builds; rate limiting already guards the endpoint
 - Source domain exclusion: same as `/api/analyze` — url is passed through to exclude the source outlet from suggestions
 
@@ -191,6 +191,10 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 **Tables:**
 - `analyses` — user analysis history (`id`, `user_id`, `created_at`, `input_type`, `url`, `title`, `direction`, `direction_label`, `confidence`, `score`, `summary`, `drivers`, `examples`, `sources`, `recommendations`, `request_meta`)
   - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. HistoryTable reads this to show source badges and hide the Inspect button for extension rows.
+  - **Measurement fields — `biasLevel` and `contentType`.** Every save also records the model's raw `bias_level` and `content_type` enums, via `analysisMetaFields()` in `src/lib/analysisMeta.js`. Both paths use that one helper so the key names stay identical and a single query covers both: the extension route spreads it into `request_meta` server-side; the web path carries it through `normalizeResponse` in `src/lib/api.js` (the web save is client-side, and `analysisToRow` has no column for either field, so `request_meta` is the only way they persist).
+    - **Deliberately not normalized.** `contentTypeFromAiJson` (`analysis.js`) and `normalizeContentType` (`api.js`) both coerce anything unrecognized to `"news"` — correct for display, fatal here, since a missing value would become indistinguishable from the model actually saying "news". Absent logs as `null`. `analysisMeta.test.js` pins this; do not "simplify" it by reusing those normalizers.
+    - Rows saved before 2026-08-25 have neither key and come back `null`. Exclude them (`where request_meta->>'biasLevel' is not null`) rather than letting them read as a category.
+    - Live since 2026-08-25, verified end-to-end on both paths. Purpose: establish whether the high `bias_level: "none"` rate is real, and which of the prompt's five one-directional suppression rules causes it, **before** any prompt rule is changed. For `none` rows, `content_type` plus the already-persisted `confidence` narrows it: `opinion`/`analysis` → content-type relaxation; `news` + confidence < 0.4 → weak-or-ambiguous clause; `news` + confidence >= 0.4 → minimum-impact threshold, by elimination. Quote exclusion stays invisible — it shrinks the evidence pool silently and surfaces as one of the others.
   - `examples` stores `[{ quote, label, explanation, highlights }]` for website saves; `[{ quote, why }]` for extension saves.
 - `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
 - `waitlist` — Pro-launch email waitlist (`id`, `email` unique, `created_at`). No `user_id` — signups are anonymous, from the Pro waitlist form on `/pricing` (`WaitlistForm.js` → `POST /api/waitlist`).
