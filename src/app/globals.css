@@ -92,6 +92,20 @@
   --brand-foreground: 34 37% 39%;
 }
 
+/* Scoped palette for the /for-comms route. Additive only: nothing above is changed. */
+.for-comms {
+  --fc-bg: #FFFFFF;
+  --fc-surface: #F4F5F5;
+  --fc-border: #DFE2E2;
+  --fc-border-input: #7F8890;
+  --fc-heading: #0D0F10;
+  --fc-body: #3B4245;
+  --fc-muted: #667074;
+  --fc-accent: #0E5A5E;
+  --fc-accent-dark: #0B484B;
+  --fc-tint: #E5F0F0;
+}
+
 * {
   box-sizing: border-box;
 }

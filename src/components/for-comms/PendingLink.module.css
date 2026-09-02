@@ -1,0 +1,21 @@
+.link {
+  color: var(--fc-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+  border-radius: 2px;
+}
+
+.link:hover {
+  color: var(--fc-accent-dark);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.pending {
+  color: var(--fc-muted);
+}
