@@ -3,7 +3,7 @@
   margin-left: 0.4em;
   padding: 0.1em 0.4em;
   border: 1px dashed var(--fc-border-input);
-  border-radius: 3px;
+  border-radius: 2px;
   background: var(--fc-bg);
   color: var(--fc-muted);
   font-family: var(--font-mono);

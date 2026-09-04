@@ -1,7 +1,10 @@
 import NeedsUrlMarker from "./NeedsUrlMarker";
 import styles from "./BookACall.module.css";
 
-const LABEL = "Book a call";
+// "Get a demo" is vendor language and there is no product to demo; this is a
+// service. "Book a meeting" says nothing about what happens. A walkthrough is
+// literally what the page offers: bring a story, we go through what it finds.
+const LABEL = "Book a demo";
 
 /**
  * The single call to action on this page. Renders as a non-interactive

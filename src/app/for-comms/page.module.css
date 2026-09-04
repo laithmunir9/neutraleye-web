@@ -16,15 +16,6 @@
   margin-top: 1.5rem;
 }
 
-.eyebrow {
-  margin: 0 0 1.25rem;
-  color: var(--fc-muted);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.11em;
-  line-height: 1.5;
-}
-
 .h1 {
   margin: 0 0 1.25rem;
   font-family: var(--font-display);
@@ -37,7 +28,7 @@
 }
 
 .h2 {
-  margin: 0 0 1rem;
+  margin: 0 0 1.5rem;
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 400;
@@ -62,7 +53,7 @@
 }
 
 .muted {
-  margin: 1.25rem 0 0;
+  margin: 2.5rem 0 0;
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--fc-muted);
@@ -115,7 +106,7 @@
 }
 
 .metaSep {
-  color: var(--fc-border-input);
+  color: var(--fc-muted);
 }
 
 .cardAction {
@@ -128,23 +119,31 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.75rem;
-  margin: 0;
+  margin: 2.5rem 0 0;
   padding: 0;
   list-style: none;
+}
+
+/* Matches the matrix breakout so the three definitions read as its legend
+   and get enough column width to set properly. */
+.wide {
+  --fc-wide: min(62rem, calc(100vw - 2.5rem));
+
+  margin-inline: calc((100% - var(--fc-wide)) / 2);
 }
 
 .column {
   margin: 0;
 }
 
+/* A key for the matrix above, so each label is set exactly as its own cells
+   are. Sentence case on purpose: the cells read "Omitted", so the legend has
+   to as well or it stops being a key. */
 .columnLabel {
-  margin: 0 0 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.09em;
+  margin: 0 0 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
   line-height: 1.5;
-  text-transform: uppercase;
-  color: var(--fc-heading);
 }
 
 .columnBody {
@@ -157,7 +156,7 @@
 /* Outlet list. Plain lines, no scores, badges or colour coding. */
 
 .outlets {
-  margin: 1.5rem 0 0;
+  margin: 2.5rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -208,5 +207,9 @@
   .columns {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
+  }
+
+  .wide {
+    --fc-wide: calc(100vw - 2.5rem);
   }
 }

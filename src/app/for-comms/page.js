@@ -1,14 +1,23 @@
 import Annotation from "@/components/for-comms/Annotation";
 import BookACall from "@/components/for-comms/BookACall";
+import CoverageMatrix from "@/components/for-comms/CoverageMatrix";
+import matrix from "@/components/for-comms/CoverageMatrix.module.css";
 import ForCommsFooter from "@/components/for-comms/ForCommsFooter";
 import ForCommsHeader from "@/components/for-comms/ForCommsHeader";
 import PendingLink from "@/components/for-comms/PendingLink";
 import styles from "./page.module.css";
 
-// Not set yet. While these are null the page renders a visible NEEDS URL
-// marker in place of each link, rather than a placeholder destination.
-export const ARTICLE_URL = null;
-export const ARCHIVE_URL = null;
+// The 24/7 Wall St piece the worked example is drawn from, plus a Wayback
+// snapshot taken 8 August 2026. Both figures quoted below were confirmed
+// present in the snapshot, so the example still checks out if the live
+// article is later edited.
+export const ARTICLE_URL =
+  "https://247wallst.com/investing/2026/08/07/honeywell-aerospace-tumbles-on-disappointing-debut-report-but-bull-case-remains-intact/";
+export const ARCHIVE_URL =
+  "https://web.archive.org/web/20260808084259/https://247wallst.com/investing/2026/08/07/honeywell-aerospace-tumbles-on-disappointing-debut-report-but-bull-case-remains-intact/";
+
+// Still not set. While this is null the page renders a visible NEEDS URL
+// marker in place of the booking link, rather than a placeholder destination.
 export const CALENDLY_URL = null;
 
 export default function ForCommsPage() {
@@ -18,9 +27,6 @@ export default function ForCommsPage() {
 
       <main className={styles.main}>
         <section className={styles.hero}>
-          <p className={styles.eyebrow}>
-            FOR COMMUNICATIONS AND INVESTOR RELATIONS TEAMS
-          </p>
           <h1 className={styles.h1}>
             See how one story was covered across every outlet that covered it.
           </h1>
@@ -61,21 +67,28 @@ export default function ForCommsPage() {
 
         <section className={styles.section}>
           <h2 className={styles.h2}>What you get back</h2>
-          <ul className={styles.columns}>
+          <CoverageMatrix />
+          <ul className={`${styles.columns} ${styles.wide}`}>
             <li className={styles.column}>
-              <h3 className={styles.columnLabel}>Reported</h3>
+              <h3 className={styles.columnLabel}>
+                <span className={`${matrix.state} ${matrix.reported}`}>Reported</span>
+              </h3>
               <p className={styles.columnBody}>
                 A matrix of the claims each outlet made, laid out side by side.
               </p>
             </li>
             <li className={styles.column}>
-              <h3 className={styles.columnLabel}>Omitted</h3>
+              <h3 className={styles.columnLabel}>
+                <span className={`${matrix.state} ${matrix.omitted}`}>Omitted</span>
+              </h3>
               <p className={styles.columnBody}>
                 What appeared in some outlets and not in others.
               </p>
             </li>
             <li className={styles.column}>
-              <h3 className={styles.columnLabel}>Contradicted</h3>
+              <h3 className={styles.columnLabel}>
+                <span className={`${matrix.state} ${matrix.contradicted}`}>Contradicted</span>
+              </h3>
               <p className={styles.columnBody}>
                 Where an outlet's own text does not support its own summary.
               </p>

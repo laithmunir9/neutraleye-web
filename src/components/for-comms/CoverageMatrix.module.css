@@ -1,0 +1,148 @@
+/* The matrix is the one element on this page allowed to break the 38rem
+   measure. Prose stays in the measure; the evidence gets the width it needs.
+   The 2.5rem allowance keeps the breakout clear of a vertical scrollbar so
+   100vw can never push the document sideways. */
+.figure {
+  --fc-wide: min(62rem, calc(100vw - 2.5rem));
+
+  margin: 2.5rem 0 0;
+  /* Percentage margins resolve against the real container width, so this
+     self-corrects once the viewport is narrower than the measure. Deriving
+     it from --fc-measure instead collapsed the table on small screens. */
+  margin-inline: calc((100% - var(--fc-wide)) / 2);
+}
+
+.scroller {
+  overflow-x: auto;
+  border: 1px solid var(--fc-border);
+  border-radius: 4px;
+  background: var(--fc-bg);
+}
+
+/* The global focus ring is a warm brown left over from the site palette.
+   Restate it here in this route's accent. */
+.scroller:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  /* Below this the claim column stops being readable and the region scrolls. */
+  min-width: 46rem;
+}
+
+.claimHead,
+.outletHead {
+  padding: 0.85rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fc-heading);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--fc-border);
+  background: var(--fc-surface);
+}
+
+.outletHead {
+  text-align: center;
+}
+
+.claimHead {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 17rem;
+  white-space: normal;
+}
+
+.claim {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 17rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--fc-body);
+  text-align: left;
+  background: var(--fc-bg);
+  /* Stands in for the right border, which sticky positioning would clip. */
+  box-shadow: inset -1px 0 0 var(--fc-border);
+}
+
+.cell {
+  padding: 0.85rem 1rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table tbody tr + tr .claim,
+.table tbody tr + tr .cell {
+  border-top: 1px solid var(--fc-border);
+}
+
+/* Four states, one hue, escalating ink. */
+.state {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.reported {
+  color: var(--fc-muted);
+}
+
+.omitted {
+  background: var(--fc-tint);
+  color: var(--fc-accent-dark);
+  font-weight: 500;
+}
+
+.contradicted {
+  background: var(--fc-accent);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.absent {
+  color: var(--fc-muted);
+}
+
+.caption {
+  margin: 0.85rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--fc-muted);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 34rem) {
+  .figure {
+    --fc-wide: calc(100vw - 2.5rem);
+  }
+
+  .claimHead,
+  .claim {
+    min-width: 13rem;
+  }
+}
