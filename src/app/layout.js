@@ -1,24 +1,17 @@
 import "./globals.css";
-import { Newsreader, Public_Sans } from "next/font/google";
+import { Source_Serif_4 } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 
-/* Newsreader is drawn for reading news, which is the subject; it also replaces
-   "Iowan Old Style", a macOS-only system font that silently fell back to
-   Palatino or Georgia everywhere else. Public Sans is a civic, neutral text
-   face, chosen over Geist because Geist is the default of every Next.js
-   project. Both load through next/font, so no dependency was added. */
-const display = Newsreader({
+/* One family throughout, per the approved homepage design: Source Serif 4 sets
+   the headings, the body, and the small tracked labels. It replaces a Newsreader
+   and Public Sans pairing, and before that "Iowan Old Style", a macOS-only
+   system font that silently fell back to Palatino or Georgia everywhere else. */
+const serif = Source_Serif_4({
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500"],
+  weight: ["300", "400", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-newsreader",
-});
-
-const sans = Public_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-public-sans",
+  variable: "--font-source-serif",
 });
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -52,9 +45,9 @@ export default function RootLayout({ children }) {
       lang="en"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${display.variable} ${sans.variable} ${GeistMono.variable}`}
+      className={`${serif.variable} ${GeistMono.variable}`}
     >
-      <body className={sans.className}>
+      <body className={serif.className}>
         <AuthProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </AuthProvider>
