@@ -331,6 +331,13 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 - **Animations:** Framer Motion
 - **Fonts:** Geist Sans (body), Geist Mono (code/data), serif display via CSS variable
 - **Theming:** Dark/light mode via `next-themes` + `ThemeProvider`
+- **Uppercase tracked labels — permitted in one place only.** They are allowed as
+  *structural* labels inside evidence and data layouts, where they name a part of a table,
+  chart, or annotation: a matrix column head, a chart's axis or series name, the signal
+  label on an interlinear note, the source line above a quoted article. They are **not**
+  permitted as decorative eyebrows above section headings, which is what they were removed
+  from across the site. If you cannot tell which category a label falls into, it is
+  decorative and it goes.
 - **Consistency:** Visual style must match the NeutralEye browser extension
 
 When building new UI, prefer extending existing components in `src/components/ui/` before creating new ones.

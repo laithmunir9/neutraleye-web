@@ -1,3 +1,5 @@
+export const BOOKING_URL = "https://cal.com/laith-munir/demo-with-neutraleye";
+
 export const EXTENSION_URL =
   "https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe";
 

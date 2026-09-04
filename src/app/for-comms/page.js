@@ -5,6 +5,7 @@ import matrix from "@/components/for-comms/CoverageMatrix.module.css";
 import ForCommsFooter from "@/components/for-comms/ForCommsFooter";
 import ForCommsHeader from "@/components/for-comms/ForCommsHeader";
 import PendingLink from "@/components/for-comms/PendingLink";
+import { BOOKING_URL } from "@/lib/content";
 import styles from "./page.module.css";
 
 // The 24/7 Wall St piece the worked example is drawn from, plus a Wayback
@@ -16,14 +17,12 @@ export const ARTICLE_URL =
 export const ARCHIVE_URL =
   "https://web.archive.org/web/20260808084259/https://247wallst.com/investing/2026/08/07/honeywell-aerospace-tumbles-on-disappointing-debut-report-but-bull-case-remains-intact/";
 
-// Still not set. While this is null the page renders a visible NEEDS URL
-// marker in place of the booking link, rather than a placeholder destination.
-export const CALENDLY_URL = null;
+
 
 export default function ForCommsPage() {
   return (
     <>
-      <ForCommsHeader calendarUrl={CALENDLY_URL} />
+      <ForCommsHeader calendarUrl={BOOKING_URL} />
 
       <main className={styles.main}>
         <section className={styles.hero}>
@@ -159,7 +158,7 @@ export default function ForCommsPage() {
               and we will go through what it finds.
             </p>
             <div className={styles.cardAction}>
-              <BookACall href={CALENDLY_URL} size="large" />
+              <BookACall href={BOOKING_URL} size="large" />
             </div>
           </div>
         </section>

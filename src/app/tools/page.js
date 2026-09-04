@@ -1,6 +1,6 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import { EXTENSION_URL } from "@/lib/content";
+import { EXTENSION_URL, BOOKING_URL } from "@/lib/content";
 import styles from "../marketing.module.css";
 
 export const metadata = {
@@ -104,7 +104,9 @@ export default function ToolsPage() {
             finds.
           </p>
           <div className={styles.actions}>
-            <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.btn}>Book a demo</a>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
             <Link href="/reports" className={styles.btnQuiet}>See a finished report</Link>
           </div>
         </section>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BOOKING_URL } from "@/lib/content";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import Annotation from "@/components/for-comms/Annotation";
 import CoverageMatrix from "@/components/for-comms/CoverageMatrix";
@@ -142,7 +143,9 @@ export default function ReportsPage() {
             with. Bring one and we will go through what it finds.
           </p>
           <div className={styles.actions}>
-            <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.btn}>Book a demo</a>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
             <Link href="/how-it-works" className={styles.btnQuiet}>How the analysis works</Link>
           </div>
         </section>

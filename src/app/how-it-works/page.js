@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BOOKING_URL } from "@/lib/content";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import styles from "../marketing.module.css";
 
@@ -63,7 +64,9 @@ export default function HowItWorksPage() {
             and nothing reaches you that did not survive being run twice.
           </p>
           <div className={styles.actions}>
-            <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.btn}>Book a demo</a>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
             <Link href="/reports" className={styles.btnQuiet}>See a finished report</Link>
           </div>
         </section>
@@ -124,7 +127,9 @@ export default function HowItWorksPage() {
             argue with.
           </p>
           <div className={styles.actions}>
-            <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.btn}>Book a demo</a>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
           </div>
         </section>
 
