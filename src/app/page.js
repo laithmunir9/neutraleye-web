@@ -1,287 +1,195 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import Annotation from "@/components/for-comms/Annotation";
-import CoverageMatrix from "@/components/for-comms/CoverageMatrix";
-import matrix from "@/components/for-comms/CoverageMatrix.module.css";
-import shell from "./marketing.module.css";
+import Interlinear, { Line, Mark, Note } from "@/components/home/Interlinear";
+import CoverageMatrixLive from "@/components/home/CoverageMatrixLive";
+import MethodCharts from "@/components/home/MethodCharts";
+import { BOOKING_URL, EXTENSION_URL } from "@/lib/content";
 import styles from "./page.module.css";
 
-const EASE = [0.22, 1, 0.36, 1];
+export const metadata = {
+  title: "NeutralEye | See How an Article Frames the Story",
+  description:
+    "NeutralEye reads an article and shows the choices behind it. Framing analysis for communications and investor relations teams, and free tools for anyone reading.",
+};
 
-const ANNOTATIONS = [
-  {
-    signal: "Tone",
-    body: "Loaded phrasing. “a decisive step toward long-overdue reform” frames the outcome as overdue progress before the policy itself is explained.",
-  },
-  {
-    signal: "Framing",
-    body: "Selective emphasis. The procedural detail leads the story; the policy change itself is three paragraphs down.",
-  },
-  {
-    signal: "Attribution",
-    body: "Unnamed sourcing. “three committee aides” is the only attribution offered for a contested figure.",
-  },
-  {
-    signal: "Sources",
-    body: "One-sided sourcing. The opposing view gets one sentence out of five paragraphs.",
-  },
-  {
-    signal: "Omission",
-    body: "Missing context. The CBO’s same-day cost estimate isn’t referenced anywhere in the piece.",
-  },
-];
-
-const REASONS = [
-  "Every quote is verified against the source text before it appears in a report. Nothing gets attributed to the wrong article.",
-  "Which claims get examined is decided by deterministic code, not by model judgment, so the same set of articles produces the same set of claims.",
-  "Each analysis runs twice and reports a stability score. Where the two runs differ, you see it, rather than being told the result is reproducible.",
-];
-
-function Mark({ index, active, onActivate, children }) {
-  return (
-    <span
-      className={`${styles.mark} ${active === index ? styles.markActive : ""}`}
-      onMouseEnter={() => onActivate(index)}
-      onMouseLeave={() => onActivate(null)}
-    >
-      {children}
-      <sup className={styles.markIndex}>{index}</sup>
-    </span>
-  );
-}
+/* The live article the hero finding is drawn from, read from the run manifest,
+   plus a Wayback capture taken 8 August 2026. Both figures quoted in the hero
+   were confirmed present in that snapshot, so the finding stays checkable if
+   the live article is later edited. */
+const ARTICLE_URL =
+  "https://247wallst.com/investing/2026/08/07/honeywell-aerospace-tumbles-on-disappointing-debut-report-but-bull-case-remains-intact/";
+const ARCHIVE_URL =
+  "https://web.archive.org/web/20260808084259/https://247wallst.com/investing/2026/08/07/honeywell-aerospace-tumbles-on-disappointing-debut-report-but-bull-case-remains-intact/";
 
 export default function Home() {
-  const [active, setActive] = useState(null);
-
-  // No reduced-motion branch here on purpose. useReducedMotion() is false during
-  // SSR and true on the client for those users, so branching on it made the
-  // server and client markup disagree and broke hydration. Reduced motion is
-  // handled once, in CSS, where it cannot race.
-  const heroContainer = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.1 } },
-  };
-
-  const heroItem = {
-    hidden: { opacity: 0, y: 22 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
-  };
-
   return (
     <MarketingShell>
       <main className={styles.page}>
 
-        {/* ── Hero ── */}
         <section className={styles.hero}>
-          <motion.div
-            className={styles.heroText}
-            variants={heroContainer}
-            initial="hidden"
-            animate="show"
-          >
-            <div className={styles.copy}>
-              <motion.h1 variants={heroItem}>
-                See how one story was covered across every outlet that covered it
-              </motion.h1>
-              <motion.p className={styles.lead} variants={heroItem}>
-                Send the coverage of a single story. Get back what each outlet reported, what each
-                one left out, and where an outlet&rsquo;s own text does not support its summary.
-                Every quote is checked against the source before it reaches you.
-              </motion.p>
-            </div>
-            <motion.div className={styles.actions} variants={heroItem}>
-              <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.heroBtn}>
-                Book a demo
+          <p className={styles.eyebrow}>Framing analysis</p>
+          <h1 className={styles.h1}>
+            The number a reader takes away is not always the number the article supports.
+          </h1>
+          <p className={styles.lead}>
+            NeutralEye reads an article and shows the choices behind it. Here is one, found in a
+            report run over five outlets covering the same earnings story.
+          </p>
+        </section>
+
+        <section className={styles.finding}>
+          <div className={styles.findingMain}>
+            <p className={styles.source}>24/7 Wall St, filed 7 August 2026</p>
+
+            <Interlinear>
+              <Line>
+                &ldquo;HONA shares <Mark step={0}>crashed 34%</Mark>{" "}
+                after adjusted EPS fell 32% and
+                management slashed full-year organic growth guidance&rdquo;
+              </Line>
+              <Note label="No period stated" step={0}>
+                This is the summary line, and 34% is the one figure in the article with no timeframe
+                attached to it.
+              </Note>
+
+              <Line>
+                Further down, the same article: shares{" "}
+                <Mark step={1}>&ldquo;fell 23.2% in the most recent session&rdquo;</Mark>{" "}
+                and &ldquo;are down 34.3% over the past month&rdquo;.
+              </Line>
+              <Note label="11.1 points apart" step={1}>
+                The session move is 23.2%. The 34% in the summary is close to the monthly figure,
+                presented where a reader looks for the day. The unqualified number is the one that
+                carries.
+              </Note>
+            </Interlinear>
+
+            <p className={styles.sources}>
+              <a
+                href={ARTICLE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.sourceLink}
+              >
+                Read the article
               </a>
-              <Link href="/analyze" className={styles.heroBtnQuiet}>
-                Or try it on one article
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* The hook is the finding itself, not a decorative graphic. */}
-          <motion.figure
-            className={styles.exhibit}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.25 }}
-          >
-            <p className={styles.exhibitBody}>
-              24/7 Wall St&rsquo;s summary of Honeywell Aerospace&rsquo;s earnings said shares{" "}
-              <Annotation sweep index={0}>crashed 34% after the earnings report</Annotation>. The article&rsquo;s own
-              body says shares <Annotation sweep index={1}>fell 23.2% in the session</Annotation> and were{" "}
-              <Annotation sweep index={2}>down 34.3% over the past month</Annotation>. The unqualified number is the
-              one a reader takes away, and it is 11.1 points from the one the body supports.
+              <span className={styles.sourceSep} aria-hidden="true">&middot;</span>
+              {ARCHIVE_URL ? (
+                <a
+                  href={ARCHIVE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.sourceLink}
+                >
+                  Archived copy
+                </a>
+              ) : (
+                <span className={styles.needsUrl}>
+                  Archived copy <span className={styles.needsUrlFlag}>NEEDS URL</span>
+                </span>
+              )}
             </p>
-            <figcaption className={styles.exhibitMeta}>
+          </div>
+
+          <div className={styles.findingAside}>
+            <p className={styles.asideLead}>
               Both figures are in the same article, so this takes about thirty seconds to check.
-            </figcaption>
-          </motion.figure>
-        </section>
-
-        {/* ── The deliverable ── */}
-        <section className={shell.section}>
-          <h2>What you get back</h2>
-          <div className={shell.measure}>
-            <p>
-              One story, every outlet that covered it, and the claims laid side by side. Not a
-              score, not a spectrum, and not a verdict on the outlet.
+            </p>
+            <p className={styles.asideNote}>
+              The analysis opens inside the paragraph, at the line it is about. Nothing is scored,
+              and no outlet is rated.
             </p>
           </div>
-
-          <div className={shell.full}>
-            <CoverageMatrix />
-          </div>
-
-          <ul className={`${styles.legend} ${shell.full}`}>
-            <li>
-              <h3 className={styles.legendLabel}>
-                <span className={`${matrix.state} ${matrix.reported}`}>Reported</span>
-              </h3>
-              <p>A matrix of the claims each outlet made, laid out side by side.</p>
-            </li>
-            <li>
-              <h3 className={styles.legendLabel}>
-                <span className={`${matrix.state} ${matrix.omitted}`}>Omitted</span>
-              </h3>
-              <p>What appeared in some outlets and not in others.</p>
-            </li>
-            <li>
-              <h3 className={styles.legendLabel}>
-                <span className={`${matrix.state} ${matrix.contradicted}`}>Contradicted</span>
-              </h3>
-              <p>Where an outlet&rsquo;s own text does not support its own summary.</p>
-            </li>
-          </ul>
         </section>
 
-        {/* ── Why it holds up ── */}
-        <section className={shell.section}>
-          <h2>Why the output holds up</h2>
-          <ul className={shell.rows}>
-            {REASONS.map((r) => (
-              <li key={r} className={shell.row}>{r}</li>
-            ))}
-          </ul>
-        </section>
+        <section className={styles.doors}>
+          <div className={styles.doorsInner}>
+            <h2 className={styles.doorsHeading}>
+              The same checks, pointed two ways. At someone else&rsquo;s article, or at your own
+              draft.
+            </h2>
 
-        {/* ── One method, two directions ── */}
-        <section className={shell.section}>
-          <h2>The same method, pointed at your own draft</h2>
-          <div className={shell.measure}>
-            <p>
-              Tone, framing, attribution, source balance, and omission, reviewed together in a
-              single pass. It reads someone else&rsquo;s article the way a sharp editor would, with
-              every signal tied to the exact language that triggered it. The reports above are this
-              same read, run across five outlets at once.
-            </p>
-          </div>
+            <div className={styles.doorsGrid}>
+              <div className={styles.door}>
+                <p className={styles.doorLabel}>Free tools</p>
+                <h3 className={styles.doorTitle}>Read with the margin filled in</h3>
+                <p className={styles.doorBody}>
+                  The extension marks the lines that carry framing choices and sets the note under
+                  the line, on the article in front of you. For anything outside the browser, paste
+                  a link into the analyzer and get the same reading back.
+                </p>
+                <div className={styles.actions}>
+                  <a
+                    href={EXTENSION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.btn}
+                  >
+                    Add to Chrome
+                  </a>
+                  <Link href="/analyze" className={styles.btnRule}>Paste a link instead</Link>
+                </div>
+                <p className={styles.doorFoot}>Free. No account needed to read.</p>
 
-          <div className={`${styles.spread} ${shell.full}`}>
-            <article className={styles.manuscript}>
-              <p className={styles.kicker}>Politics · Senate · thenationalstandard.com</p>
-              <h3 className={styles.headline}>Senate Committee Advances Border Security Package</h3>
-              <p className={styles.byline}>Staff report · 14:22</p>
+                <div className={styles.companion}>
+                  <h3 className={styles.companionTitle}>
+                    The writing companion will not draft for you.
+                  </h3>
+                  <p className={styles.doorBody}>
+                    It runs the same checks on your own draft, marks the lines where your framing is
+                    doing the work, and stops there. The refusal is the design. It is in build now.
+                  </p>
+                </div>
+              </div>
 
-              <div className={styles.body}>
-                <p>
-                  After months of stalled negotiations, the Senate Judiciary Committee voted 11–9 along
-                  party lines Tuesday to advance the border security package, what its sponsors called{" "}
-                  <Mark index={1} active={active} onActivate={setActive}>a decisive step toward long-overdue reform</Mark>{" "}
-                  after years of inaction.
+              <div className={styles.door} id="reports">
+                <p className={styles.doorLabel}>Coverage reports</p>
+                <h3 className={styles.doorTitle}>A written report on how your story was covered</h3>
+                <p className={styles.doorBody}>
+                  For communications and investor relations teams. Several outlets on one story,
+                  read separately and then set against each other: what each one foregrounded, what
+                  it left out that others carried, whose voices it included, and where the accounts
+                  diverge.
                 </p>
-                <p>
-                  Coverage centered on{" "}
-                  <Mark index={2} active={active} onActivate={setActive}>the committee&rsquo;s revised inspection timeline</Mark>,
-                  framing the vote chiefly as a procedural win for chamber leadership rather than a shift
-                  in the underlying policy.
+                <p className={styles.doorBody}>
+                  Every claim is traced to a verbatim span in the article that carried it. Reports
+                  describe editorial choices. They do not rate outlets or place them on a spectrum.
                 </p>
-                <p>
-                  <Mark index={3} active={active} onActivate={setActive}>Three committee aides said</Mark> the
-                  new funding formula was negotiated &ldquo;in good faith,&rdquo; though none were named and
-                  no on-the-record source confirmed the figures.
-                </p>
-                <p>
-                  Opposition members, who hold one of the package&rsquo;s four amendments, were{" "}
-                  <Mark index={4} active={active} onActivate={setActive}>given a single sentence</Mark> near
-                  the close of the article to register their objection.
-                </p>
-                <p>
-                  Not mentioned anywhere in the piece:{" "}
-                  <Mark index={5} active={active} onActivate={setActive}>the Congressional Budget Office&rsquo;s same-day estimate</Mark>,
-                  which projects the package would add $4.2B to the deficit over five years.
+                <div className={styles.actions}>
+                  <Link href="/reports" className={styles.btn}>See a full report</Link>
+                  <a
+                    href={BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.btnRule}
+                  >
+                    Request one for your story
+                  </a>
+                </div>
+                <p className={styles.doorFoot}>
+                  The Honeywell analysis below is one of these, run over five outlets.
                 </p>
               </div>
-            </article>
-
-            <div className={styles.margin}>
-              {ANNOTATIONS.map((note, i) => (
-                <div key={note.signal}>
-                  <div
-                    className={styles.note}
-                    data-active={active === i + 1}
-                    style={{ "--rot": i % 2 === 0 ? "-0.6deg" : "0.6deg" }}
-                    onMouseEnter={() => setActive(i + 1)}
-                    onMouseLeave={() => setActive(null)}
-                  >
-                    <div className={styles.noteHead}>
-                      <span className={styles.noteIndex}>{i + 1}</span>
-                      <span className={styles.noteSignal}>{note.signal}</span>
-                    </div>
-                    <p className={styles.noteText}>{note.body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className={`${styles.directions} ${shell.full}`}>
-            <div className={styles.direction}>
-              <h3>Reading</h3>
-              <p>
-                Run it on any article, free, in the browser or as a Chrome extension. No account
-                needed.
-              </p>
-              <Link href="/analyze" className={styles.directionLink}>Open the analyzer</Link>
-            </div>
-            <div className={styles.direction}>
-              <h3>Writing</h3>
-              <p>
-                The same five checks pointed at a draft you are about to publish, before anyone
-                else reads it. In development.
-              </p>
-              <span className={styles.directionSoon}>Not yet available</span>
             </div>
           </div>
         </section>
 
-        {/* ── What this is not ── */}
-        <section className={shell.section}>
-          <h2>What this is not</h2>
-          <div className={shell.measure}>
-            <p>
-              Not media monitoring, not sentiment scoring, and not a volume dashboard. It does not
-              tell you how many mentions you got or whether the tone was positive. It is a close
-              read of a small number of articles about one story, and it answers a narrower
-              question than a monitoring tool does.
+        <section className={styles.matrix} id="method">
+          <div className={styles.matrixIntro}>
+            <p className={styles.eyebrowSmall}>One story, five outlets</p>
+            <h2 className={styles.h2}>
+              Two outlets covering the same quarter told readers a different number was expected.
+            </h2>
+            <p className={styles.matrixLead}>
+              Every claim in the story, set against every outlet. Pick a cell to see what the
+              analysis holds for it.
             </p>
           </div>
+          <CoverageMatrixLive />
         </section>
 
-        {/* ── CTA ── */}
-        <section className={shell.cta}>
-          <h2>Bring a story you already know well</h2>
-          <p>
-            The fastest way to judge this is on coverage you have already read closely. Bring one
-            and we will go through what it finds.
-          </p>
-          <div className={shell.actions}>
-          <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={shell.btn}>Book a demo</a>
-          </div>
+        <section className={styles.charts}>
+          <MethodCharts />
         </section>
 
       </main>
