@@ -679,3 +679,30 @@
     height: 2.75rem;
   }
 }
+
+/* A persistent booking action in the header. The hero still carries none, so
+   this gives a reader somewhere to go without putting an ask in front of the
+   finding. */
+.bookCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  background: var(--fc-accent);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bookCta:hover { background: var(--fc-accent-dark); }
+
+.bookCta:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+@media (max-width: 34rem) {
+  .bookCta { display: none; }
+}

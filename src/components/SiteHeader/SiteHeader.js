@@ -8,15 +8,18 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { EXTENSION_URL } from "@/lib/content";
 import { useAuth } from "@/lib/supabase/AuthProvider";
 import AuthDialog from "@/components/AuthDialog/AuthDialog";
+import { BOOKING_URL } from "@/lib/content";
 import styles from "./SiteHeader.module.css";
 
 /* Flat by design. Three generic dropdown categories were borrowed chrome;
    a reader needs to run the tool, understand it, get it in their browser,
    and see what it costs. Everything else belongs in the footer. */
+/* Two items. The hero deliberately carries no call to action, and a header CTA
+   would undercut that: the finding is meant to do the work before anything is
+   asked for. */
 const NAV_LINKS = [
-  { href: "/reports", label: "Reports" },
-  { href: "/tools", label: "Tools" },
-  { href: "/how-it-works", label: "How it works" },
+  { href: "/how-it-works", label: "Method" },
+  { href: "/reports", label: "Coverage reports" },
 ];
 
 function userInitial(user) {
@@ -90,7 +93,12 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
       </nav>
 
       <div className={styles.headerActions}>
-        <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.analyzeCta}>
+        <a
+          href={BOOKING_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.bookCta}
+        >
           Book a demo
         </a>
 
@@ -173,10 +181,6 @@ export default function SiteHeader({ compact = false, defaultDark = false, noBor
 
       <div id="mobile-nav" className={styles.mobileMenu} data-open={mobileOpen}>
         <nav className={styles.mobileNav} aria-label="Mobile">
-          <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.mobileAnalyzeCta}>
-            Book a demo
-          </a>
-
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={styles.mobileLink}>
               {link.label}
