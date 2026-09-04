@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NeutralEye">
+  <circle cx="256" cy="256" r="248" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="247" fill="none" stroke="#e6e8e8" stroke-width="2"/>
+  <!-- Control points sit well beyond the intended apex: a cubic reaches only
+       about three quarters of the way toward them, so y=132 yields a ~160 peak. -->
+  <path
+    d="M108 245 C 170 132, 342 132, 404 245 C 342 358, 170 358, 108 245 Z"
+    fill="none"
+    stroke="#111417"
+    stroke-width="26"
+    stroke-linejoin="round"
+  />
+  <circle cx="256" cy="245" r="56" fill="#c2c6c6"/>
+  <circle cx="256" cy="245" r="30" fill="#111417"/>
+</svg>

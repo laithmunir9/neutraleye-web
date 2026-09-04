@@ -30,7 +30,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(255, 252, 247, 0.9)),
+    linear-gradient(180deg, rgb(var(--surface-rgb) / 0.98), rgb(var(--surface-rgb) / 0.9)),
     var(--surface);
   box-shadow: var(--shadow);
   padding: clamp(1.1rem, 1.8vw, 1.38rem);
@@ -43,19 +43,19 @@
 }
 
 .outputCard:hover {
-  border-color: rgba(93, 75, 53, 0.14);
+  border-color: rgb(var(--border-rgb) / 0.14);
 }
 
 .outputCard:first-child {
-  border-color: rgba(139, 103, 65, 0.2);
-  border-top: 3px solid #8b6741;
+  border-color: rgb(var(--brand-rgb) / 0.2);
+  border-top: 3px solid rgb(var(--brand-rgb));
   background:
-    linear-gradient(158deg, #fffcf7 18%, rgba(236, 222, 202, 0.48) 100%),
+    linear-gradient(158deg, rgb(var(--surface-rgb)) 18%, rgba(236, 222, 202, 0.48) 100%),
     var(--surface);
   padding: clamp(1.6rem, 3vw, 2.4rem);
   box-shadow:
-    0 2.2rem 4.8rem rgba(40, 29, 19, 0.1),
-    0 0.55rem 1.1rem rgba(40, 29, 19, 0.045);
+    0 2.2rem 4.8rem rgb(var(--shadow-rgb) / 0.1),
+    0 0.55rem 1.1rem rgb(var(--shadow-rgb) / 0.045);
 }
 
 .resultHero {
@@ -74,7 +74,6 @@
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 .contentTypeBadge {
@@ -82,14 +81,13 @@
   align-items: center;
   flex-shrink: 0;
   padding: 0.22rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(139, 103, 65, 0.25);
-  background: rgba(139, 103, 65, 0.08);
+  border-radius: 2px;
+  border: 1px solid rgb(var(--brand-rgb) / 0.25);
+  background: rgb(var(--brand-rgb) / 0.08);
   color: var(--accent-strong);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -133,7 +131,7 @@
 .resultHero .helperText {
   margin-top: 0;
   padding-top: 0.9rem;
-  border-top: 1px solid rgba(93, 75, 53, 0.1);
+  border-top: 1px solid rgb(var(--border-rgb) / 0.1);
   max-width: 58rem;
 }
 
@@ -167,15 +165,15 @@
 
 .confTrack {
   height: 4px;
-  border-radius: 999px;
-  background: rgba(93, 75, 53, 0.12);
+  border-radius: 2px;
+  background: rgb(var(--border-rgb) / 0.12);
   overflow: hidden;
 }
 
 .confFill {
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(139, 103, 65, 0.55), #8b6741);
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.55), rgb(var(--brand-rgb)));
   transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -190,13 +188,12 @@
   font-family: var(--font-mono);
   color: var(--muted);
   letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .confLevel {
   font-size: 0.75rem;
   font-family: var(--font-mono);
-  color: #8b6741;
+  color: rgb(var(--brand-rgb));
   letter-spacing: 0.03em;
 }
 
@@ -231,7 +228,7 @@
   font-size: 0.95rem;
   line-height: 1.62;
   padding-left: 0.85rem;
-  border-left: 2px solid rgba(139, 103, 65, 0.16);
+  border-left: 2px solid rgb(var(--brand-rgb) / 0.16);
 }
 
 .simpleList li {
@@ -249,8 +246,8 @@
   left: 0;
   width: 0.4rem;
   height: 0.4rem;
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.82);
+  border-radius: 2px;
+  background: rgb(var(--brand-rgb) / 0.82);
 }
 
 .simpleList li.placeholderText::before {
@@ -271,12 +268,12 @@
 }
 
 .simpleList a:hover {
-  color: #6e4f2f;
+  color: rgb(var(--brand-dark-rgb));
 }
 
 .emptyState .outputCard {
   box-shadow: none;
-  background: rgba(255, 252, 247, 0.6);
+  background: rgb(var(--surface-rgb) / 0.6);
 }
 
 .emptyState .outputCard:not(:first-child) {
@@ -335,7 +332,7 @@
   }
 
   50% {
-    box-shadow: 0 1.1rem 2.4rem rgba(40, 29, 19, 0.095);
+    box-shadow: 0 1.1rem 2.4rem rgb(var(--shadow-rgb) / 0.095);
   }
 }
 
@@ -345,8 +342,8 @@
   gap: 0.5rem;
   padding: 0.7rem 1rem;
   border-radius: var(--radius-md);
-  background: rgba(139, 103, 65, 0.07);
-  border: 1px solid rgba(139, 103, 65, 0.18);
+  background: rgb(var(--brand-rgb) / 0.07);
+  border: 1px solid rgb(var(--brand-rgb) / 0.18);
   font-size: 0.875rem;
   color: var(--text);
   line-height: 1.5;
@@ -354,11 +351,11 @@
 
 .limitBanner svg {
   flex-shrink: 0;
-  color: #8b6741;
+  color: rgb(var(--brand-rgb));
 }
 
 .limitLink {
-  color: #8b6741;
+  color: rgb(var(--brand-rgb));
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.18em;
@@ -368,9 +365,9 @@
   display: inline-flex;
   align-self: flex-start;
   padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.07);
-  border: 1px solid rgba(139, 103, 65, 0.16);
+  border-radius: 2px;
+  background: rgb(var(--brand-rgb) / 0.07);
+  border: 1px solid rgb(var(--brand-rgb) / 0.16);
   font-size: 0.8rem;
   color: var(--secondary-text);
 }

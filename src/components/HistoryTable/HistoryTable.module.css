@@ -17,11 +17,10 @@
   text-align: left;
   padding: 14px 16px;
   font-size: 12px;
-  text-transform: uppercase;
   letter-spacing: 0;
   color: var(--secondary-text);
   border-bottom: 1px solid var(--border);
-  background: rgba(239, 231, 220, 0.42);
+  background: rgb(var(--muted-rgb) / 0.42);
 }
 
 .table td {
@@ -30,11 +29,11 @@
 }
 
 .table tr:hover {
-  background: rgba(255, 252, 247, 0.72);
+  background: rgb(var(--surface-rgb) / 0.72);
 }
 
 .table tr:focus-within {
-  background: rgba(239, 231, 220, 0.52);
+  background: rgb(var(--muted-rgb) / 0.52);
 }
 
 .actionButton,
@@ -70,12 +69,12 @@
 .inspectButton:focus-visible,
 .deleteButton:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.12);
+  box-shadow: 0 0 0 4px rgb(var(--brand-rgb) / 0.12);
 }
 
 .empty {
   border: 1px dashed var(--border-strong);
-  background: rgba(239, 231, 220, 0.42);
+  background: rgb(var(--muted-rgb) / 0.42);
   color: var(--secondary-text);
   border-radius: var(--radius-md);
   padding: 24px;
@@ -95,18 +94,18 @@
 .empty a {
   margin-top: 12px;
   display: inline-flex;
-  border: 1px solid #8b6741;
-  background: #8b6741;
-  color: #f8f4ee;
-  border-radius: 999px;
+  border: 1px solid rgb(var(--brand-rgb));
+  background: rgb(var(--brand-rgb));
+  color: rgb(var(--offwhite-rgb));
+  border-radius: 2px;
   padding: 8px 18px;
   font-size: 13px;
   transition: background 150ms ease;
 }
 
 .empty a:hover {
-  background: #6e4f2f;
-  border-color: #6e4f2f;
+  background: rgb(var(--brand-dark-rgb));
+  border-color: rgb(var(--brand-dark-rgb));
 }
 
 .titleCell {
@@ -122,10 +121,10 @@
 .sourceBadge {
   display: inline-block;
   padding: 2px 7px;
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.08);
-  border: 1px solid rgba(139, 103, 65, 0.2);
-  color: #8b6741;
+  border-radius: 2px;
+  background: rgb(var(--brand-rgb) / 0.08);
+  border: 1px solid rgb(var(--brand-rgb) / 0.2);
+  color: rgb(var(--brand-rgb));
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -147,9 +146,9 @@
 }
 
 .menuOpen .actionButton {
-  border-color: rgba(139, 103, 65, 0.24);
-  background: rgba(239, 231, 220, 0.62);
-  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.08);
+  border-color: rgb(var(--brand-rgb) / 0.24);
+  background: rgb(var(--muted-rgb) / 0.62);
+  box-shadow: 0 0 0 4px rgb(var(--brand-rgb) / 0.08);
 }
 
 .inspectButton,
@@ -163,7 +162,7 @@
   background: var(--error-bg);
   border-color: var(--error-border);
   color: var(--error-text);
-  box-shadow: 0 0.8rem 1.6rem rgba(53, 36, 30, 0.1);
+  box-shadow: 0 0.8rem 1.6rem rgba(13, 15, 16, 0.1);
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
@@ -181,14 +180,14 @@
 }
 
 .inspectButton {
-  background: rgba(255, 252, 247, 0.94);
+  background: rgb(var(--surface-rgb) / 0.94);
   color: var(--text);
-  box-shadow: 0 0.55rem 1.2rem rgba(53, 36, 30, 0.08);
+  box-shadow: 0 0.55rem 1.2rem rgba(13, 15, 16, 0.08);
 }
 
 .inspectButton:hover {
-  background: rgba(239, 231, 220, 0.5);
-  box-shadow: 0 0.7rem 1.4rem rgba(53, 36, 30, 0.1);
+  background: rgb(var(--muted-rgb) / 0.5);
+  box-shadow: 0 0.7rem 1.4rem rgba(13, 15, 16, 0.1);
 }
 
 .menuOpen .inspectButton,
@@ -204,7 +203,7 @@
 .deleteButton:hover {
   background: #f7e5e2;
   border-color: rgba(138, 67, 60, 0.38);
-  box-shadow: 0 0.9rem 1.8rem rgba(53, 36, 30, 0.13);
+  box-shadow: 0 0.9rem 1.8rem rgba(13, 15, 16, 0.13);
 }
 
 @media (max-width: 920px) {
