@@ -1,9 +1,13 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import shell from "../marketing.module.css";
 import styles from "./page.module.css";
+
+export const metadata = {
+  title: "FAQ | NeutralEye",
+  description:
+    "Reading results, what the scores mean, how data is handled, and the limits of the analysis.",
+};
 
 const SECTIONS = [
   {
@@ -116,93 +120,43 @@ const SECTIONS = [
       },
     ],
   },
-];
+]
 
 export default function FaqPage() {
-  const [activeId, setActiveId] = useState(SECTIONS[0].id);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        });
-      },
-      { rootMargin: "-15% 0px -70% 0px" }
-    );
-
-    SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <MarketingShell>
-      <main className={styles.page}>
+      <main className={shell.page}>
 
-        {/* ── Hero ── */}
-        <header className={styles.hero}>
-          <p className={styles.eyebrow}>Help</p>
-          <h1>Frequently asked questions</h1>
-          <p className={styles.lead}>
-            Everything you need to know about reading results, understanding scores,
-            and how NeutralEye handles your data.
+        <section className={shell.hero}>
+          <h1>Questions people actually ask</h1>
+          <p className={shell.lead}>
+            Mostly about what the scores mean and what happens to the text you submit. The short
+            version of both: the score measures consistency, not truth, and the article text is not
+            kept unless you ask for it.
           </p>
-        </header>
+        </section>
 
-        {/* ── Two-column layout ── */}
-        <div className={styles.layout}>
-
-          {/* Sticky nav */}
-          <aside className={styles.nav}>
-            <p className={styles.navHeading}>Topics</p>
-            <nav>
-              {SECTIONS.map((s) => (
-                <a
-                  key={s.id}
-                  href={`#${s.id}`}
-                  className={`${styles.navLink}${activeId === s.id ? ` ${styles.navLinkActive}` : ""}`}
-                >
-                  {s.label}
-                </a>
+        {SECTIONS.map((section) => (
+          <section key={section.id} id={section.id} className={shell.section}>
+            <h2>{section.label}</h2>
+            <div className={styles.list}>
+              {section.questions.map((item) => (
+                <details key={item.q} className={styles.item}>
+                  <summary className={styles.question}>{item.q}</summary>
+                  <p className={styles.answer}>{item.a}</p>
+                </details>
               ))}
-            </nav>
-            <div className={styles.navFooter}>
-              <p>Still have questions?</p>
-              <Link href="/support">Contact us →</Link>
             </div>
-          </aside>
+          </section>
+        ))}
 
-          {/* Q&A sections */}
-          <div className={styles.sections}>
-            {SECTIONS.map((section, si) => (
-              <section key={section.id} id={section.id} className={styles.section}>
-                <div className={styles.sectionHeader}>
-                  <span className={styles.sectionNumber} aria-hidden="true">
-                    {String(si + 1).padStart(2, "0")}
-                  </span>
-                  <h2>{section.label}</h2>
-                </div>
-
-                <div className={styles.questions}>
-                  {section.questions.map((item) => (
-                    <details key={item.q} className={styles.item}>
-                      <summary className={styles.question}>
-                        <span>{item.q}</span>
-                        <span className={styles.toggle} aria-hidden="true" />
-                      </summary>
-                      <p className={styles.answer}>{item.a}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            ))}
-
+        <section className={shell.cta}>
+          <h2>Still stuck</h2>
+          <p>Send the question directly. It reaches one person, not a queue.</p>
+          <div className={shell.actions}>
+            <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20question" className={shell.btn}>Ask a question</a>
           </div>
-        </div>
+        </section>
 
       </main>
     </MarketingShell>

@@ -19,22 +19,6 @@
   flex-wrap: wrap;
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.26rem 0.68rem;
-  border: 1px solid rgba(139, 103, 65, 0.22);
-  border-radius: 999px;
-  background: rgba(139, 103, 65, 0.06);
-  color: #6e4f2f;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  width: fit-content;
-  margin: 0 0 0.9rem;
-}
-
 .hero h1 {
   margin: 0 0 0.75rem;
   color: var(--text);
@@ -59,7 +43,7 @@
   gap: 0.5rem;
   padding: 0.38rem 0.85rem 0.38rem 0.6rem;
   border: 1px solid rgba(82, 145, 106, 0.3);
-  border-radius: 999px;
+  border-radius: 2px;
   background: rgba(82, 145, 106, 0.07);
   color: rgba(52, 115, 76, 0.9);
   font-size: 0.75rem;
@@ -125,9 +109,9 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #8b6741;
-  border: 2px solid #f8f4ee;
-  box-shadow: 0 0 0 1.5px rgba(139, 103, 65, 0.35);
+  background: rgb(var(--brand-rgb));
+  border: 2px solid rgb(var(--offwhite-rgb));
+  box-shadow: 0 0 0 1.5px rgb(var(--brand-rgb) / 0.35);
   flex-shrink: 0;
   z-index: 1;
 }
@@ -136,7 +120,7 @@
   flex: 1;
   width: 1px;
   min-height: 3rem;
-  background: linear-gradient(180deg, rgba(139, 103, 65, 0.25), rgba(139, 103, 65, 0.08));
+  background: linear-gradient(180deg, rgb(var(--brand-rgb) / 0.25), rgb(var(--brand-rgb) / 0.08));
   margin-top: 0.4rem;
 }
 
@@ -166,7 +150,7 @@
 
 .versionLabel {
   display: block;
-  color: rgba(32, 27, 22, 0.28);
+  color: rgb(var(--text-rgb) / 0.28);
   font-family: var(--font-mono);
   font-size: 0.65rem;
   letter-spacing: 0.04em;
@@ -202,7 +186,7 @@
 }
 
 .changeText {
-  color: rgba(32, 27, 22, 0.82);
+  color: rgb(var(--text-rgb) / 0.82);
   font-size: 0.92rem;
   line-height: 1.58;
 }
@@ -218,7 +202,6 @@
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   flex-shrink: 0;
   text-align: center;
 }
@@ -230,9 +213,9 @@
 }
 
 .tagImproved {
-  background: rgba(139, 103, 65, 0.08);
-  color: rgba(110, 79, 47, 0.95);
-  border: 1px solid rgba(139, 103, 65, 0.2);
+  background: rgb(var(--brand-rgb) / 0.08);
+  color: rgb(var(--brand-dark-rgb) / 0.95);
+  border: 1px solid rgb(var(--brand-rgb) / 0.2);
 }
 
 .tagFixed {

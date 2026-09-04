@@ -1,45 +1,48 @@
-import Image from "next/image";
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { BLOG_POSTS } from "@/lib/content";
+import shell from "../marketing.module.css";
 import styles from "./page.module.css";
 
 export const metadata = {
   title: "Blog | NeutralEye",
-  description: "Guides on media literacy, framing, sourcing, and reading the news critically.",
+  description: "Notes on framing, sourcing, and reading the news closely.",
 };
 
-
 export default function BlogPage() {
+  const posts = [...BLOG_POSTS].sort((a, b) => new Date(b.date) - new Date(a.date));
+
   return (
     <MarketingShell>
-      <main className={styles.page}>
-        <header className={styles.header}>
-          <h1>Blog</h1>
-          <p className={styles.lead}>
-            Essays on media bias, how to read analysis results, and what NeutralEye finds in the articles you're already reading.
-          </p>
-        </header>
+      <main className={shell.page}>
 
-        <section className={styles.grid}>
-          {[...BLOG_POSTS].sort((a, b) => new Date(b.date) - new Date(a.date)).map((post, index) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.card}>
-              <div className={`${styles.media} ${styles[`media${(index % 4) + 1}`]}`} aria-hidden>
-                {post.showBrandTitle && (
-                  <span className={styles.mediaBrand}>
-                    <Image src="/neutraleye-logo.png" alt="" width={28} height={28} className={styles.mediaBrandLogo} />
-                    <span className={styles.mediaTitle}>NeutralEye</span>
-                  </span>
-                )}
-              </div>
-              <div className={styles.metaRow}>
-                <span className={styles.metaCategory}>{post.category}</span>
-                <span className={styles.metaDate}>{post.date}</span>
-              </div>
-              <h2>{post.title}</h2>
-            </Link>
-          ))}
+        <section className={shell.hero}>
+          <h1>Notes on reading closely</h1>
+          <p className={shell.lead}>
+            How framing works, what the analysis actually measures, and what turns up in the
+            articles people are already reading.
+          </p>
         </section>
+
+        {/* A list, not a grid of thumbnails. The titles are the content; the
+            decorative colour blocks were carrying no information. */}
+        <section className={shell.section}>
+          <ul className={`${styles.list} ${shell.full}`}>
+            {posts.map((post) => (
+              <li key={post.slug} className={styles.item}>
+                <Link href={`/blog/${post.slug}`} className={styles.link}>
+                  <h2 className={styles.title}>{post.title}</h2>
+                  <p className={styles.meta}>
+                    <span>{post.category}</span>
+                    <span className={styles.metaSep} aria-hidden="true">&middot;</span>
+                    <span>{post.date}</span>
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
       </main>
     </MarketingShell>
   );
