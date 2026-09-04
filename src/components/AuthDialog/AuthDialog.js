@@ -89,12 +89,14 @@ export default function AuthDialog({ open, onClose, mode: initialMode = "signin"
           &times;
         </button>
 
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/neutraleye-mark.svg" alt="" width={32} height={32} className={styles.mark} />
+
         <h2 id="auth-dialog-title" className={styles.title}>
           {signup ? "Create an account" : "Sign in"}
         </h2>
         <p className={styles.sub}>
-          Signing in saves your tools history across devices, so you can go back to an article you
-          ran last week. The tools work without an account either way.
+          Saves your history across devices. The tools work without an account either way.
         </p>
 
         {sent ? (
@@ -112,6 +114,7 @@ export default function AuthDialog({ open, onClose, mode: initialMode = "signin"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
+                autoFocus
                 required
               />
             </label>
