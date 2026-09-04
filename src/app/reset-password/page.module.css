@@ -94,8 +94,8 @@
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #f7f4ef inset;
-  box-shadow: 0 0 0 1000px #f7f4ef inset;
+  -webkit-box-shadow: 0 0 0 1000px rgb(var(--bg-rgb)) inset;
+  box-shadow: 0 0 0 1000px rgb(var(--bg-rgb)) inset;
   -webkit-text-fill-color: var(--text);
   caret-color: var(--text);
   border-color: var(--border-strong);
@@ -109,8 +109,8 @@
   font-size: 0.9rem;
   font-weight: 600;
   font-family: var(--font-sans);
-  color: #f8f4ee;
-  background: #8b6741;
+  color: rgb(var(--offwhite-rgb));
+  background: rgb(var(--brand-rgb));
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -119,7 +119,7 @@
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: #6e4f2f;
+  background: rgb(var(--brand-dark-rgb));
 }
 
 .submitBtn:disabled {

@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SetNewPasswordPage } from "@/components/ui/sign-in";
+import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import { createClient } from "@/lib/supabase/client";
 import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
+import shell from "../marketing.module.css";
+import form from "@/components/AuthDialog/AuthDialog.module.css";
+import styles from "../login/page.module.css";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -34,7 +37,7 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const password = String(formData.get("password") || "");
-    const confirm  = String(formData.get("confirm")  || "");
+    const confirm = String(formData.get("confirm") || "");
 
     if (password !== confirm) {
       setError("Passwords don't match.");
@@ -57,13 +60,53 @@ export default function ResetPasswordPage() {
   if (!ready) return null;
 
   return (
-    <SetNewPasswordPage
-      description={error
-        ? <span style={{ color: "#8a443c", fontSize: "0.85rem" }}>{error}</span>
-        : undefined}
-      onSubmit={handleSubmit}
-      onBack={() => router.push("/login")}
-      loading={loading}
-    />
+    <MarketingShell>
+      <main className={shell.page}>
+        <section className={styles.wrap}>
+          <h1 className={styles.title}>Set a new password</h1>
+          <p className={styles.blurb}>
+            Choose a new password for your account. It needs to be at least eight characters.
+          </p>
+
+          {error && <p className={form.error}>{error}</p>}
+
+          <form className={form.form} onSubmit={handleSubmit}>
+            <label className={form.field}>
+              <span className={form.label}>New password</span>
+              <input
+                name="password"
+                type="password"
+                className={form.input}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </label>
+
+            <label className={form.field}>
+              <span className={form.label}>Confirm new password</span>
+              <input
+                name="confirm"
+                type="password"
+                className={form.input}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </label>
+
+            <button type="submit" className={form.submit} disabled={loading}>
+              {loading ? "Working" : "Update password"}
+            </button>
+          </form>
+
+          <div className={form.foot}>
+            <button type="button" className={form.switch} onClick={() => router.push("/login")}>
+              Back to sign in
+            </button>
+          </div>
+        </section>
+      </main>
+    </MarketingShell>
   );
 }
