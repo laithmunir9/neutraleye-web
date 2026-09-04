@@ -2,25 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
-import HeroSystemVisualization from "@/components/HeroSystemVisualization/HeroSystemVisualization";
-import MediaBarrier from "@/components/MediaBarrier/MediaBarrier";
+import Annotation from "@/components/for-comms/Annotation";
+import CoverageMatrix from "@/components/for-comms/CoverageMatrix";
+import matrix from "@/components/for-comms/CoverageMatrix.module.css";
+import shell from "./marketing.module.css";
 import styles from "./page.module.css";
 
 const EASE = [0.22, 1, 0.36, 1];
-
-const TRACE_STEPS = [
-  { type: "setup",  title: "Article submitted",        badge: "URL",        desc: "thenationalstandard.com/politics/senate-vote",           time: "14:22:01" },
-  { type: "setup",  title: "Content extracted",        badge: "2,847 words", desc: "Article confirmed, news report",                        time: "14:22:02" },
-  { type: "signal", title: "Tone analyzed",            badge: "Signal",     desc: "Loaded phrasing detected, 2 instances",                  time: "14:22:04" },
-  { type: "signal", title: "Framing checked",          badge: "Signal",     desc: "Selective emphasis on committee position",                 time: "14:22:06" },
-  { type: "signal", title: "Attribution reviewed",     badge: "Signal",     desc: "3 claims presented without clear sourcing",                time: "14:22:08" },
-  { type: "signal", title: "Source balance checked",   badge: "Signal",     desc: "Single-perspective sourcing throughout",                   time: "14:22:10" },
-  { type: "signal", title: "Omission scanned",         badge: "Signal",     desc: "Counter-context absent from body text",                    time: "14:22:12" },
-  { type: "result", title: "Result assembled",         badge: "Conclusion", desc: "Moderate bias toward Senate leadership · confidence 0.74", time: "14:22:13" },
-];
 
 const ANNOTATIONS = [
   {
@@ -45,10 +35,10 @@ const ANNOTATIONS = [
   },
 ];
 
-const FURTHER = [
-  { name: "The Continental Wire", kind: "Wire service",   note: "Primary committee coverage, both sides quoted", lean: 50 },
-  { name: "The Ledger",           kind: "Center-left daily", note: "Same vote, different framing",                lean: 34 },
-  { name: "Public Record Review", kind: "Policy desk",     note: "Includes the CBO estimate in full",            lean: 62 },
+const REASONS = [
+  "Every quote is verified against the source text before it appears in a report. Nothing gets attributed to the wrong article.",
+  "Which claims get examined is decided by deterministic code, not by model judgment, so the same set of articles produces the same set of claims.",
+  "Each analysis runs twice and reports a stability score. Where the two runs differ, you see it, rather than being told the result is reproducible.",
 ];
 
 function Mark({ index, active, onActivate, children }) {
@@ -65,36 +55,19 @@ function Mark({ index, active, onActivate, children }) {
 }
 
 export default function Home() {
-  const shouldReduce = useReducedMotion();
   const [active, setActive] = useState(null);
 
-  const reveal = (delay = 0) =>
-    shouldReduce
-      ? {}
-      : {
-          initial: { opacity: 0, y: 36 },
-          whileInView: { opacity: 1, y: 0 },
-          viewport: { once: true, margin: "-80px" },
-          transition: { duration: 0.55, ease: EASE, delay },
-        };
-
+  // No reduced-motion branch here on purpose. useReducedMotion() is false during
+  // SSR and true on the client for those users, so branching on it made the
+  // server and client markup disagree and broke hydration. Reduced motion is
+  // handled once, in CSS, where it cannot race.
   const heroContainer = {
     hidden: {},
-    show: { transition: { staggerChildren: shouldReduce ? 0 : 0.1 } },
+    show: { transition: { staggerChildren: 0.1 } },
   };
 
   const heroItem = {
-    hidden: shouldReduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
-  };
-
-  const marginContainer = {
-    hidden: {},
-    show: { transition: { staggerChildren: shouldReduce ? 0 : 0.14, delayChildren: shouldReduce ? 0 : 0.15 } },
-  };
-
-  const marginItem = {
-    hidden: shouldReduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
+    hidden: { opacity: 0, y: 22 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
   };
 
@@ -105,82 +78,110 @@ export default function Home() {
         {/* ── Hero ── */}
         <section className={styles.hero}>
           <motion.div
-            className={styles.heroSystem}
-            initial={shouldReduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
-          >
-            <HeroSystemVisualization />
-          </motion.div>
-
-          <motion.div
             className={styles.heroText}
             variants={heroContainer}
             initial="hidden"
             animate="show"
           >
             <div className={styles.copy}>
-              <motion.div className={styles.eyebrow} variants={heroItem}>
-                <span className={styles.eyebrowDot} />
-                Media Bias Analysis
-              </motion.div>
-              <motion.h1 variants={heroItem}>See how an article moves the reader</motion.h1>
+              <motion.h1 variants={heroItem}>
+                See how one story was covered across every outlet that covered it
+              </motion.h1>
               <motion.p className={styles.lead} variants={heroItem}>
-                Checks tone, framing, sourcing, and omission, with the evidence behind every call.
+                Send the coverage of a single story. Get back what each outlet reported, what each
+                one left out, and where an outlet&rsquo;s own text does not support its summary.
+                Every quote is checked against the source before it reaches you.
               </motion.p>
             </div>
             <motion.div className={styles.actions} variants={heroItem}>
-              <Link href="/analyze" className={styles.heroBtn}>
-                Open Analyzer
+              <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={styles.heroBtn}>
+                Book a demo
+              </a>
+              <Link href="/analyze" className={styles.heroBtnQuiet}>
+                Or try it on one article
               </Link>
-              <p className={styles.trustSignal}>
-                No account required · Free to start
-              </p>
             </motion.div>
           </motion.div>
+
+          {/* The hook is the finding itself, not a decorative graphic. */}
+          <motion.figure
+            className={styles.exhibit}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.25 }}
+          >
+            <p className={styles.exhibitBody}>
+              24/7 Wall St&rsquo;s summary of Honeywell Aerospace&rsquo;s earnings said shares{" "}
+              <Annotation sweep index={0}>crashed 34% after the earnings report</Annotation>. The article&rsquo;s own
+              body says shares <Annotation sweep index={1}>fell 23.2% in the session</Annotation> and were{" "}
+              <Annotation sweep index={2}>down 34.3% over the past month</Annotation>. The unqualified number is the
+              one a reader takes away, and it is 11.1 points from the one the body supports.
+            </p>
+            <figcaption className={styles.exhibitMeta}>
+              Both figures are in the same article, so this takes about thirty seconds to check.
+            </figcaption>
+          </motion.figure>
         </section>
 
-        {/* ── Media barrier ── */}
-        <MediaBarrier />
-
-        {/* ── Analysis trace ── */}
-        <motion.section className={styles.traceSection} {...reveal()}>
-          <div className={styles.traceIntro}>
-            <p className={styles.featureEyebrow}>The analysis</p>
-            <h2>The same five checks, every article</h2>
-            <p>Tone, framing, attribution, source balance, and omission, reviewed together in a single pass. Every article gets the same sequence, and every result arrives with the specific evidence that produced it.</p>
+        {/* ── The deliverable ── */}
+        <section className={shell.section}>
+          <h2>What you get back</h2>
+          <div className={shell.measure}>
+            <p>
+              One story, every outlet that covered it, and the claims laid side by side. Not a
+              score, not a spectrum, and not a verdict on the outlet.
+            </p>
           </div>
-          <div className={styles.traceCard}>
-            {TRACE_STEPS.map((step) => (
-              <div key={step.title} className={`${styles.traceRow} ${step.type === "result" ? styles.traceRowFinal : ""}`}>
-                <div className={`${styles.traceIcon} ${styles[`traceIcon_${step.type}`]}`} aria-hidden="true">
-                  {step.type === "setup"  && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>}
-                  {step.type === "signal" && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>}
-                  {step.type === "result" && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                </div>
-                <div className={styles.traceBody}>
-                  <div className={styles.traceTitle}>
-                    <span className={styles.traceTitleText}>{step.title}</span>
-                    <span className={styles.traceBadge}>{step.badge}</span>
-                  </div>
-                  <p className={styles.traceDesc}>{step.desc}</p>
-                </div>
-                <time className={styles.traceMeta}>{step.time}</time>
-              </div>
+
+          <div className={shell.full}>
+            <CoverageMatrix />
+          </div>
+
+          <ul className={`${styles.legend} ${shell.full}`}>
+            <li>
+              <h3 className={styles.legendLabel}>
+                <span className={`${matrix.state} ${matrix.reported}`}>Reported</span>
+              </h3>
+              <p>A matrix of the claims each outlet made, laid out side by side.</p>
+            </li>
+            <li>
+              <h3 className={styles.legendLabel}>
+                <span className={`${matrix.state} ${matrix.omitted}`}>Omitted</span>
+              </h3>
+              <p>What appeared in some outlets and not in others.</p>
+            </li>
+            <li>
+              <h3 className={styles.legendLabel}>
+                <span className={`${matrix.state} ${matrix.contradicted}`}>Contradicted</span>
+              </h3>
+              <p>Where an outlet&rsquo;s own text does not support its own summary.</p>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── Why it holds up ── */}
+        <section className={shell.section}>
+          <h2>Why the output holds up</h2>
+          <ul className={shell.rows}>
+            {REASONS.map((r) => (
+              <li key={r} className={shell.row}>{r}</li>
             ))}
+          </ul>
+        </section>
+
+        {/* ── One method, two directions ── */}
+        <section className={shell.section}>
+          <h2>The same method, pointed at your own draft</h2>
+          <div className={shell.measure}>
+            <p>
+              Tone, framing, attribution, source balance, and omission, reviewed together in a
+              single pass. It reads someone else&rsquo;s article the way a sharp editor would, with
+              every signal tied to the exact language that triggered it. The reports above are this
+              same read, run across five outlets at once.
+            </p>
           </div>
-        </motion.section>
 
-        {/* ── Annotated read ── */}
-        <motion.section className={styles.annotated} {...reveal()}>
-
-          <div className={styles.annotatedIntro}>
-            <p className={styles.featureEyebrow}>How it reads</p>
-            <h2>Read between the lines</h2>
-            <p>NeutralEye marks up an article the way a sharp editor would, using five signals, found in context, each tied to the exact language that triggered it.</p>
-          </div>
-
-          <div className={styles.spread}>
+          <div className={`${styles.spread} ${shell.full}`}>
             <article className={styles.manuscript}>
               <p className={styles.kicker}>Politics · Senate · thenationalstandard.com</p>
               <h3 className={styles.headline}>Senate Committee Advances Border Security Package</h3>
@@ -217,15 +218,9 @@ export default function Home() {
               </div>
             </article>
 
-            <motion.div
-              className={styles.margin}
-              variants={marginContainer}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
-            >
+            <div className={styles.margin}>
               {ANNOTATIONS.map((note, i) => (
-                <motion.div key={note.signal} variants={marginItem}>
+                <div key={note.signal}>
                   <div
                     className={styles.note}
                     data-active={active === i + 1}
@@ -239,37 +234,55 @@ export default function Home() {
                     </div>
                     <p className={styles.noteText}>{note.body}</p>
                   </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          <div className={styles.further}>
-            <p className={styles.furtherLabel}>Further reading</p>
-            <div className={styles.furtherGrid}>
-              {FURTHER.map((f) => (
-                <div key={f.name} className={styles.furtherCard}>
-                  <span className={styles.furtherKind}>{f.kind}</span>
-                  <h4 className={styles.furtherName}>{f.name}</h4>
-                  <p className={styles.furtherNote}>{f.note}</p>
-                  <div className={styles.leanTrack}>
-                    <span className={styles.leanMarker} style={{ left: `${f.lean}%` }} />
-                  </div>
-                  <div className={styles.leanLabels}>
-                    <span>Left</span>
-                    <span>Right</span>
-                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-        </motion.section>
+          <div className={`${styles.directions} ${shell.full}`}>
+            <div className={styles.direction}>
+              <h3>Reading</h3>
+              <p>
+                Run it on any article, free, in the browser or as a Chrome extension. No account
+                needed.
+              </p>
+              <Link href="/analyze" className={styles.directionLink}>Open the analyzer</Link>
+            </div>
+            <div className={styles.direction}>
+              <h3>Writing</h3>
+              <p>
+                The same five checks pointed at a draft you are about to publish, before anyone
+                else reads it. In development.
+              </p>
+              <span className={styles.directionSoon}>Not yet available</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── What this is not ── */}
+        <section className={shell.section}>
+          <h2>What this is not</h2>
+          <div className={shell.measure}>
+            <p>
+              Not media monitoring, not sentiment scoring, and not a volume dashboard. It does not
+              tell you how many mentions you got or whether the tone was positive. It is a close
+              read of a small number of articles about one story, and it answers a narrower
+              question than a monitoring tool does.
+            </p>
+          </div>
+        </section>
 
         {/* ── CTA ── */}
-        <motion.section className={styles.cta} {...reveal(0.05)}>
-          <AnalyzerCta />
-        </motion.section>
+        <section className={shell.cta}>
+          <h2>Bring a story you already know well</h2>
+          <p>
+            The fastest way to judge this is on coverage you have already read closely. Bring one
+            and we will go through what it finds.
+          </p>
+          <div className={shell.actions}>
+          <a href="mailto:contact@tryneutraleye.com?subject=NeutralEye%20demo" className={shell.btn}>Book a demo</a>
+          </div>
+        </section>
 
       </main>
     </MarketingShell>
