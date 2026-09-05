@@ -48,6 +48,18 @@
   gap: 1.15rem;
 }
 
+/* One line saying what the product is. The footer named the company and its
+   copyright but never what it does, so a visitor who scrolled past the homepage
+   evidence had nothing to anchor the link columns to. */
+.footerTagline {
+  max-width: 21rem;
+  margin: 0 0 0.15rem;
+  color: rgb(var(--text-rgb) / 0.72);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
 .footerBrand p {
   margin: 0;
   color: rgb(var(--text-rgb) / 0.72);

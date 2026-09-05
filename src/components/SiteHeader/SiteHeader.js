@@ -11,15 +11,25 @@ import AuthDialog from "@/components/AuthDialog/AuthDialog";
 import { BOOKING_URL } from "@/lib/content";
 import styles from "./SiteHeader.module.css";
 
-/* Flat by design. Three generic dropdown categories were borrowed chrome;
-   a reader needs to run the tool, understand it, get it in their browser,
-   and see what it costs. Everything else belongs in the footer. */
-/* Two items. The hero deliberately carries no call to action, and a header CTA
-   would undercut that: the finding is meant to do the work before anything is
-   asked for. */
+/* Flat by design: no dropdowns. The four items mirror the homepage's own spine,
+   which is the two-audience split (paid reports, free tools) plus the two
+   questions a stranger asks about a one-person operation (how does it work, who
+   is behind it). Media-intelligence comparables carry the same slots: Muck Rack
+   runs For PR Teams / For Journalists / Resources / Company, Signal AI runs
+   Solutions / Approach / Insights / Company. Both drop pricing in favour of a
+   demo request, which is this product's model too.
+
+   Labels match the footer exactly, so the same page is never called two things.
+   "How it works" replaced "Method", which collided with /methodology.
+
+   /for-comms is deliberately absent. It carries its own stripped header and
+   footer, which makes it a conversion landing page, and those are kept out of
+   site nav so the visitor has a single path. It stays linked from the footer. */
 const NAV_LINKS = [
-  { href: "/how-it-works", label: "Method" },
   { href: "/reports", label: "Coverage reports" },
+  { href: "/tools", label: "Tools" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/about", label: "About" },
 ];
 
 function userInitial(user) {

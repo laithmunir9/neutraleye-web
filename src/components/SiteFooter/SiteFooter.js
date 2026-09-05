@@ -6,7 +6,11 @@ import styles from "./SiteFooter.module.css";
    Product / Learn / Company taxonomy. "Company" was a heading for a company
    with a team and a careers page; this is one person, so the honest word is
    Project. The three explainers sit together under Learn because they answer
-   versions of the same question. */
+   versions of the same question.
+
+   Every label here that also appears in the header uses the identical wording:
+   Coverage reports, Tools, How it works, About. A page called two different
+   names in two places reads as two pages. */
 const FOOTER_COLS = [
   {
     heading: "Product",
@@ -53,6 +57,9 @@ export default function SiteFooter({ compact = false }) {
             <Image src="/neutraleye-mark.svg" alt="" width={30} height={30} className={styles.footerLogo} unoptimized />
             <span>NeutralEye</span>
           </Link>
+          <p className={styles.footerTagline}>
+            NeutralEye reads an article and shows the choices behind it.
+          </p>
           <div className={styles.footerMeta}>
             <p>© 2026 NeutralEye. All rights reserved.</p>
             <span className={styles.footerStatus}>
