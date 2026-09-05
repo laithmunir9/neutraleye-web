@@ -10,7 +10,10 @@ const supabaseWsUrl = supabaseUrl.replace(/^http/, "ws");
 // - connect-src allows Supabase (REST + realtime websocket) and Sentry ingest.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  // va.vercel-scripts.com serves the Web Analytics collector. Without it the
+  // <Analytics /> component mounts but its script is refused, in production as
+  // well as dev, and no page views are recorded at all.
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://images.unsplash.com",
   "font-src 'self' data:",
