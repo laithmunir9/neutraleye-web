@@ -16,6 +16,7 @@ import styles from "./CoverageMatrixLive.module.css";
  */
 
 const OUTLETS = ["CNBC", "Motley Fool", "Quartz", "AeroTime", "24/7 Wall St"];
+const FULL = ["CNBC Investing Club", "The Motley Fool", "Quartz", "AeroTime", "24/7 Wall St"];
 
 const ROWS = [
   {
@@ -66,9 +67,55 @@ const ROWS = [
 
 const LABEL = { reported: "Reported", omitted: "Omitted", diverges: "Diverges", none: "–" };
 
+/* The panel describes the selected cell: this outlet, this claim, this state.
+   Reading it off the row alone told you about whichever outlet the row happened
+   to be written around, even when you had clicked a different column. */
+function readCell(row, col) {
+  const state = row.cells[col];
+  const outlet = FULL[col];
+  const carried = row.cells
+    .map((s, i) => (s === "reported" || s === "diverges" ? FULL[i] : null))
+    .filter((o, i) => o && i !== col);
+
+  if (state === "diverges") {
+    return {
+      outlet,
+      detail: "The two articles give different figures for the same expected number, on the same quarter.",
+      spans: row.spans || [],
+      check: "Both spans located verbatim. Reproduced in both independent passes. The analysis records the divergence and does not resolve which figure was right.",
+    };
+  }
+  if (state === "omitted") {
+    return {
+      outlet,
+      detail: `Absent from ${outlet}, and carried by ${carried.length} of the other four outlets: ${carried.join(", ")}.`,
+      spans: [],
+      effect: row.effect,
+      check: "Checked against this article's filing time and its format, and recorded as an editorial choice rather than a consequence of either.",
+    };
+  }
+  if (state === "reported") {
+    return {
+      outlet,
+      detail: carried.length
+        ? `${outlet} carried this claim, as did ${carried.join(", ")}.`
+        : `${outlet} carried this claim.`,
+      spans: [],
+      check: "Located verbatim in the article and reproduced in both independent passes.",
+    };
+  }
+  return {
+    outlet,
+    detail: `Not stated in ${outlet}'s article.`,
+    spans: [],
+    check: "Below the corroboration threshold, so this is recorded as not stated rather than counted as a coverage gap.",
+  };
+}
+
 export default function CoverageMatrixLive() {
-  const [sel, setSel] = useState({ row: 0, col: 0 });
-  const active = ROWS[sel.row];
+  const [sel, setSel] = useState({ row: 1, col: 0 });
+  const active = readCell(ROWS[sel.row], sel.col);
+  const claim = ROWS[sel.row].claim;
 
   return (
     <div className={styles.wrap}>
@@ -105,7 +152,7 @@ export default function CoverageMatrixLive() {
 
       <div className={styles.panel} aria-live="polite" key={`${sel.row}-${sel.col}`}>
         <p className={styles.panelOutlet}>{active.outlet}</p>
-        <h3 className={styles.panelClaim}>{active.claim}</h3>
+        <h3 className={styles.panelClaim}>{claim}</h3>
         <p className={styles.panelDetail}>{active.detail}</p>
 
         {active.spans.length > 0 && (
