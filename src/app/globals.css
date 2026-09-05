@@ -109,11 +109,10 @@
   --brand-foreground: 34 37% 39%;
 }
 
-/* Was scoped to /for-comms. Now that the whole site runs this palette, these
-   live at the root so any page can use them. The .for-comms class is kept as a
-   no-op alias so that route's stylesheets keep resolving unchanged. */
-:root,
-.for-comms {
+/* The site palette. These were once scoped to the /for-comms landing page; that
+   page has since been redirected to the homepage and the whole site runs this
+   palette, so they live at the root. The .for-comms no-op alias went with it. */
+:root {
   --fc-bg: #FFFFFF;
   --fc-surface: #F4F5F5;
   --fc-border: #DFE2E2;

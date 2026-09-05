@@ -21,10 +21,7 @@ import styles from "./SiteHeader.module.css";
 
    Labels match the footer exactly, so the same page is never called two things.
    "How it works" replaced "Method", which collided with /methodology.
-
-   /for-comms is deliberately absent. It carries its own stripped header and
-   footer, which makes it a conversion landing page, and those are kept out of
-   site nav so the visitor has a single path. It stays linked from the footer. */
+ */
 const NAV_LINKS = [
   { href: "/reports", label: "Coverage reports" },
   { href: "/tools", label: "Tools" },

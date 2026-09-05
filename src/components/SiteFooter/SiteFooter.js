@@ -19,7 +19,6 @@ const FOOTER_COLS = [
       { href: "/reports", label: "Coverage reports" },
       { href: "/tools", label: "Tools" },
       { href: "/analyze", label: "Analyzer" },
-      { href: "/for-comms", label: "For comms and IR teams" },
     ],
   },
   {

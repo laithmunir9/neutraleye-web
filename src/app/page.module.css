@@ -1,7 +1,6 @@
 /* The homepage runs a wider container than the rest of the site. The shared
    header and footer stay at their current width on purpose: widening them would
-   change every page, including /for-comms, which is out of scope here. Global
-   width is a decision for the full-site pass. */
+   change every page. Global width is a decision for the full-site pass. */
 .page {
   --home-max: 97.5rem;
   --home-gutter: clamp(1.25rem, 5vw, 6rem);

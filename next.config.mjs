@@ -63,6 +63,12 @@ const nextConfig = {
       { source: "/compare", destination: "/reports", permanent: true },
       { source: "/extension", destination: "/tools", permanent: true },
       { source: "/support", destination: "/faq", permanent: true },
+      // Built when the homepage was still the old consumer site, so it had to
+      // carry the whole B2B argument alone. The homepage now makes that case
+      // with the same worked example in the current design system, and
+      // /how-it-works carries the positioning and delivery terms, so keeping it
+      // meant two pages saying one thing with one of them visually behind.
+      { source: "/for-comms", destination: "/", permanent: true },
       // Unpublished: its whole argument was how to read a confidence score and
       // a direction label, neither of which the analysis produces. /methodology
       // covers how to read a result without either.

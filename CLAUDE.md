@@ -312,6 +312,12 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 - **Imports:** Use `@/` alias for `src/` imports
 - **Logging:** Always use `logEvent(level, event, meta)` in API routes — never raw `console.log`
 - **No secrets in code:** All keys and URLs via environment variables only
+- **Admin tooling never goes on a public marketing path.** It lives behind auth on its own
+  route. In particular `/for-comms` is a retired public marketing URL that now permanently
+  redirects to `/`, and it was linked in cold outreach, so external parties still hold that
+  address. Do not reuse it for admin, internal, or authenticated tooling. The same applies
+  to the other retired marketing paths that redirect: `/pricing`, `/compare`, `/extension`,
+  `/support`.
 - **Prompt changes:** The article-detection and bias-analysis prompts live in ONE place: `src/lib/analysis.js`. Both `/api/analyze` and `/api/extension` import from it (along with URL extraction, OpenAI calls, and `buildHumanResult`). Never re-add prompt text to a route file. Shared logging/Sentry helpers live in `src/lib/apiLog.js`.
 - **`driverLabelFromReason`** in `analyze/route.js`: maps "language" → "Loaded wording", "framing" → "Framing", "source" → "Source imbalance", "attribution" → "Attribution gaps". Any other value (e.g. AI returns "LOADED PHRASING") is title-cased and passed through rather than collapsed to a generic fallback.
 - **`storage.js` `saveAnalysis`**: always tags website Supabase saves with `requestMeta.source = "website"` before persisting. The extension API tags its own saves with `source: "extension"` server-side.
