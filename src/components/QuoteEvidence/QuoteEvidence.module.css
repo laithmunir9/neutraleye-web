@@ -2,17 +2,16 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 1rem;
-  background: rgba(255, 252, 247, 0.88);
+  background: rgb(var(--surface-rgb) / 0.88);
 }
 
 .chip {
   display: inline-flex;
-  border-radius: 999px;
+  border-radius: 2px;
   border: 1px solid var(--border);
-  background: rgba(239, 231, 220, 0.86);
+  background: rgb(var(--muted-rgb) / 0.86);
   padding: 0.35rem 0.65rem;
   font-size: 0.68rem;
-  text-transform: uppercase;
   letter-spacing: 0;
   font-weight: 700;
   color: var(--accent-strong);
@@ -29,7 +28,7 @@
 }
 
 .mark {
-  color: rgba(139, 103, 65, 0.52);
+  color: rgb(var(--brand-rgb) / 0.52);
   font-size: 2rem;
   line-height: 1;
 }

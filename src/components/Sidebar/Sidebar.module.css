@@ -33,7 +33,7 @@
 }
 
 .navItem:focus-visible {
-  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.12);
+  box-shadow: 0 0 0 4px rgb(var(--brand-rgb) / 0.12);
 }
 
 .navIcon {
@@ -52,17 +52,17 @@
 }
 
 .active {
-  border-color: rgba(139, 103, 65, 0.28);
-  background: rgba(139, 103, 65, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 252, 247, 0.6);
+  border-color: rgb(var(--brand-rgb) / 0.28);
+  background: rgb(var(--brand-rgb) / 0.1);
+  box-shadow: inset 0 1px 0 rgb(var(--surface-rgb) / 0.6);
 }
 
 .active .navIcon {
-  color: #6e4f2f;
+  color: rgb(var(--brand-dark-rgb));
 }
 
 .active .navLabel {
-  color: #6e4f2f;
+  color: rgb(var(--brand-dark-rgb));
   font-weight: 700;
 }
 

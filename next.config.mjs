@@ -10,7 +10,10 @@ const supabaseWsUrl = supabaseUrl.replace(/^http/, "ws");
 // - connect-src allows Supabase (REST + realtime websocket) and Sentry ingest.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  // va.vercel-scripts.com serves the Web Analytics collector. Without it the
+  // <Analytics /> component mounts but its script is refused, in production as
+  // well as dev, and no page views are recorded at all.
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://images.unsplash.com",
   "font-src 'self' data:",
@@ -51,6 +54,27 @@ const nextConfig = {
         source: "/:path*",
         has: [{ type: "host", value: "www.tryneutraleye.com" }],
         destination: "https://tryneutraleye.com/:path*",
+        permanent: true,
+      },
+      // Pages removed in the site design pass. They were live and indexed, so
+      // they redirect to the page that now answers the same question rather
+      // than dead-ending a visitor arriving from search.
+      { source: "/pricing", destination: "/reports", permanent: true },
+      { source: "/compare", destination: "/reports", permanent: true },
+      { source: "/extension", destination: "/tools", permanent: true },
+      { source: "/support", destination: "/faq", permanent: true },
+      // Unpublished: its whole argument was how to read a confidence score and
+      // a direction label, neither of which the analysis produces. /methodology
+      // covers how to read a result without either.
+      {
+        source: "/blog/what-confidence-scores-actually-measure",
+        destination: "/methodology",
+        permanent: true,
+      },
+      // Renamed so the banned phrase does not survive in the URL.
+      {
+        source: "/blog/how-to-detect-bias-in-news",
+        destination: "/blog/how-to-read-framing-in-news",
         permanent: true,
       },
     ];

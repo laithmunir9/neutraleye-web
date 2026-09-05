@@ -3,14 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ScanSearch, History, Columns2, Settings2 } from "lucide-react";
+import { ScanSearch, History, Settings2 } from "lucide-react";
 import { EXTENSION_URL } from "@/lib/content";
 import styles from "./Sidebar.module.css";
 
 const NAV_ITEMS = [
   { href: "/analyze",  label: "Analyze",  Icon: ScanSearch },
   { href: "/history",  label: "History",  Icon: History },
-  { href: "/compare",  label: "Compare",  Icon: Columns2 },
   { href: "/settings", label: "Settings", Icon: Settings2 },
 ];
 

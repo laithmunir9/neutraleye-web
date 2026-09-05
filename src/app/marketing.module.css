@@ -1,0 +1,317 @@
+/* Shared marketing layout.
+ *
+ * Written to replace the borrowed page shapes: variance's dark institutional
+ * hero bands and alternating rows of invented product screenshots, and
+ * Quillbot's grid of tool cards. The rules this system holds to:
+ *
+ *   1. No dark full-bleed bands. The site is light.
+ *   2. No invented product UI. Show real output, or show nothing.
+ *   3. Rules, not cards. A card has to contain actual evidence to earn itself.
+ *   4. No eyebrow labels. The heading already says it.
+ *   5. No 01/02/03 display numerals.
+ *   6. One left edge, all the way down every page.
+ *
+ * The signature device is the annotation mark, not the container.
+ */
+
+.page {
+  position: relative;
+  max-width: 100%;
+  --section-pad-x: clamp(1rem, 4vw, 2rem);
+  overflow: clip;
+}
+
+.hero {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(3rem, 6vw, 4.5rem) var(--section-pad-x) 0;
+}
+
+.hero h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 3.1vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  /* A large serif needs its tracking pulled in; at default it reads loose. */
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
+}
+
+.lead {
+  max-width: 42rem;
+  margin: 1.5rem 0 0;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--fc-body);
+}
+
+/* Heading left, content right. A single narrow column left-aligned inside a
+   72rem container left ~560px dead on the right; this uses the width without
+   reaching for cards to fill it, and the heading still starts on the same left
+   edge as every other page. */
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) minmax(0, 46rem);
+  gap: 0 3rem;
+  align-items: start;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(3.5rem, 6vw, 5rem) var(--section-pad-x) 0;
+}
+
+/* The heading spans every row of its column. Left on a single row it set that
+   row's height, so a taller heading silently pushed the first content block
+   down and the gap under it varied page to page (65px here, 78px there)
+   despite an identical 40px margin. */
+.section h2 { grid-column: 1; grid-row: 1 / span 99; align-self: start; }
+.section > *:not(h2) { grid-column: 2; }
+/* For sections with no heading of their own, so the content keeps the page
+   left edge instead of being pushed into the right-hand column. */
+.section > .full { grid-column: 1 / -1; }
+
+.section h2 {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.1vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.008em;
+  text-wrap: pretty;
+}
+
+.measure {
+  max-width: 42rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--fc-body);
+}
+
+.measure p { margin: 0 0 1rem; }
+.measure p:last-child { margin-bottom: 0; }
+
+/* Hairline-separated rows. This is what replaced the card grids: the divider
+   carries the structure so the container does not have to. */
+.rows {
+  max-width: 46rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  padding: 1.35rem 0;
+  border-top: 1px solid var(--fc-border);
+}
+
+.row:first-child { border-top: 0; padding-top: 0; }
+.row:last-child { padding-bottom: 0; }
+
+.rowTitle {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.004em;
+  color: var(--fc-heading);
+}
+
+.rowBody {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--fc-body);
+}
+
+/* Sequence. Used only where the content really is ordered, and set as a small
+   inline numeral rather than a display number competing with the heading. */
+.step { position: relative; padding-left: 2.25rem; }
+
+.stepNum {
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--fc-muted);
+}
+
+/* The one card style, reserved for real evidence. */
+.exhibit {
+  margin: 1.75rem 0 0;
+  padding: 1.5rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: 4px;
+}
+
+.exhibitBody {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--fc-body);
+}
+
+.exhibitMeta {
+  margin: 1rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--fc-border);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--fc-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--control-radius);
+  background: var(--fc-accent);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.btn:hover { background: var(--fc-accent-dark); }
+
+.btn:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+.btnQuiet {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  font-size: 0.9375rem;
+  color: var(--fc-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.btnQuiet:hover { color: var(--fc-accent-dark); }
+
+.btnQuiet:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+/* Ink family. Colour carries the kind of action: ink means "use the free
+   tool", accent means "talk to us about paid work". A CTA block takes the
+   colour of its primary action so a pair never splits across two hues. */
+.btnInk {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.btnInk:hover { background: var(--fc-ink-hover); }
+
+.btnInkQuiet {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  font-size: 0.9375rem;
+  color: var(--fc-heading);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.btnInkQuiet:hover { color: var(--fc-ink-hover); }
+
+.btnInk:focus-visible,
+.btnInkQuiet:focus-visible {
+  outline: 2px solid var(--fc-heading);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+/* Closing call to action. Left-aligned like everything above it. */
+.cta {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(4rem, 7vw, 6rem) var(--section-pad-x) 5rem;
+}
+
+.cta h2 {
+  max-width: 22ch;
+  margin: 0;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.1vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.008em;
+}
+
+.cta p {
+  max-width: 42rem;
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--fc-body);
+}
+
+.twoUp {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5rem;
+  margin-top: 1.75rem;
+}
+
+.section > * + * { margin-top: 2.5rem; }
+
+/* On the stacked layout the heading and its body share a column, so the
+   heading needs real air beneath it rather than the 1rem it inherited. */
+@media (max-width: 64rem) {
+  .section > h2 + * { margin-top: 1.5rem; }
+}
+.section .rows + .actions { margin-top: 2rem; }
+
+@media (max-width: 64rem) {
+  .section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .section h2,
+  .section > *:not(h2) { grid-column: 1; }
+
+  .section h2 { max-width: 22ch; }
+  .section > *:not(h2) { margin-top: 1.25rem; }
+  .section > * + * { margin-top: 2.5rem; }
+
+/* On the stacked layout the heading and its body share a column, so the
+   heading needs real air beneath it rather than the 1rem it inherited. */
+@media (max-width: 64rem) {
+  .section > h2 + * { margin-top: 1.5rem; }
+}
+.section .rows + .actions { margin-top: 2rem; }
+}
+
+@media (max-width: 48rem) {
+  .twoUp { grid-template-columns: minmax(0, 1fr); }
+}

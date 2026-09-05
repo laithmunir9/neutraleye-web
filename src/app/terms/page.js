@@ -14,7 +14,6 @@ export default function TermsPage() {
     <MarketingShell>
       <main className={styles.page}>
         <section className={styles.hero}>
-          <p className={styles.eyebrow}>Legal</p>
           <h1>Terms & Conditions</h1>
           <p>
             These terms apply to the NeutralEye website, analysis service, browser extension, and any paid plan
@@ -56,7 +55,7 @@ export default function TermsPage() {
             <p>
               NeutralEye offers a free tier and a paid Pro plan. The Pro plan unlocks additional features, including
               unlimited analyses, cloud history synced across devices, and Compare Analyses. Pro plan pricing and
-              available features are described on the <Link href="/pricing">Pricing page</Link>.
+              available features are described on the <Link href="/tools">Tools page</Link>.
             </p>
             <p>
               Payments are processed by Stripe. By subscribing to a paid plan you authorize us to charge your payment

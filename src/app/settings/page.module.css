@@ -23,15 +23,15 @@
   justify-content: space-between;
   gap: 1.25rem;
   padding: 1.1rem 1.15rem;
-  border: 1px solid rgba(93, 75, 53, 0.1);
+  border: 1px solid rgb(var(--border-rgb) / 0.1);
   border-radius: var(--radius-md);
-  background: rgba(239, 231, 220, 0.32);
+  background: rgb(var(--muted-rgb) / 0.32);
   transition: border-color 150ms ease, background 150ms ease;
 }
 
 .row:hover {
-  border-color: rgba(93, 75, 53, 0.18);
-  background: rgba(239, 231, 220, 0.5);
+  border-color: rgb(var(--border-rgb) / 0.18);
+  background: rgb(var(--muted-rgb) / 0.5);
 }
 
 .row > span {
@@ -61,7 +61,7 @@
   align-items: center;
   gap: 0.4rem;
   margin: 0.85rem 0 0;
-  color: rgba(32, 27, 22, 0.42);
+  color: rgb(var(--text-rgb) / 0.42);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 500;
@@ -75,7 +75,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: rgba(139, 103, 65, 0.45);
+  background: rgb(var(--brand-rgb) / 0.45);
   flex-shrink: 0;
 }
 
@@ -103,19 +103,19 @@
   align-items: center;
   width: 2.6rem;
   height: 1.4rem;
-  border-radius: 999px;
-  background: rgba(93, 75, 53, 0.2);
+  border-radius: 2px;
+  background: rgb(var(--border-rgb) / 0.2);
   padding: 0.18rem;
   transition: background 180ms ease, box-shadow 180ms ease;
 }
 
 .toggleInput:checked ~ .toggleTrack {
-  background: #8b6741;
-  box-shadow: 0 0 0 1px rgba(139, 103, 65, 0.28);
+  background: rgb(var(--brand-rgb));
+  box-shadow: 0 0 0 1px rgb(var(--brand-rgb) / 0.28);
 }
 
 .toggleInput:focus-visible ~ .toggleTrack {
-  outline: 2px solid rgba(139, 103, 65, 0.5);
+  outline: 2px solid rgb(var(--brand-rgb) / 0.5);
   outline-offset: 2px;
 }
 
@@ -138,7 +138,7 @@
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: rgba(32, 27, 22, 0.36);
+  color: rgb(var(--text-rgb) / 0.36);
   letter-spacing: 0.03em;
   line-height: 1.7;
 }

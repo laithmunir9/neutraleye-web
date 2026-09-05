@@ -1,0 +1,16 @@
+.marker {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0.1em 0.4em;
+  border: 1px dashed var(--fc-border-input);
+  border-radius: 2px;
+  background: var(--fc-bg);
+  color: var(--fc-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  vertical-align: baseline;
+  white-space: nowrap;
+}

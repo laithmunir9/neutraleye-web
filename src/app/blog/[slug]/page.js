@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
 import ReadingLayout from "./ReadingLayout";
 import { BLOG_POSTS, BLOG_POSTS_BY_SLUG, getBlogPostSections } from "@/lib/content";
 import styles from "./page.module.css";
@@ -50,9 +49,7 @@ export default async function BlogPostPage({ params }) {
             </div>
           </header>
 
-          <ScrollReveal>
-            <ReadingLayout sections={sections} />
-          </ScrollReveal>
+          <ReadingLayout sections={sections} />
         </article>
       </main>
     </MarketingShell>

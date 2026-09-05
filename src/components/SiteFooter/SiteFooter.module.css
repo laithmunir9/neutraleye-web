@@ -4,7 +4,7 @@
   margin-top: auto;
   padding: 0 0 1.5rem;
   background: var(--panel-strong);
-  border-top: 1px solid rgba(93, 75, 53, 0.14);
+  border-top: 1px solid rgb(var(--border-rgb) / 0.14);
 }
 
 .footerInner {
@@ -48,9 +48,21 @@
   gap: 1.15rem;
 }
 
+/* One line saying what the product is. The footer named the company and its
+   copyright but never what it does, so a visitor who scrolled past the homepage
+   evidence had nothing to anchor the link columns to. */
+.footerTagline {
+  max-width: 21rem;
+  margin: 0 0 0.15rem;
+  color: rgb(var(--text-rgb) / 0.72);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
 .footerBrand p {
   margin: 0;
-  color: rgba(32, 27, 22, 0.72);
+  color: rgb(var(--text-rgb) / 0.72);
   font-size: 0.88rem;
   line-height: 1.55;
 }
@@ -59,7 +71,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  color: rgba(32, 27, 22, 0.72);
+  color: rgb(var(--text-rgb) / 0.72);
   font-size: 0.88rem;
   line-height: 1.4;
 }
@@ -67,7 +79,7 @@
 .footerStatusDot {
   width: 0.65rem;
   height: 0.65rem;
-  border-radius: 999px;
+  border-radius: 2px;
   background: var(--status-ok);
   box-shadow: 0 0 0 0.18rem var(--status-ok-glow);
 }
@@ -79,13 +91,15 @@
 }
 
 
+/* Colour and weight already separate these from the links below, so caps was
+   a third redundant signal on the one piece of borrowed chrome left standing.
+   Sized up to keep the same presence without shouting. */
 .footerHeading {
   margin: 0;
   color: var(--accent-strong);
-  font-size: 0.68rem;
-  font-weight: 650;
+  font-size: 0.8rem;
+  font-weight: 600;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .footerLinks {
@@ -95,7 +109,7 @@
 }
 
 .footerLinks a {
-  color: rgba(32, 27, 22, 0.72);
+  color: rgb(var(--text-rgb) / 0.72);
   font-size: 0.89rem;
   font-weight: 430;
   letter-spacing: 0;

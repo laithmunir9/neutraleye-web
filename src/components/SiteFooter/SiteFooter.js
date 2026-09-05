@@ -2,41 +2,50 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./SiteFooter.module.css";
 
+/* Grouped by what a reader is trying to do, not by the borrowed
+   Product / Learn / Company taxonomy. "Company" was a heading for a company
+   with a team and a careers page; this is one person, so the honest word is
+   Project. The three explainers sit together under Learn because they answer
+   versions of the same question.
+
+   Every label here that also appears in the header uses the identical wording:
+   Coverage reports, Tools, How it works, About. A page called two different
+   names in two places reads as two pages. */
 const FOOTER_COLS = [
   {
     heading: "Product",
     label: "Footer product",
     links: [
-      { href: "/analyze",      label: "Analyze" },
-      { href: "/how-it-works", label: "How It Works" },
-      { href: "/extension",   label: "Chrome Extension" },
-      { href: "/pricing",     label: "Pricing" },
+      { href: "/reports", label: "Coverage reports" },
+      { href: "/tools", label: "Tools" },
+      { href: "/analyze", label: "Analyzer" },
+      { href: "/for-comms", label: "For comms and IR teams" },
     ],
   },
   {
     heading: "Learn",
     label: "Footer learn",
     links: [
+      { href: "/how-it-works", label: "How it works" },
       { href: "/methodology", label: "Methodology" },
-      { href: "/blog",        label: "Blog" },
-      { href: "/faq",         label: "FAQ" },
+      { href: "/faq", label: "FAQ" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
-    heading: "Company",
-    label: "Footer company",
+    heading: "Project",
+    label: "Footer project",
     links: [
-      { href: "/about",     label: "About" },
+      { href: "/about", label: "About" },
       { href: "/changelog", label: "Changelog" },
-      { href: "/support",   label: "Support" },
     ],
   },
 ];
 
 const FOOTER_LEGAL_LINKS = [
-  { href: "/terms",             label: "Terms of Service" },
-  { href: "/privacy",           label: "Privacy Policy" },
-  { href: "/extension-privacy", label: "Extension Privacy" },
+  { href: "/terms", label: "Terms of service" },
+  { href: "/privacy", label: "Privacy policy" },
+  { href: "/extension-privacy", label: "Extension privacy" },
 ];
 
 export default function SiteFooter({ compact = false }) {
@@ -45,9 +54,12 @@ export default function SiteFooter({ compact = false }) {
       <div className={styles.footerInner}>
         <div className={styles.footerBrand}>
           <Link href="/" className={styles.footerBrandLink} aria-label="NeutralEye home">
-            <Image src="/neutraleye-logo-128.png" alt="" width={30} height={30} className={styles.footerLogo} />
+            <Image src="/neutraleye-mark.svg" alt="" width={30} height={30} className={styles.footerLogo} unoptimized />
             <span>NeutralEye</span>
           </Link>
+          <p className={styles.footerTagline}>
+            NeutralEye reads an article and shows the choices behind it.
+          </p>
           <div className={styles.footerMeta}>
             <p>© 2026 NeutralEye. All rights reserved.</p>
             <span className={styles.footerStatus}>

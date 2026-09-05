@@ -4,23 +4,32 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --bg: #f7f4ef;
-  --surface: rgba(255, 252, 247, 0.94);
-  --surface-strong: #fffcf7;
-  --surface-muted: #efe7dc;
-  --panel: rgba(243, 237, 229, 0.9);
-  --panel-strong: #e8dfd3;
-  --text: #201b16;
-  --secondary-text: #65584b;
-  --muted: #7b6a58;
-  --border: rgba(93, 75, 53, 0.1);
-  --border-strong: rgba(93, 75, 53, 0.2);
-  --shadow: 0 1rem 2.2rem rgba(40, 29, 19, 0.055);
-  --shadow-strong: 0 1.65rem 3.6rem rgba(40, 29, 19, 0.105);
+  --bg: #ffffff;
+  --surface: rgb(255 255 255 / 0.94);
+  --surface-strong: #ffffff;
+  --surface-muted: #f4f5f5;
+  --panel: rgb(244 245 245 / 0.9);
+  --panel-strong: #eaecec;
+  --text: #0d0f10;
+  --secondary-text: #3b4245;
+  --muted: #667074;
+  --border: rgb(13 15 16 / 0.1);
+  --border-strong: rgb(13 15 16 / 0.2);
+  --shadow: 0 1rem 2.2rem rgb(13 15 16 / 0.055);
+  --shadow-strong: 0 1.65rem 3.6rem rgb(13 15 16 / 0.105);
   --radius-xl: 0.5rem;
   --radius-lg: 0.5rem;
   --radius-md: 0.5rem;
   --radius-sm: 0.375rem;
+  /* Buttons and the controls that sit beside them. Separate from the 2px used
+     on marks, cells and rules, which is typographic rather than interactive:
+     rounding those too would soften the evidence layouts.
+
+     Deliberately NOT named --radius-*: Tailwind v4 reserves that namespace for
+     its rounded-* utilities and tree-shakes any variable in it that no utility
+     references, so --radius-control was silently dropped from the built CSS and
+     every button fell back to 0px. */
+  --control-radius: 0.5rem;
   --space-1: 0.4rem;
   --space-2: 0.75rem;
   --space-3: 1rem;
@@ -29,9 +38,9 @@
   --space-6: 3rem;
   --space-7: 4rem;
   --space-8: 6rem;
-  --success-bg: #efe7dc;
-  --success-text: #6e4f2f;
-  --warning-bg: #f4ecd6;
+  --success-bg: #e5f0f0;
+  --success-text: #0b484b;
+  --warning-bg: #eef1f1;
   --error-bg: #f7e5e2;
   --error-text: #8a443c;
   --error-border: rgba(138, 67, 60, 0.24);
@@ -39,43 +48,35 @@
   --status-ok-glow: rgba(138, 203, 157, 0.18);
   --status-ok-bg: rgba(138, 203, 157, 0.15);
   --status-ok-text: #2d6a4f;
-  --background: #f7f4ef;
-  --foreground: #201b16;
-  --card: #fffcf7;
-  --card-foreground: #201b16;
-  --popover: #fffcf7;
-  --popover-foreground: #201b16;
-  --primary: #2d2823;
-  --primary-foreground: #f8f4ee;
-  --secondary: #efe7dc;
-  --secondary-foreground: #201b16;
-  --muted-foreground: #65584b;
-  --accent: #efe3cf;
-  --accent-strong: #8b6741;
-  --accent-foreground: #201b16;
+  --background: #ffffff;
+  --foreground: #0d0f10;
+  --card: #ffffff;
+  --card-foreground: #0d0f10;
+  --popover: #ffffff;
+  --popover-foreground: #0d0f10;
+  --primary: #0d0f10;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f5f5;
+  --secondary-foreground: #0d0f10;
+  --muted-foreground: #667074;
+  --accent: #e5f0f0;
+  --accent-strong: #0e5a5e;
+  --accent-foreground: #0d0f10;
   --destructive: #8a443c;
   --destructive-foreground: #fff8f6;
-  --input: rgba(93, 75, 53, 0.14);
-  --ring: rgba(139, 103, 65, 0.2);
-  --brand: 34 37% 39%;
-  --brand-foreground: 38 42% 76%;
+  --input: rgb(13 15 16 / 0.14);
+  --ring: rgb(14 90 94 / 0.2);
+  --brand: 183 74% 21%;
+  --brand-foreground: 182 40% 90%;
   --font-sans:
-    var(--font-geist-sans),
-    "Avenir Next",
-    Avenir,
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Text",
-    "Segoe UI",
-    "Helvetica Neue",
-    system-ui,
-    Arial,
-    sans-serif;
+    var(--font-source-serif),
+    "Source Serif 4",
+    Georgia,
+    serif;
   --font-display:
-    "Iowan Old Style",
-    "Palatino Linotype",
-    "Book Antiqua",
-    "Georgia",
+    var(--font-source-serif),
+    "Source Serif 4",
+    Georgia,
     serif;
   --font-mono:
     var(--font-geist-mono),
@@ -85,6 +86,22 @@
     "Consolas",
     monospace;
   --site-header-height: 5rem;
+
+  /* Channel tokens. The warm palette was written as 672 literal colour values
+     across 34 stylesheets, most of them the same few hues at different alphas.
+     Expressing the hue once and deriving the alpha variants from it means a
+     palette change is an edit to these lines rather than to every call site. */
+  --brand-rgb: 14 90 94;   /* #0E5A5E accent */
+  --brand-dark-rgb: 11 72 75;   /* #0B484B accent pressed */
+  --surface-rgb: 255 255 255;   /* #FFFFFF */
+  --border-rgb: 13 15 16;   /* dark neutral, used at low alpha for hairlines */
+  --text-rgb: 13 15 16;   /* #0D0F10 */
+  --bg-rgb: 255 255 255;   /* #FFFFFF */
+  --offwhite-rgb: 244 245 245;   /* #F4F5F5 */
+  --muted-rgb: 229 240 240;   /* #E5F0F0 tint */
+  --panel-rgb: 234 236 236;   /* panel */
+  --secondary-rgb: 102 112 116;   /* #667074 */
+  --shadow-rgb: 13 15 16;   /* cool shadow base */
 }
 
 .dark {
@@ -92,12 +109,33 @@
   --brand-foreground: 34 37% 39%;
 }
 
+/* Was scoped to /for-comms. Now that the whole site runs this palette, these
+   live at the root so any page can use them. The .for-comms class is kept as a
+   no-op alias so that route's stylesheets keep resolving unchanged. */
+:root,
+.for-comms {
+  --fc-bg: #FFFFFF;
+  --fc-surface: #F4F5F5;
+  --fc-border: #DFE2E2;
+  --fc-border-input: #7F8890;
+  --fc-heading: #0D0F10;
+  --fc-body: #3B4245;
+  --fc-muted: #667074;
+  --fc-accent: #0E5A5E;
+  --fc-accent-dark: #0B484B;
+  --fc-tint: #E5F0F0;
+  /* The ink button family. Colour carries the kind of action: ink means "use
+     the free tool", accent means "talk to us about paid work". Base is
+     --fc-heading; this is only the hover lift. */
+  --fc-ink-hover: #2C3235;
+}
+
 * {
   box-sizing: border-box;
 }
 
 *::selection {
-  background: rgba(205, 188, 163, 0.5);
+  background: rgb(14 90 94 / 0.16);
 }
 
 html,
@@ -109,7 +147,7 @@ body {
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(123, 106, 88, 0.55) rgba(247, 244, 239, 0.9);
+  scrollbar-color: rgb(102 112 116 / 0.55) rgb(255 255 255 / 0.9);
   scrollbar-width: thin;
 }
 
@@ -127,19 +165,19 @@ body::-webkit-scrollbar {
 
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
-  background: rgba(247, 244, 239, 0.92);
+  background: rgb(255 255 255 / 0.92);
 }
 
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  border: 0.18rem solid rgba(247, 244, 239, 0.92);
+  border: 0.18rem solid rgb(255 255 255 / 0.92);
   border-radius: 999px;
-  background: rgba(123, 106, 88, 0.55);
+  background: rgb(102 112 116 / 0.55);
 }
 
 html::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover {
-  background: rgba(101, 88, 75, 0.65);
+  background: rgb(59 66 69 / 0.65);
 }
 
 button,
@@ -171,7 +209,7 @@ summary {
 
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(139, 103, 65, 0.12);
+  box-shadow: 0 0 0 4px rgb(14 90 94 / 0.14);
 }
 
 a {
@@ -182,77 +220,6 @@ a {
 img {
   max-width: 100%;
   display: block;
-}
-
-.max-w-container {
-  max-width: 80rem;
-}
-
-.fade-bottom {
-  position: relative;
-}
-
-.fade-bottom::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 8rem;
-  background: linear-gradient(to bottom, rgba(247, 244, 239, 0), rgba(247, 244, 239, 1));
-  pointer-events: none;
-}
-
-.animate-appear {
-  animation: appear 0.5s ease-out forwards;
-}
-
-.animate-appear-zoom {
-  animation: appear-zoom 0.5s ease-out forwards;
-}
-
-.delay-100 {
-  animation-delay: 100ms;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
-
-.delay-700 {
-  animation-delay: 700ms;
-}
-
-.delay-1000 {
-  animation-delay: 1000ms;
-}
-
-@keyframes appear {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes appear-zoom {
-  0% {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes border-beam {
-  100% {
-    offset-distance: 100%;
-  }
 }
 
 @theme inline {
@@ -296,101 +263,3 @@ img {
     transform: translateZ(0) rotate(360deg);
     }
   }}
-
-/* ── Sign-in component animations ── */
-
-@keyframes fadeSlideIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px);
-  }
-}
-
-@keyframes slideRightIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateX(0px);
-  }
-}
-
-@keyframes testimonialIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px) scale(1);
-  }
-}
-
-@keyframes barGrow {
-  from { height: 0%; }
-}
-
-.font-geist {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-}
-
-.animate-element {
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateY(8px);
-  animation: fadeSlideIn 0.5s ease forwards;
-}
-
-.animate-slide-right {
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateX(20px);
-  animation: slideRightIn 0.6s ease forwards;
-}
-
-.animate-testimonial {
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateY(12px) scale(0.97);
-  animation: testimonialIn 0.5s ease forwards;
-}
-
-.animate-delay-100  { animation-delay: 100ms; }
-.animate-delay-200  { animation-delay: 200ms; }
-.animate-delay-300  { animation-delay: 300ms; }
-.animate-delay-400  { animation-delay: 400ms; }
-.animate-delay-500  { animation-delay: 500ms; }
-.animate-delay-600  { animation-delay: 600ms; }
-.animate-delay-700  { animation-delay: 700ms; }
-.animate-delay-800  { animation-delay: 800ms; }
-.animate-delay-900  { animation-delay: 900ms; }
-.animate-delay-1000 { animation-delay: 1000ms; }
-.animate-delay-1200 { animation-delay: 1200ms; }
-.animate-delay-1400 { animation-delay: 1400ms; }
-
-.custom-checkbox {
-  appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 0.25rem;
-  background: transparent;
-  cursor: pointer;
-  position: relative;
-  flex-shrink: 0;
-  transition: background 150ms ease, border-color 150ms ease;
-}
-
-.custom-checkbox:checked {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
-}
-
-.custom-checkbox:checked::after {
-  content: "";
-  position: absolute;
-  left: 0.19rem;
-  top: 0.04rem;
-  width: 0.5rem;
-  height: 0.28rem;
-  border-left: 1.5px solid white;
-  border-bottom: 1.5px solid white;
-  transform: rotate(-45deg);
-}

@@ -1,4 +1,5 @@
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import shell from "../marketing.module.css";
 import styles from "./page.module.css";
 
 export const metadata = {
@@ -90,15 +91,14 @@ const TAG_COLORS = {
 export default function ChangelogPage() {
   return (
     <MarketingShell>
-      <main className={styles.page}>
+      <main className={shell.page}>
 
         {/* ── Hero ── */}
-        <header className={styles.hero}>
+        <header className={shell.hero}>
           <div className={styles.heroInner}>
             <div>
-              <p className={styles.eyebrow}>Product</p>
               <h1>Changelog</h1>
-              <p className={styles.lead}>
+              <p className={shell.lead}>
                 Every update to NeutralEye, including new features, improvements, and fixes,
                 in the order they shipped.
               </p>

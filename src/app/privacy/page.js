@@ -14,7 +14,6 @@ export default function PrivacyPage() {
     <MarketingShell>
       <main className={styles.page}>
         <section className={styles.hero}>
-          <p className={styles.eyebrow}>Legal</p>
           <h1>Website Privacy Policy</h1>
           <p>
             This policy explains how NeutralEye handles information submitted through the NeutralEye website,

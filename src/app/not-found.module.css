@@ -14,7 +14,6 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent-strong);
 }
@@ -56,25 +55,25 @@
 }
 
 .primaryAction {
-  background: #8b6741;
-  color: #f8f4ee;
-  box-shadow: 0 0.45rem 1rem rgba(139, 103, 65, 0.1);
+  background: rgb(var(--brand-rgb));
+  color: rgb(var(--offwhite-rgb));
+  box-shadow: 0 0.45rem 1rem rgb(var(--brand-rgb) / 0.1);
   transition: background 160ms ease;
 }
 
 .primaryAction:hover {
-  background: #6e4f2f;
+  background: rgb(var(--brand-dark-rgb));
 }
 
 .secondaryAction {
-  border: 1px solid rgba(93, 75, 53, 0.14);
-  background: rgba(255, 252, 247, 0.72);
+  border: 1px solid rgb(var(--border-rgb) / 0.14);
+  background: rgb(var(--surface-rgb) / 0.72);
   color: var(--text);
   backdrop-filter: blur(12px);
   transition: border-color 160ms ease, background 160ms ease;
 }
 
 .secondaryAction:hover {
-  border-color: rgba(93, 75, 53, 0.24);
-  background: rgba(255, 252, 247, 0.94);
+  border-color: rgb(var(--border-rgb) / 0.24);
+  background: rgb(var(--surface-rgb) / 0.94);
 }

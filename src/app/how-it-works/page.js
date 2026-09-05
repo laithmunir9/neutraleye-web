@@ -1,300 +1,137 @@
+import Link from "next/link";
+import { BOOKING_URL } from "@/lib/content";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import AnalyzerCta from "@/components/AnalyzerCta/AnalyzerCta";
-import ScrollReveal from "@/components/ScrollReveal/ScrollReveal";
-import styles from "../overview/page.module.css";
+import styles from "../marketing.module.css";
 
 export const metadata = {
   title: "How It Works | NeutralEye",
-  description: "The NeutralEye pipeline: how article text is extracted, checked across tone, framing, sourcing, attribution, and omission, and turned into an evidence-backed result.",
+  description:
+    "How a coverage report is produced: how the articles are gathered, how claims are extracted, what is checked against filing times, and why the whole thing runs twice.",
 };
 
-
-const heroInputs = ["Article text", "Tone", "Source mix", "Framing", "Attribution"];
-const heroOutputs = ["Direction", "Summary", "Examples", "Confidence", "Next reads"];
-const heroRailY = [100, 200, 300, 400, 500];
-
-const pipelineSteps = [
+const STEPS = [
   {
-    number: "01",
-    title: "Submit",
-    body: "Paste article text or provide a URL. NeutralEye accepts both, and URL submissions extract the article body automatically.",
+    title: "You send the story",
+    body: "A link to the story, and the coverage you want read if you already have it. If you do not, naming the story is enough and the coverage gets gathered for you.",
   },
   {
-    number: "02",
-    title: "Validate",
-    body: "The system confirms the material is article-like. Short passages, navigation text, and blocked pages are flagged before analysis starts.",
+    title: "Every article is captured with its timestamps",
+    body: "First published and last updated are recorded for each one. This is what later separates an outlet that chose not to report something from an outlet that had stopped updating before the fact existed.",
   },
   {
-    number: "03",
-    title: "Analyze",
-    body: "Tone, framing, attribution, source balance, and omission are reviewed together in one pass, not as five independent checks.",
+    title: "Claims are extracted by code, not by judgment",
+    body: "Which claims get examined is decided deterministically, so the same set of articles produces the same set of claims. A model reads the articles; it does not get to choose what counts as a claim.",
   },
   {
-    number: "04",
-    title: "Score",
-    body: "A confidence score is calibrated against how consistently signals appeared. Articles where all five checks point the same way score higher than those with mixed or thin evidence.",
+    title: "Each outlet is checked against each claim",
+    body: "Reported, omitted, contradicted, or not stated. A gap only counts where several other outlets carried the same fact, so one outlet mentioning something the rest did not is a difference in emphasis, not a coverage gap.",
   },
   {
-    number: "05",
-    title: "Return",
-    body: "The result comes back with a direction label, confidence score, quoted evidence, and sources to read alongside, everything needed to check the reasoning yourself.",
+    title: "The whole analysis runs twice",
+    body: "Independently, end to end. Anything that appears in one pass and not the other is reported as unstable rather than presented as a finding.",
+  },
+  {
+    title: "Quotes are verified against the source",
+    body: "Every quote is checked against the original article text before it reaches the report, so nothing is attributed to the wrong outlet.",
   },
 ];
 
-const principleCards = [
+const NOT = [
   {
-    title: "One pipeline",
-    body: "Article intake, content extraction, signal review, and evidence packaging run as a single sequence, not independent steps stitched together.",
+    title: "It does not rate outlets",
+    body: "There is no score and no spectrum. Every finding is specific to one article about one story, and the same outlet reads differently across two stories.",
   },
   {
-    title: "Structured output",
-    body: "Every result uses the same schema: direction, confidence, summary, examples, sources, and recommendations, making results comparable across runs.",
+    title: "It does not check whether claims are true",
+    body: "This describes how a story was assembled: what was carried, what was left out, and where an outlet's own text disagrees with its summary. Fact-checking is a different discipline.",
   },
   {
-    title: "No black box",
-    body: "The system returns what it found and where. Quoted language and sourcing patterns are included so the output can be checked against the original text.",
+    title: "It is not media monitoring",
+    body: "No mention counts, no sentiment, no volume dashboard. It is a close read of a small number of articles about one story.",
   },
 ];
-
-function FeatureVisual({ visual }) {
-  if (visual === "pipeline") {
-    return (
-      <div className={styles.visualShell}>
-        <div className={styles.pipelineCard}>
-          <div className={styles.pipelineHeader}>System flow</div>
-          <div className={styles.pipelineRow}>
-            <span className={styles.pipelineDot} />
-            <div className={styles.pipelineBar}>Readable article material confirmed</div>
-          </div>
-          <div className={styles.pipelineRow}>
-            <span className={styles.pipelineDot} />
-            <div className={styles.pipelineDetail}>
-              <strong>Signal families checked together</strong>
-              <p>Framing, source balance, attribution, and omission reviewed in one pass.</p>
-            </div>
-          </div>
-          <div className={styles.pipelineRow}>
-            <span className={styles.pipelineDot} />
-            <div className={styles.pipelineDetail}>
-              <strong>Structured result assembled</strong>
-              <p>Summary, examples, confidence, and next-reading context stay attached.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (visual === "confidence") {
-    const signals = [
-      { name: "Framing",     width: "82%", label: "High" },
-      { name: "Language",    width: "61%", label: "Moderate" },
-      { name: "Attribution", width: "38%", label: "Low" },
-    ];
-    return (
-      <div className={styles.visualShell}>
-        <div className={styles.confidenceCard}>
-          <div className={styles.resultChrome}>
-            <span /><span /><span />
-          </div>
-          <div className={styles.confReport}>
-            <div className={styles.confHeaderLabel}>Confidence report</div>
-            <div className={styles.confDirectionBlock}>
-              <span className={styles.confDirectionKey}>Direction</span>
-              <span className={styles.confDirectionVal}>Moderate bias, toward government sources</span>
-            </div>
-            <div className={styles.confScoreBlock}>
-              <div className={styles.confScoreRow}>
-                <span className={styles.confScoreLabel}>Analysis confidence</span>
-                <span className={styles.confScoreNum}>0.74</span>
-              </div>
-              <div className={styles.confBar}>
-                <div className={styles.confBarFill} style={{ width: "74%" }} />
-              </div>
-            </div>
-            <div className={styles.confSignals}>
-              <div className={styles.confSignalsTitle}>Signal strengths</div>
-              {signals.map((s) => (
-                <div key={s.name} className={styles.confSignalRow}>
-                  <span className={styles.confSignalName}>{s.name}</span>
-                  <div className={styles.confSignalBar}>
-                    <div className={styles.confSignalFill} style={{ width: s.width }} />
-                  </div>
-                  <span className={styles.confSignalVal}>{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={styles.visualShell}>
-      <div className={styles.resultCard}>
-        <div className={styles.resultChrome}>
-          <span /><span /><span />
-        </div>
-        <div className={styles.resultHead}>
-          <div>
-            <strong>Structured result</strong>
-            <p>Readable explanation with evidence attached.</p>
-          </div>
-          <span className={styles.approvalPill}>Inspectable</span>
-        </div>
-        <div className={styles.resultChecklist}>
-          <div className={styles.checkRow}>
-            <span className={styles.checkMark}>+</span>
-            <span>Summary grounded in article text</span>
-            <span className={styles.countPill}>1</span>
-          </div>
-          <div className={styles.checkRow}>
-            <span className={styles.checkMark}>+</span>
-            <span>Quoted evidence linked</span>
-            <span className={styles.countPill}>2</span>
-          </div>
-          <div className={styles.checkRow}>
-            <span className={styles.checkMark}>+</span>
-            <span>Next-read suggestions included</span>
-            <span className={styles.countPill}>3</span>
-          </div>
-        </div>
-        <div className={styles.citationBlock}>
-          <span>Evidence packet</span>
-          <div className={styles.citationItem}>1 Quoted phrase with explanation</div>
-          <div className={styles.citationItem}>2 Source balance note</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function HowItWorksPage() {
   return (
-    <MarketingShell darkHeader>
+    <MarketingShell>
       <main className={styles.page}>
 
-        {/* ── Dark hero ── */}
-        <section className={styles.hero} data-header-theme="dark">
-          <div className={styles.heroInner}>
-            <svg className={styles.heroConnections} viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-              <defs>
-                <linearGradient id="hero-line-left-fade" x1="280" x2="760" y1="0" y2="0" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.13)" />
-                  <stop offset="68%" stopColor="rgba(255,255,255,0.1)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                </linearGradient>
-                <linearGradient id="hero-line-right-fade" x1="840" x2="1320" y1="0" y2="0" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                  <stop offset="32%" stopColor="rgba(255,255,255,0.1)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.13)" />
-                </linearGradient>
-              </defs>
-              <path className={styles.heroConnectionLeft} d="M280 100 C480 104 600 180 760 244" />
-              <path className={styles.heroConnectionLeft} d="M280 200 C480 196 600 236 740 268" />
-              <path className={styles.heroConnectionLeft} d="M280 300 C480 296 580 300 680 300" />
-              <path className={styles.heroConnectionLeft} d="M280 400 C480 404 600 364 740 332" />
-              <path className={styles.heroConnectionLeft} d="M280 500 C480 496 600 420 760 356" />
-              <path className={styles.heroConnectionRight} d="M1320 100 C1120 104 1000 180 840 244" />
-              <path className={styles.heroConnectionRight} d="M1320 200 C1120 196 1000 236 860 268" />
-              <path className={styles.heroConnectionRight} d="M1320 300 C1120 296 1020 300 920 300" />
-              <path className={styles.heroConnectionRight} d="M1320 400 C1120 404 1000 364 860 332" />
-              <path className={styles.heroConnectionRight} d="M1320 500 C1120 496 1000 420 840 356" />
-              {heroInputs.map((item, i) => (
-                <g key={item}>
-                  <text className={styles.heroSvgLabel} x="255" y={heroRailY[i]} textAnchor="end" dominantBaseline="middle">{item}</text>
-                  <circle className={styles.heroSvgNode} cx="280" cy={heroRailY[i]} r="5.5" />
-                </g>
-              ))}
-              {heroOutputs.map((item, i) => (
-                <g key={item}>
-                  <circle className={styles.heroSvgNode} cx="1320" cy={heroRailY[i]} r="5.5" />
-                  <text className={styles.heroSvgLabel} x="1345" y={heroRailY[i]} textAnchor="start" dominantBaseline="middle">{item}</text>
-                </g>
-              ))}
-            </svg>
-            <div className={styles.heroCopy}>
-              <h1>How NeutralEye Works</h1>
-              <p className={styles.lead}>
-                Article text goes in. A structured bias analysis comes out, with direction, evidence, confidence, and next reads.
-              </p>
-              <div className={styles.heroActions}>
-                <a className={styles.heroButton} href="/analyze">Open Analyzer</a>
-              </div>
-            </div>
+        <section className={styles.hero}>
+          <h1>How a report is produced</h1>
+          <p className={styles.lead}>
+            Every report follows the same sequence, and the order matters: filing times are
+            established before absences are judged, claims are fixed before outlets are compared,
+            and nothing reaches you that did not survive being run twice.
+          </p>
+          <div className={styles.actions}>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
+            <Link href="/reports" className={styles.btnQuiet}>See a finished report</Link>
           </div>
         </section>
 
-        {/* ── Pipeline steps ── */}
-        <ScrollReveal>
-          <section className={styles.stepsSection} aria-label="Pipeline steps">
-            <div className={styles.stepsGrid}>
-              {pipelineSteps.map((step) => (
-                <div key={step.number} className={styles.step}>
-                  <span className={styles.stepNumber}>{step.number}</span>
-                  <strong className={styles.stepTitle}>{step.title}</strong>
-                  <p className={styles.stepBody}>{step.body}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        </ScrollReveal>
-
-        {/* ── Principle cards ── */}
-        <ScrollReveal>
-          <section className={styles.principleRow} aria-label="System principles">
-            {principleCards.map((item) => (
-              <article key={item.title} className={styles.principleCard}>
-                <h2>{item.title}</h2>
-                <p>{item.body}</p>
-              </article>
+        <section className={styles.section}>
+          <h2>The sequence</h2>
+          <div className={styles.measure}>
+            <p>
+              You get the report back within two business days. It is delivered as a service, so
+              there is no account to create and nothing to learn.
+            </p>
+          </div>
+          <ol className={styles.rows}>
+            {STEPS.map((s, i) => (
+              <li key={s.title} className={`${styles.row} ${styles.step}`}>
+                <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
+                <h3 className={styles.rowTitle}>{s.title}</h3>
+                <p className={styles.rowBody}>{s.body}</p>
+              </li>
             ))}
-          </section>
-        </ScrollReveal>
+          </ol>
+        </section>
 
-        {/* ── Feature row 1: processing ── */}
-        <ScrollReveal>
-          <section className={styles.featureSection}>
-            <div className={styles.featureCopy}>
-              <span className={styles.featureEyebrow}>Processing</span>
-              <h2>One pass, five signals</h2>
-              <p>Every article goes through tone, framing, attribution, source balance, and omission in a single sequence, not as independent checks stitched together. The output stays tied to what was actually in the text.</p>
-            </div>
-            <FeatureVisual visual="pipeline" />
-          </section>
-        </ScrollReveal>
+        <section className={styles.section}>
+          <h2>What it deliberately does not do</h2>
+          <ul className={styles.rows}>
+            {NOT.map((n) => (
+              <li key={n.title} className={styles.row}>
+                <h3 className={styles.rowTitle}>{n.title}</h3>
+                <p className={styles.rowBody}>{n.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        {/* ── Feature row 2: output ── */}
-        <ScrollReveal>
-          <section className={`${styles.featureSection} ${styles.featureReverse}`}>
-            <div className={styles.featureCopy}>
-              <span className={styles.featureEyebrow}>Output</span>
-              <h2>Evidence exits with the result</h2>
-              <p>Every result includes the direction label, a confidence score, quoted examples of the signals that shaped it, and sources to read alongside, so the analysis is a starting point, not a final word.</p>
-            </div>
-            <FeatureVisual visual="result" />
-          </section>
-        </ScrollReveal>
+        <section className={styles.section}>
+          <h2>The free tools run the same checks</h2>
+          <div className={styles.measure}>
+            <p>
+              Tone, framing, attribution, source balance and omission are the same five signals in
+              both places. The difference is scale: the tools read one article, and a report reads
+              every outlet that covered the story and sets them against each other.
+            </p>
+            <p>
+              If you want to see the method before you send anything, the analyzer is free and
+              needs no account.
+            </p>
+          </div>
+          <div className={styles.actions}>
+            <Link href="/tools" className={styles.btnInkQuiet}>See the free tools</Link>
+          </div>
+        </section>
 
-        {/* ── Feature row 3: confidence ── */}
-        <ScrollReveal>
-          <section className={styles.featureSection}>
-            <div className={styles.featureCopy}>
-              <span className={styles.featureEyebrow}>Confidence</span>
-              <h2>A score, not just a label</h2>
-              <p>Every result includes a confidence score reflecting how consistently the detected signals appeared across the article. When evidence is sparse or ambiguous, the score drops, so you know when to read the analysis with more caution.</p>
-            </div>
-            <FeatureVisual visual="confidence" />
-          </section>
-        </ScrollReveal>
-
-        {/* ── CTA ── */}
-        <ScrollReveal>
-          <section className={styles.cta}>
-            <AnalyzerCta heading="Put the pipeline to work" label="Open Analyzer" />
-          </section>
-        </ScrollReveal>
+        <section className={styles.cta}>
+          <h2>Bring a story you already know well</h2>
+          <p>
+            The fastest way to judge the output is on coverage you have read closely enough to
+            argue with.
+          </p>
+          <div className={styles.actions}>
+            <a href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer" className={styles.btn}>Book a demo</a>
+          </div>
+        </section>
 
       </main>
     </MarketingShell>

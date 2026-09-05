@@ -14,7 +14,6 @@ export default function ExtensionPrivacyPage() {
     <MarketingShell>
       <main className={styles.page}>
         <section className={styles.hero}>
-          <p className={styles.eyebrow}>Legal</p>
           <h1>Extension Privacy Policy</h1>
           <p>
             This policy explains how the NeutralEye browser extension collects, uses, stores, and shares user data.

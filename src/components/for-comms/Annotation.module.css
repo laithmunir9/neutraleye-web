@@ -1,0 +1,42 @@
+.annotation {
+  /* <mark> carries a UA default background-color of yellow. The layers below are
+     background-images, so without this the yellow shows through wherever they
+     have not painted, which flashed during the sweep. */
+  background-color: transparent;
+
+  /* Two stacked background layers: the tint, and a 2px rule along the baseline.
+     Painted as backgrounds rather than a box-shadow so their width can be
+     animated, which is what lets the highlight draw itself in. */
+  /* Rule first: the first background layer paints on top, and listing the tint
+     first hid the 2px accent rule underneath it entirely. */
+  background-image:
+    linear-gradient(var(--fc-accent), var(--fc-accent)),
+    linear-gradient(var(--fc-tint), var(--fc-tint));
+  background-size: 100% 2px, 100% 100%;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  color: inherit;
+  padding: 0.08em 0.14em;
+  border-radius: 2px 2px 0 0;
+  /* Keeps the tint and the underline intact when the span wraps a line. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.sweep {
+  background-size: 0% 2px, 0% 100%;
+  animation: markUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes markUp {
+  to {
+    background-size: 100% 2px, 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    background-size: 100% 2px, 100% 100%;
+    animation: none;
+  }
+}
