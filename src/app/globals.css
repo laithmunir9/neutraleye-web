@@ -124,6 +124,10 @@
   --fc-accent: #0E5A5E;
   --fc-accent-dark: #0B484B;
   --fc-tint: #E5F0F0;
+  /* The ink button family. Colour carries the kind of action: ink means "use
+     the free tool", accent means "talk to us about paid work". Base is
+     --fc-heading; this is only the hover lift. */
+  --fc-ink-hover: #2C3235;
 }
 
 * {

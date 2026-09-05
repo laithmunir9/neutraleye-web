@@ -83,8 +83,8 @@ export default function AboutPage() {
             The judgment is easier to make on something you know well enough to argue with.
           </p>
           <div className={styles.actions}>
-            <Link href="/analyze" className={styles.btn}>Open the analyzer</Link>
-            <Link href="/how-it-works" className={styles.btnQuiet}>See how it works</Link>
+            <Link href="/analyze" className={styles.btnInk}>Open the analyzer</Link>
+            <Link href="/how-it-works" className={styles.btnInkQuiet}>See how it works</Link>
           </div>
         </section>
 

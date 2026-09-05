@@ -213,6 +213,42 @@
   box-shadow: none;
 }
 
+/* Ink family. Colour carries the kind of action: ink means "use the free
+   tool", accent means "talk to us about paid work". A CTA block takes the
+   colour of its primary action so a pair never splits across two hues. */
+.btnInk {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.btnInk:hover { background: var(--fc-ink-hover); }
+
+.btnInkQuiet {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  font-size: 0.9375rem;
+  color: var(--fc-heading);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.btnInkQuiet:hover { color: var(--fc-ink-hover); }
+
+.btnInk:focus-visible,
+.btnInkQuiet:focus-visible {
+  outline: 2px solid var(--fc-heading);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
 /* Closing call to action. Left-aligned like everything above it. */
 .cta {
   max-width: 72rem;

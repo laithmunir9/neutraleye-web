@@ -123,11 +123,11 @@ export default function Home() {
                     href={EXTENSION_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={styles.btn}
+                    className={styles.btnInk}
                   >
                     Add to Chrome
                   </a>
-                  <Link href="/analyze" className={styles.btnRule}>Paste a link instead</Link>
+                  <Link href="/analyze" className={styles.btnInkRule}>Paste a link instead</Link>
                 </div>
                 <p className={styles.doorFoot}>Free. No account needed to read.</p>
 

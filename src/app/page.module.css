@@ -212,6 +212,42 @@
   border-bottom-color: var(--fc-accent-dark);
 }
 
+/* Ink family. A CTA block takes the colour of its primary action, so a pair
+   never splits across two hues: the free-tools door is ink throughout, the
+   coverage-reports door is accent throughout. */
+.btnInk {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8125rem 1.5rem;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: #ffffff;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.btnInk:hover { background: var(--fc-ink-hover); }
+
+.btnInkRule {
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--fc-heading);
+  color: var(--fc-heading);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.btnInkRule:hover {
+  color: var(--fc-ink-hover);
+  border-bottom-color: var(--fc-ink-hover);
+}
+
+.btnInk:focus-visible,
+.btnInkRule:focus-visible {
+  outline: 2px solid var(--fc-heading);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
 .btn:focus-visible,
 .btnRule:focus-visible,
 .sourceLink:focus-visible {

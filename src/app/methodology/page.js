@@ -149,8 +149,8 @@ export default function MethodologyPage() {
             The labels make more sense with a result in front of you.
           </p>
           <div className={styles.actions}>
-            <Link href="/analyze" className={styles.btn}>Open the analyzer</Link>
-            <Link href="/how-it-works" className={styles.btnQuiet}>See how it works</Link>
+            <Link href="/analyze" className={styles.btnInk}>Open the analyzer</Link>
+            <Link href="/how-it-works" className={styles.btnInkQuiet}>See how it works</Link>
           </div>
         </section>
 

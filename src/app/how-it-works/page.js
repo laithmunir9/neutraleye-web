@@ -116,7 +116,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
           <div className={styles.actions}>
-            <Link href="/tools" className={styles.btnQuiet}>See the free tools</Link>
+            <Link href="/tools" className={styles.btnInkQuiet}>See the free tools</Link>
           </div>
         </section>
 

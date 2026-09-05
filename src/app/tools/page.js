@@ -60,10 +60,10 @@ export default function ToolsPage() {
             </li>
           </ul>
           <div className={styles.actions}>
-            <Link href="/analyze" className={styles.btn}>Open the analyzer</Link>
+            <Link href="/analyze" className={styles.btnInk}>Open the analyzer</Link>
             <a
               href={EXTENSION_URL}
-              className={styles.btnQuiet}
+              className={styles.btnInkQuiet}
               target="_blank"
               rel="noopener noreferrer"
             >
