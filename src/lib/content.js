@@ -36,20 +36,20 @@ export const BLOG_POSTS = [
         paragraphs: [
           "Missing context can be just as influential as explicit persuasion. A reader may never see the tradeoffs, background, or alternate interpretation needed for a fair assessment.",
           "Omission is difficult because it is invisible inside a single article. A piece can feel complete while leaving out the strongest counterargument, the relevant history, or a source who would complicate the main claim.",
-          "This is why NeutralEye separates evidence from confidence. It can point to visible signals in the text, but it should also remind readers where comparison reading may be necessary."
+          "This is why NeutralEye points to the line rather than summarising it. It can show the signals that are visible in the text, and it should also remind readers where comparison reading may be necessary."
         ]
       }
     ]
   },
   {
-    slug: "how-to-detect-bias-in-news",
+    slug: "how-to-read-framing-in-news",
     category: "Critical thinking",
     date: "April 18, 2026",
     readTime: "6 min read",
-    title: "How to detect bias in news",
+    title: "How to read framing in news",
     excerpt: "A repeatable checklist for comparing language, attribution, and missing context.",
     intro:
-      "Detecting bias starts with slowing down and checking how a story is assembled, not just whether you agree with it.",
+      "Reading framing starts with slowing down and checking how a story is assembled, not just whether you agree with it.",
     sections: [
       {
         title: "Scan for loaded wording",
@@ -73,43 +73,6 @@ export const BLOG_POSTS = [
           "A strong reading habit is to identify the most relevant context that would change the meaning of the piece if it were included.",
           "This can mean prior reporting, policy background, source incentives, data limitations, or the strongest version of an opposing argument. Missing context does not always mean bad faith, but it can change how much weight a reader should give the story.",
           "When NeutralEye suggests follow-up reading, it is trying to preserve that habit: stay with the article, but keep enough distance to ask what else would matter."
-        ]
-      }
-    ]
-  },
-  {
-    slug: "what-confidence-scores-actually-measure",
-    category: "Analysis",
-    date: "May 6, 2026",
-    showBrandTitle: true,
-    readTime: "5 min read",
-    title: "What confidence scores actually measure",
-    excerpt: "A high confidence score does not mean an article is dishonest. It means the signals are consistent.",
-    intro:
-      "Confidence in NeutralEye does not describe how certain we are about a political judgment. It describes how clearly and consistently bias signals appear across the submitted text.",
-    sections: [
-      {
-        title: "Confidence is about signal consistency, not truth",
-        paragraphs: [
-          "When NeutralEye returns a confidence score of 0.82, it means that tone, framing, sourcing, and attribution signals pointed in the same direction across most of the article. The signals were consistent and clear.",
-          "It does not mean the article is wrong, dishonest, or that the underlying facts are disputed. A well-written opinion column can score high confidence because its rhetorical structure is deliberately consistent. A breaking news report with mixed sources may score low confidence because the picture is still developing.",
-          "Understanding this distinction matters. Confidence measures pattern strength, not moral failure."
-        ]
-      },
-      {
-        title: "Low confidence has more than one cause",
-        paragraphs: [
-          "A low confidence score often gets misread as a good sign, as if the article passed inspection. But low confidence can mean several different things.",
-          "It can mean the article is genuinely balanced and the signals genuinely cancel out. It can also mean the text was too short for a reliable read, the writing mixed tones inconsistently, or the article covered a fast-moving story where sourcing was necessarily thin.",
-          "In those cases, low confidence is a flag for caution, not a clean bill of health. The right response is the same as with high confidence: read the evidence, check a second source, and decide what weight the analysis deserves given the context."
-        ]
-      },
-      {
-        title: "How to use confidence alongside the result",
-        paragraphs: [
-          "The most useful way to read confidence is in combination with the direction label and the evidence section, not in isolation.",
-          "A high-confidence left-leaning result with multiple quoted examples of loaded phrasing is a stronger finding than a high-confidence label with no supporting evidence. The confidence score compresses a lot of information into a single number. The examples and summary are where the reasoning lives.",
-          "Think of confidence as a volume dial, not a pass/fail gate. It tells you how strongly the signal was present. What you do with that signal is still a judgment call, and NeutralEye is designed to keep that judgment with the reader."
         ]
       }
     ]
@@ -166,7 +129,7 @@ export const BLOG_POSTS = [
         paragraphs: [
           "One article can frame a policy story around public safety while another frames it around civil liberties. The reported facts may overlap, but the reader is being guided toward a different conclusion.",
           "Neither frame is automatically wrong. The issue is whether the article lets the reader see the frame clearly enough to evaluate it.",
-          "Good analysis should show the frame without pretending that every framing choice is manipulation. Reporting always has a shape. Bias detection becomes useful when it can describe that shape precisely."
+          "Good analysis should show the frame without pretending that every framing choice is manipulation. Reporting always has a shape. Framing analysis becomes useful when it can describe that shape precisely."
         ]
       },
       {
