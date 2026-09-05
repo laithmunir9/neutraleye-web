@@ -7,8 +7,12 @@ import styles from "./CoverageMatrix.module.css";
  * page exactly.
  *
  * Four states, escalating by ink rather than by hue: "reported" recedes,
- * "omitted" is tinted, "contradicted" is solid. The reader's eye should land
+ * "omitted" is tinted, "diverges" is solid. The reader's eye should land
  * on the findings, not on the baseline.
+ *
+ * "Diverges" rather than "Contradicted": contradicted is an accusation about an
+ * outlet, diverges is an observation about two texts, and the analysis does not
+ * resolve which figure was right.
  */
 
 const OUTLETS = [
@@ -37,15 +41,15 @@ const ROWS = [
     cells: ["reported", "reported", "omitted", "reported", "absent"],
   },
   {
-    claim: "Adjusted EPS estimate: CNBC cited $2.11 per share.",
-    cells: ["contradicted", "contradicted", "absent", "absent", "absent"],
+    claim: "Adjusted EPS estimate for the quarter.",
+    cells: ["diverges", "diverges", "absent", "absent", "absent"],
   },
 ];
 
 const LABELS = {
   reported: "Reported",
   omitted: "Omitted",
-  contradicted: "Contradicted",
+  diverges: "Diverges",
   absent: "not stated",
 };
 

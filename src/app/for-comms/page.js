@@ -86,10 +86,10 @@ export default function ForCommsPage() {
             </li>
             <li className={styles.column}>
               <h3 className={styles.columnLabel}>
-                <span className={`${matrix.state} ${matrix.contradicted}`}>Contradicted</span>
+                <span className={`${matrix.state} ${matrix.diverges}`}>Diverges</span>
               </h3>
               <p className={styles.columnBody}>
-                Where an outlet's own text does not support its own summary.
+                Where two outlets give different figures for the same fact.
               </p>
             </li>
           </ul>
