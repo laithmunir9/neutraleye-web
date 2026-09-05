@@ -87,7 +87,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 1.05rem 0.5rem 0.85rem;
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   background: rgb(var(--brand-rgb));
   color: rgb(var(--offwhite-rgb));
   font-size: 0.88rem;
@@ -135,7 +135,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.55rem 1.1rem;
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   background: rgba(22, 20, 18, 0.88);
   color: rgb(var(--offwhite-rgb));
   font-size: 0.88rem;
@@ -536,7 +536,7 @@
   gap: 0.4rem;
   min-height: 44px;
   margin: 0.75rem 0 0.25rem;
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   background: rgb(var(--brand-rgb));
   color: rgb(var(--offwhite-rgb));
   font-size: 0.95rem;
@@ -687,7 +687,7 @@
   display: inline-flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   background: var(--fc-accent);
   color: #ffffff;
   font-size: 0.9375rem;

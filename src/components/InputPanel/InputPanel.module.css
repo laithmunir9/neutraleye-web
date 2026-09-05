@@ -117,7 +117,7 @@
   gap: 0.35rem;
   padding: 0.24rem;
   border: 1px solid var(--border);
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   background: rgb(var(--muted-rgb) / 0.72);
 }
 
@@ -127,7 +127,7 @@
   border: 1px solid transparent;
   background: transparent;
   color: rgb(var(--text-rgb) / 0.72);
-  border-radius: 2px;
+  border-radius: var(--control-radius);
   padding: 0.66rem 0.9rem;
   font-size: 0.9rem;
   font-weight: 620;
