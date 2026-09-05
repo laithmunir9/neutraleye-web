@@ -377,6 +377,22 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
+- **`--radius-sm` / `--radius-md` are silently overridden by Tailwind.** Deferred, not
+  fixed. `globals.css` declares `--radius-sm: 0.375rem` and `--radius-md: 0.5rem`, but the
+  browser receives Tailwind v4's own defaults (`0.25rem` / `0.375rem`) because `--radius-*`
+  is a reserved theme namespace. Roughly 28 usages across the codebase are therefore
+  rendering at values nobody chose. The fix is to rename them out of the namespace, the way
+  `--control-radius` already is. Cosmetic, so it was left out of the pre-outreach push.
+- **The Design System section above is still partly stale.** Deferred, not fixed. Three
+  lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
+  added; the rest still references deleted components (`MediaBarrier`, the `/extension`
+  page), Framer Motion, `next-themes`, and a `max-width: 92rem` section rule that the
+  rebuilt pages do not follow. Treat entries below the CTA rule as unverified until
+  someone re-reads them against the code.
+- **Three visual systems across the site.** Accepted deliberately, not a bug to fix
+  casually. Homepage is 1440px wide with a 92px h1, interior pages are 1152px with 44px,
+  `/for-comms` is a 560px centred landing page with 48px. They share the typeface, palette
+  and accent, so it reads as hierarchy rather than breakage. Unifying them is a later pass.
 
 ---
 
