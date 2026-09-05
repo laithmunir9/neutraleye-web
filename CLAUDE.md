@@ -324,12 +324,12 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 
 ## Design System
 
-- **Aesthetic:** Warm, editorial, not sterile — warm browns (`#8b6741`), off-whites (`#f8f4ee`), serif display font
-- **Primary colour:** `#8b6741` (hover: `#6e4f2f`)
+- **Aesthetic:** Cool, editorial, evidence-first — deep teal accent (`#0E5A5E`), near-white surfaces (`#F4F5F5`), ink (`#0D0F10`). The warm-brown palette it replaced is gone; do not reintroduce `#8b6741` or `#f8f4ee`.
+- **Primary colour:** `--fc-accent: #0E5A5E` (hover `--fc-accent-dark: #0B484B`). Ink is `--fc-heading: #0D0F10` (hover `--fc-ink-hover: #2C3235`).
 - **Upgrade to Pro button:** Dark near-black (`rgba(22,20,18,0.88)`) — flips to white when header scrolls over a dark section (`data-header-theme='dark'`). Not brand brown.
 - **Components:** shadcn/ui + Radix UI primitives (`src/components/ui/`)
 - **Animations:** Framer Motion
-- **Fonts:** Geist Sans (body), Geist Mono (code/data), serif display via CSS variable
+- **Fonts:** Source Serif 4 throughout — headings, body, and small tracked labels are one family. Geist Mono for code/data only.
 - **Theming:** Dark/light mode via `next-themes` + `ThemeProvider`
 - **Uppercase tracked labels — permitted in one place only.** They are allowed as
   *structural* labels inside evidence and data layouts, where they name a part of a table,
@@ -338,6 +338,24 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
   permitted as decorative eyebrows above section headings, which is what they were removed
   from across the site. If you cannot tell which category a label falls into, it is
   decorative and it goes.
+- **Button colour carries meaning — ink vs accent.** Colour encodes what *kind*
+  of action a button is, not how important it looks.
+  - **Ink** (`--fc-heading`, solid or underline) = a free action the reader takes
+    themselves: open the analyzer, add the extension, paste a link, see the free tools.
+  - **Accent** (`--fc-accent`, solid or underline) = a paid conversation: book a demo,
+    request a report, see a finished report.
+  - **One hue per CTA block.** A block takes the colour of its *primary* action, and a
+    pair never splits across two hues. A black primary next to a teal secondary reads as
+    decoration rather than meaning.
+  - Classes: `.btn` / `.btnRule` / `.btnQuiet` are accent; `.btnInk` / `.btnInkRule` /
+    `.btnInkQuiet` are ink. Defined in `page.module.css` (homepage scale) and
+    `marketing.module.css` (interior scale).
+- **Control radius token is `--control-radius`, never `--radius-*`.** Tailwind v4 reserves
+  the `--radius-*` namespace for its `rounded-*` utilities and **tree-shakes any variable
+  in it that no utility references**, so a `--radius-foo` token is silently stripped from
+  the built CSS while its `var()` usages ship, making `border-radius` invalid and
+  rendering 0px. This already affects `--radius-sm` / `--radius-md` declared in
+  `globals.css`: the browser gets Tailwind's defaults, not the declared values.
 - **Consistency:** Visual style must match the NeutralEye browser extension
 
 When building new UI, prefer extending existing components in `src/components/ui/` before creating new ones.
@@ -361,6 +379,50 @@ When building new UI, prefer extending existing components in `src/components/ui
 - **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
 
 ---
+
+## Product Direction and Priority
+
+**Recorded 5 September 2026. Nothing here is settled, and the order below is a
+current judgment rather than a decision.**
+
+Priority order as it stands:
+
+1. **The B2B coverage report**, for communications and investor relations teams.
+   This is where the site is pointed and the nearest thing to revenue. Live.
+2. **The writing companion.** Not built, not validated, contested. Could move
+   above B2B depending on validation. Treat it as a locked waitlist state on the
+   site, never as a shipped feature or a settled roadmap item.
+3. **The reading companion.** Live (analyzer plus Chrome extension), but not the
+   focus. It exists on the site as proof the method works, not as the product.
+
+**Why the order is contested.** Two advisers disagreed. One reviewed the deck,
+validated the methodology and put the B2B report highest on revenue potential,
+and advised treating reading and writing as one consumer product rather than
+two. The other argued for the writing companion on grounds of *access to users*
+rather than market size: classmates and a writing teacher are reachable today, a
+communications director is not.
+
+**What the market research found.** The writing-tool market is heavily
+saturated: more than 2,800 AI education startups in 2026, an 18x rise since
+2023, 4.2 billion dollars raised in 2025 (62 percent of all edtech funding).
+Grammarly has 40 million users, and Khanmigo's Writing Coach is free and already
+does guided writing with teacher insight. Critically, "the tool refuses to draft
+for you" is the category's standard design pattern, not a differentiator.
+
+So if the writing companion is built, it is not a general writing assistant. The
+only version where the existing framing-analysis work transfers is narrow:
+teaching how to research and write *political journalism* specifically. That
+needs a curriculum that does not exist yet, so it is blocked on a co-author.
+
+**Targeting advice worth acting on regardless of which product wins:** if
+pursuing B2B, target small and cost-sensitive organisations. Procurement and
+compliance close the door at large ones for a founder with no registered entity.
+
+**What this means for the site.** The two-doors structure holds either way: the
+consumer tools and the coverage report both exist today, and the writing
+companion is a locked waitlist state under any outcome. Do not build it out, do
+not add an email capture for it, and do not describe it as coming soon with a
+date.
 
 ## Roadmap
 
