@@ -56,6 +56,27 @@ const nextConfig = {
         destination: "https://tryneutraleye.com/:path*",
         permanent: true,
       },
+      // Pages removed in the site design pass. They were live and indexed, so
+      // they redirect to the page that now answers the same question rather
+      // than dead-ending a visitor arriving from search.
+      { source: "/pricing", destination: "/reports", permanent: true },
+      { source: "/compare", destination: "/reports", permanent: true },
+      { source: "/extension", destination: "/tools", permanent: true },
+      { source: "/support", destination: "/faq", permanent: true },
+      // Unpublished: its whole argument was how to read a confidence score and
+      // a direction label, neither of which the analysis produces. /methodology
+      // covers how to read a result without either.
+      {
+        source: "/blog/what-confidence-scores-actually-measure",
+        destination: "/methodology",
+        permanent: true,
+      },
+      // Renamed so the banned phrase does not survive in the URL.
+      {
+        source: "/blog/how-to-detect-bias-in-news",
+        destination: "/blog/how-to-read-framing-in-news",
+        permanent: true,
+      },
     ];
   },
 };
