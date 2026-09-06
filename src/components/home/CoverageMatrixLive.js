@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import styles from "./CoverageMatrixLive.module.css";
 
 /**
@@ -118,9 +119,22 @@ function readCell(row, col) {
 }
 
 export default function CoverageMatrixLive() {
-  const [sel, setSel] = useState({ row: 1, col: 0 });
+  /* dy and dx carry which way the selection just moved, so the panel can enter
+     from the direction of the cell that produced it. Derived at click time from
+     the previous selection rather than tracked in a ref, so there is no effect
+     and nothing to keep in sync. */
+  const [sel, setSel] = useState({ row: 1, col: 0, dy: 0, dx: 0 });
+  const reduce = useReducedMotion();
   const active = readCell(ROWS[sel.row], sel.col);
   const claim = ROWS[sel.row].claim;
+
+  const pick = (r, c) =>
+    setSel((prev) => ({
+      row: r,
+      col: c,
+      dy: Math.sign(r - prev.row),
+      dx: Math.sign(c - prev.col),
+    }));
 
   return (
     <div className={styles.wrap}>
@@ -139,12 +153,24 @@ export default function CoverageMatrixLive() {
                   key={OUTLETS[c]}
                   type="button"
                   className={`${styles.cell} ${sel.row === r && sel.col === c ? styles.cellOn : ""}`}
-                  onClick={() => setSel({ row: r, col: c })}
+                  onClick={() => pick(r, c)}
                   aria-pressed={sel.row === r && sel.col === c}
                   aria-label={`${FULL[c]}. ${row.claim} ${SPOKEN[state]}.`}
                 >
                   <span className={styles.cellOutlet} aria-hidden="true">{OUTLETS[c]}</span>
                   <span className={`${styles.state} ${styles[state]}`}>{LABEL[state]}</span>
+                  {sel.row === r && sel.col === c && (
+                    /* The same gesture as the interlinear mark: a rule drawn
+                       under the thing being pointed at, rather than a state
+                       that simply appears. */
+                    <motion.span
+                      className={styles.cellRule}
+                      aria-hidden="true"
+                      initial={reduce ? false : { scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.26, ease: [0.2, 0.7, 0.3, 1] }}
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -157,7 +183,18 @@ export default function CoverageMatrixLive() {
         </p>
       </div>
 
-      <div className={styles.panel} aria-live="polite" key={`${sel.row}-${sel.col}`}>
+      {/* Entering from the direction of the cell is what makes the panel read as
+          coming from that cell rather than simply replacing itself. The offset
+          is deliberately small: 6px is enough to be felt and not enough to be
+          watched. */}
+      <motion.div
+        className={styles.panel}
+        aria-live="polite"
+        key={`${sel.row}-${sel.col}`}
+        initial={reduce ? false : { opacity: 0, y: sel.dy * 6, x: sel.dx * 4 }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.24, ease: [0.2, 0.7, 0.3, 1] }}
+      >
         <p className={styles.panelOutlet}>{active.outlet}</p>
         <h3 className={styles.panelClaim}>{claim}</h3>
         <p className={styles.panelDetail}>{active.detail}</p>
@@ -175,7 +212,7 @@ export default function CoverageMatrixLive() {
 
         {active.effect && <p className={styles.panelEffect}>{active.effect}</p>}
         <p className={styles.panelCheck}>{active.check}</p>
-      </div>
+      </motion.div>
     </div>
   );
 }

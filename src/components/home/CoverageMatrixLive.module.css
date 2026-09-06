@@ -41,6 +41,7 @@
    matrix could be operated was a sentence above it that a reader may not read.
    A hairline says "selectable" before anything is explained. */
 .cell {
+  position: relative;
   padding: 0.9375rem 0.625rem;
   border: 1px solid transparent;
   border-bottom-color: var(--fc-border);
@@ -64,6 +65,19 @@
 }
 
 .cellOn .state { font-weight: 600; }
+
+/* Drawn, not switched on. Sits on the cell's own bottom border so selecting a
+   cell reads as marking it, the same gesture as the interlinear rule under a
+   quoted line. */
+.cellRule {
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--fc-accent);
+  transform-origin: left center;
+}
 
 .cell:focus-visible {
   outline: 2px solid var(--fc-accent);
@@ -94,16 +108,20 @@
 .panel {
   flex: 0 0 22.5rem;
   padding-top: 2.375rem;
-  animation: panelIn 220ms ease-out;
 }
 
-@keyframes panelIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: none; }
-}
-
+/* useReducedMotion resolves in JS, which can lag the first paint. The media
+   query is evaluated by the browser from frame one, so this is the guarantee
+   and the hook is the optimisation. transform:none lands both elements on their
+   end state: the panel at its resting offset, the rule at full width. */
 @media (prefers-reduced-motion: reduce) {
-  .panel { animation: none; }
+  .panel,
+  .cellRule {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 .panelOutlet {
