@@ -332,6 +332,16 @@ How to satisfy the rule:
 - **Tests:** a new test should be seen failing against the unfixed code at least
   once.
 
+**Layout height projections have been optimistic three times in a row, in the
+same direction.** A pipeline section projected at 254 words to about 40 landed at
+241. An FAQ conversion projected to land "about the height of the collapsed page"
+came in 682px taller. A marginalia pass projected to cut the empty column
+substantially moved it 78% to 68%. The misses share a cause: estimating the
+content and forgetting the container, section padding, heading blocks, and the
+ragged bottoms that `break-inside: avoid` produces. Treat any layout projection
+as an estimate until it is measured on the built page, say so when giving one,
+and report the measured number even when it contradicts what was promised.
+
 ---
 
 ## Positioning Sweep
@@ -497,6 +507,16 @@ When building new UI, prefer extending existing components in `src/components/ui
   worth setting when it is a real parameter or finding, never a count of the list
   beside it. Moving the page requires changing how the page is structured, which is
   a larger decision than a marginalia pass.
+- **/about, /reports and /tools sit at 64 to 72% empty left column, by decision.**
+  Closed as a known state on 6 September 2026, not an open task. Marginalia does not
+  move these pages: see the /methodology entry above for the measurement. /tools was
+  tested rather than assumed and failed twice. Its comparison table needs 736px in
+  three tracks and the margin column is 288px, so it cannot go there; and setting the
+  section full-width improved the metric (64% to 48% empty) while making the design
+  worse, leaving the table stranded with 416px of dead space beside it. Widening the
+  table to fill 1152px would put five-to-eight word cells in 450px columns. Changing
+  these pages means restructuring them, which is a larger decision than a density
+  pass. **Do not retry marginalia here.**
 - **The Design System section above is still partly stale.** Deferred, not fixed. Three
   lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
   added; the rest still references deleted components (`MediaBarrier`, the `/extension`
