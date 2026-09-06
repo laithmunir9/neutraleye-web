@@ -119,15 +119,22 @@ export default function FaqPage() {
           </p>
         </section>
 
+        {/* No accordion. Every answer is short (median 39 words, longest 54) and
+            the whole page is 607 words, so the disclosure widget was hiding
+            almost nothing behind sixteen clicks. Removing it also removes the
+            keyboard and expanded-state semantics it needed: a heading and a
+            paragraph carry more for a screen reader than a summary button did,
+            because headings are navigable and every answer is now in the
+            accessibility tree at all times. */}
         {SECTIONS.map((section) => (
-          <section key={section.id} id={section.id} className={shell.section}>
+          <section key={section.id} id={section.id} className={`${shell.section} ${shell.sectionWide}`}>
             <h2>{section.label}</h2>
             <div className={styles.list}>
               {section.questions.map((item) => (
-                <details key={item.q} className={styles.item}>
-                  <summary className={styles.question}>{item.q}</summary>
+                <div key={item.q} className={styles.item}>
+                  <h3 className={styles.question}>{item.q}</h3>
                   <p className={styles.answer}>{item.a}</p>
-                </details>
+                </div>
               ))}
             </div>
           </section>

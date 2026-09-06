@@ -481,3 +481,19 @@
 @media (max-width: 48rem) {
   .twoUp { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* A section whose content spans both columns, heading above rather than beside.
+   For reference content that reads better wide than in a 46rem measure with an
+   empty column next to it. Declared last so it wins on source order: it ties
+   with `.section h2` and `.section > *:not(h2)` on specificity. */
+.sectionWide > h2 {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  max-width: 28ch;
+}
+
+.sectionWide > *:not(h2) {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  margin-top: 1.75rem;
+}
