@@ -304,6 +304,38 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 
 ---
 
+## Confirm a Check Can Fail Before Trusting It
+
+**A check that cannot return a fail is worse than no check, because it produces
+false confidence.** Before reporting any verification as passed, establish that
+it was capable of failing. This is a standing rule, not advice.
+
+Three times this has produced a green result that meant nothing:
+
+- A grep for four marketing taglines reported the site clean while `/methodology`
+  carried a full political spectrum. The pattern could not match the violation.
+- A `getBoundingClientRect()` overflow check reported zero offenders on a page
+  with photographic evidence of glyph collision. Boxes stayed inside the
+  viewport while the text spilled; only `scrollWidth > clientWidth` sees it.
+- Four widths of overflow checks came back clean against a stale build. `npm run
+  start` had failed with `EADDRINUSE` and an orphaned `next-server` was still
+  serving the pre-change code.
+
+How to satisfy the rule:
+
+- **Sweeps and pattern checks:** run the pattern against a known violation and
+  confirm it fires, before trusting a clean result. `scripts/positioning-sweep.mjs`
+  does this to itself: every category carries a fixture it must catch and must
+  not flag known-good copy, and the script exits 2 rather than reporting clean if
+  a pattern has been edited into uselessness.
+- **Rendered and browser checks:** confirm the server is serving the current
+  build before measuring. Assert on something the change actually altered. Byte-
+  identical numbers across an edit are the tell, not a reassurance.
+- **Tests:** a new test should be seen failing against the unfixed code at least
+  once.
+
+---
+
 ## Positioning Sweep
 
 `node scripts/positioning-sweep.mjs` checks public copy against the positioning

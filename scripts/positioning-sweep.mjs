@@ -25,16 +25,16 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const CATEGORIES = [
-  ["SPECTRUM PLACEMENT", /left[- ]leaning|right[- ]leaning|left of cent|right of cent|political spectrum|leans? (?:left|right)|centrist/i],
-  ["SCORING / RATING", /confidence score|direction label|bias direction|\bscores? an outlet|\brates? (?:an )?outlet|pass\/fail|clean bill/i],
-  ["BANNED TERM", /bias detection|detects? bias|bias comparison|bias checker|biased publications|bias signals?|bias level/i],
-  ["FACT-CHECK IMPLIED", /\b(?:we|it|neutraleye) (?:fact[- ]checks?|verif(?:y|ies) (?:the )?(?:facts|claims))\b/i],
-  ["DEAD ROUTE / FEATURE", /\/pricing|\/compare\b|pricing page|Pro plan|Compare Analyses|join the waitlist/i],
+  ["SPECTRUM PLACEMENT", /left[- ]leaning|right[- ]leaning|left of cent|right of cent|political spectrum|leans? (?:left|right)|centrist/i, "The result came back Left-leaning."],
+  ["SCORING / RATING", /confidence score|direction label|bias direction|\bscores? an outlet|\brates? (?:an )?outlet|pass\/fail|clean bill/i, "a confidence score of 0.85"],
+  ["BANNED TERM", /bias detection|detects? bias|bias comparison|bias checker|biased publications|bias signals?|bias level/i, "Bias detection and fact-checking differ."],
+  ["FACT-CHECK IMPLIED", /\b(?:we|it|neutraleye) (?:fact[- ]checks?|verif(?:y|ies) (?:the )?(?:facts|claims))\b/i, "NeutralEye fact-checks every claim."],
+  ["DEAD ROUTE / FEATURE", /\/pricing|\/compare\b|pricing page|Pro plan|Compare Analyses|join the waitlist/i, "Described on the pricing page."],
   /* Demo material has to be politically neutral so a prospect reacts to the
      tool rather than the topic. Named outlets and named candidates are the
      subject of a coverage report and stay; a named lobbying or advocacy
      organisation is not the subject and reads as a side being taken. */
-  ["NAMED ADVOCACY GROUP", /\bAIPAC\b|\bNRA\b|\bACLU\b|\bNAACP\b|Planned Parenthood|Heritage Foundation|Sierra Club|Club for Growth|Americans for Prosperity|Federalist Society|Human Rights Campaign|MoveOn|Emily's List|AFL-CIO|\bsuper ?PACs?\b|lobbying (?:group|organi[sz]ation)|advocacy (?:group|organi[sz]ation)/i],
+  ["NAMED ADVOCACY GROUP", /\bAIPAC\b|\bNRA\b|\bACLU\b|\bNAACP\b|Planned Parenthood|Heritage Foundation|Sierra Club|Club for Growth|Americans for Prosperity|Federalist Society|Human Rights Campaign|MoveOn|Emily's List|AFL-CIO|\bsuper ?PACs?\b|lobbying (?:group|organi[sz]ation)|advocacy (?:group|organi[sz]ation)/i, "framed as a defeat for AIPAC"],
 ];
 
 /* Copy that matches a pattern and is correct as written: the site disowning the
@@ -99,6 +99,32 @@ function walk(p, out = []) {
 function deferralFor(file, line) {
   return DEFERRED.find((d) => d.file === file && (d.line === undefined || d.line === line));
 }
+
+/* A check that cannot return a fail is worse than no check: it manufactures
+   confidence. Every category is tested against a known violation it must catch,
+   and against clean copy none of them may flag, before a single file is read.
+   If a pattern is edited into uselessness the sweep aborts instead of reporting
+   clean. This exists because an earlier grep reported the site clean for months
+   while a whole page carried the thing it was supposed to find. */
+const CLEAN_FIXTURE =
+  "The analyzer returns a framing strength and the quoted sentences behind it. " +
+  "NBC News and the Detroit Free Press covered the same primary.";
+
+function selfTest() {
+  const failures = [];
+  for (const [name, re, fixture] of CATEGORIES) {
+    if (!fixture) failures.push(`${name}: no fixture, so the pattern is untested`);
+    else if (!re.test(fixture)) failures.push(`${name}: pattern does not catch its own known violation`);
+    if (re.test(CLEAN_FIXTURE)) failures.push(`${name}: pattern flags known-good copy`);
+  }
+  if (failures.length) {
+    console.error("SELF-TEST FAILED. The sweep cannot be trusted:");
+    for (const f of failures) console.error(`  ${f}`);
+    process.exit(2);
+  }
+}
+
+selfTest();
 
 const files = ROOTS.flatMap((r) => walk(r));
 const live = [];
