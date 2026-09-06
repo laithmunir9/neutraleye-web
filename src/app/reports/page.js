@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BOOKING_URL } from "@/lib/content";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
-import Annotation from "@/components/for-comms/Annotation";
+import Annotation from "@/components/Annotation/Annotation";
 import styles from "../marketing.module.css";
 
 export const metadata = {
@@ -22,9 +22,19 @@ const DIVERGENCES = [
       "The Detroit Free Press said the exact amount spent by campaigns and outside allies was not yet known.",
   },
   {
-    claim:
-      "Stevens and her allies outspent El-Sayed and his allies on advertising by about nine to one.",
-    against: "Fox News quoted El-Sayed putting the same disparity at eleven to one.",
+    claim: (
+      <>
+        Stevens and her allies outspent El-Sayed and his allies on advertising by about{" "}
+        <Annotation>nine to one</Annotation>.
+      </>
+    ),
+    key: "spend-ratio",
+    against: (
+      <>
+        Fox News quoted El-Sayed putting the same disparity at{" "}
+        <Annotation>eleven to one</Annotation>.
+      </>
+    ),
   },
 ];
 
@@ -82,8 +92,8 @@ export default function ReportsPage() {
           </div>
 
           <ul className={styles.rows}>
-            {DIVERGENCES.map((d) => (
-              <li key={d.claim} className={styles.row}>
+            {DIVERGENCES.map((d, i) => (
+              <li key={d.key || i} className={styles.row}>
                 <h3 className={styles.rowTitle}>{d.claim}</h3>
                 <p className={styles.rowBody}>{d.against}</p>
               </li>

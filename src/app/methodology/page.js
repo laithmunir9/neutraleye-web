@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import Annotation from "@/components/Annotation/Annotation";
 import styles from "../marketing.module.css";
 
 export const metadata = {
@@ -49,11 +50,21 @@ const THRESHOLDS = [
   },
   {
     title: "Weak evidence",
-    body: "Where the evidence is thin or ambiguous, the result is none or uncertain, and confidence is held below 0.40.",
+    body: (
+      <>
+        Where the evidence is thin or ambiguous, the result is none or uncertain, and confidence is
+        held below <Annotation>0.40</Annotation>.
+      </>
+    ),
   },
   {
     title: "High values are rare",
-    body: "Above 0.85 is reserved for framing that is clear, repeated, and explicit in the text.",
+    body: (
+      <>
+        Above <Annotation>0.85</Annotation> is reserved for framing that is clear, repeated, and
+        explicit in the text.
+      </>
+    ),
   },
   {
     title: "No excerpt, no finding",

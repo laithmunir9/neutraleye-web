@@ -1,3 +1,4 @@
+import Annotation from "@/components/Annotation/Annotation";
 import styles from "./ClaimPipeline.module.css";
 
 /**
@@ -116,7 +117,7 @@ export default function ClaimPipeline() {
           <h3 className={styles.stageName}>Quotes checked</h3>
           <div className={styles.stageBody}>
             <p className={styles.check}>Both spans located verbatim in the source articles.</p>
-            <p className={styles.tally}>252 of 252 on this run</p>
+            <p className={styles.tally}><Annotation>252 of 252</Annotation> on this run</p>
           </div>
         </div>
 

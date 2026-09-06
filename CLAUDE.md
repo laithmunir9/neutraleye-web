@@ -477,6 +477,15 @@ When building new UI, prefer extending existing components in `src/components/ui
   correction is carried by a dated note above the timeline instead
   (`src/app/changelog/page.js`, `.historyNote`). The sweep fails if that note is
   removed while the exemption stands, so the two cannot drift apart.
+- **The matrix's drawn selection rule is redundant in a still frame.** Accepted, not
+  fixed, by decision on 6 September 2026. Selecting a cell draws a 2px accent rule
+  along its bottom edge over 260ms, but `.cellOn` already turns the whole border
+  accent, so in a still frame at any width the rule reads as a slightly heavier
+  bottom border rather than as a mark. This is not width-specific; the motion is
+  where the value is, and it works at every width. Making the selection read as
+  *marked* rather than *boxed* would mean dropping the accent border and letting
+  the drawn rule be the whole selected state, which is a change to an established
+  interaction and was judged the wrong trade for now.
 - **The Design System section above is still partly stale.** Deferred, not fixed. Three
   lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
   added; the rest still references deleted components (`MediaBarrier`, the `/extension`
