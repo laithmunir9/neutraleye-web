@@ -98,8 +98,6 @@ src/
     Sidebar/                # App sidebar
     InputPanel/             # Article URL / text input
     ResultCard/             # Bias result display card
-    ConfidenceRing/         # Animated confidence score ring
-    DriverChips/            # Bias driver pill tags
     QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
     HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows `NO_BIAS_LABEL`; Confidence shows "N/A" when no bias
     AnalyzerCta/            # CTA heading + button — no card/box background
