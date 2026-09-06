@@ -263,3 +263,29 @@
   .change { flex-direction: column; gap: 0.35rem; }
   .tag { min-width: auto; width: fit-content; }
 }
+
+/* Standing correction above the timeline. The entries themselves are a
+   historical record and are never edited to match current vocabulary, so the
+   correction has to live outside them. */
+.historyNote {
+  max-width: 46rem;
+  margin: 2rem auto 0;
+  padding: 1.1rem 1.25rem;
+  border-left: 2px solid var(--fc-accent);
+  background: var(--fc-surface);
+}
+
+.historyNoteDate {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+}
+
+.historyNoteBody {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fc-body);
+}

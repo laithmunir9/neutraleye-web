@@ -304,6 +304,36 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 
 ---
 
+## Positioning Sweep
+
+`node scripts/positioning-sweep.mjs` checks public copy against the positioning
+rule: framing analysis only, never place an outlet or article on a spectrum,
+never score or rate one, never imply fact-checking, never advertise a route or
+feature that does not exist. It exits non-zero on a live hit. `/gating-check`
+runs it first, and the monthly positioning check should call the same script
+rather than an ad-hoc grep.
+
+**It is written against the rule, not a phrase list, and it must stay that way.**
+The sweep it replaced tested for four marketing taglines
+(`bias comparison|side-by-side bias|bias detection|detects bias`). That pattern
+could not have matched a `Left-leaning` label, and did not: `/methodology`
+documented a full political spectrum with a 0.00-1.00 score, and 2 of 5 FAQ
+sections were built on it, while the sweep reported clean. A sweep that tests
+for the phrases you already deleted will always pass.
+
+**Report a sweep's scope in the same sentence as its result.** A sweep scoped to
+one file must be reported as scoped to one file. An earlier run over
+`src/lib/content.js` alone printed a clean result that read as site-wide, and
+nothing rechecked the rest of the site afterward. "Clean" with no stated scope
+is not a result.
+
+Source comments are stripped before matching, so a comment may name what it is
+refusing to do. Entries under `KNOWN, DEFERRED` print every run and do not fail
+the gate; each one needs a reason in the script and a matching line in Known
+Issues below. Do not add to that list to make the sweep pass.
+
+---
+
 ## Code Style & Conventions
 
 - **JS vs TS:** App pages, API routes, and components use `.js`. shadcn/ui components use `.tsx`. Follow the pattern of the file you're editing.
@@ -389,6 +419,19 @@ When building new UI, prefer extending existing components in `src/components/ui
   is a reserved theme namespace. Roughly 28 usages across the codebase are therefore
   rendering at values nobody chose. The fix is to rename them out of the namespace, the way
   `--control-radius` already is. Cosmetic, so it was left out of the pre-outreach push.
+- **`/analyze` empty state still uses the old vocabulary.** Deferred, not fixed, by
+  decision on 6 September 2026. `src/app/analyze/page.js:585` reads "No confidence
+  score is generated when no significant bias is detected." Both halves are wrong
+  against the current contract: `bias_level` is internal and never user-facing
+  (`src/lib/biasLevel.js`), and the analyzer returns a framing strength rather than
+  a score of the article. It is the live tool's own UI, so changing it is a product
+  change rather than a copy fix, and it goes with the next product change. It is in
+  the positioning sweep's `KNOWN, DEFERRED` list until then.
+- **The changelog is exempt from the positioning sweep, conditionally.** Entries are
+  a historical record and are never rewritten to match current vocabulary. The
+  correction is carried by a dated note above the timeline instead
+  (`src/app/changelog/page.js`, `.historyNote`). The sweep fails if that note is
+  removed while the exemption stands, so the two cannot drift apart.
 - **The Design System section above is still partly stale.** Deferred, not fixed. Three
   lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
   added; the rest still references deleted components (`MediaBarrier`, the `/extension`

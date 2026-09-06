@@ -7,7 +7,7 @@ export const metadata = {
   description: "How NeutralEye handles information submitted through the website."
 };
 
-const LAST_UPDATED = "June 2, 2026";
+const LAST_UPDATED = "September 6, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <h1>Website Privacy Policy</h1>
           <p>
             This policy explains how NeutralEye handles information submitted through the NeutralEye website,
-            including the analyzer workspace, account features, and any paid plan functionality.
+            including the analyzer workspace and account features.
           </p>
           <span>Last updated: {LAST_UPDATED}</span>
         </section>
@@ -42,7 +42,6 @@ export default function PrivacyPage() {
               <li>Basic technical information, such as browser type, device information, timestamps, error logs, and request metadata.</li>
               <li>If you create an account: your email address, authentication provider (email/password or Google), account ID, and account creation date.</li>
               <li>If you are signed in: analysis results saved to your account, stored on our servers, and your daily usage count.</li>
-              <li>If you subscribe to a paid plan: billing-related information processed by our payment provider. We do not store full payment card details on our servers.</li>
             </ul>
           </article>
 
@@ -50,10 +49,10 @@ export default function PrivacyPage() {
             <h2>How We Use Information</h2>
             <p>We use information to:</p>
             <ul>
-              <li>Provide article extraction, bias-signal analysis, and structured output.</li>
-              <li>Authenticate you and manage your account, usage limits, and plan status.</li>
-              <li>Display saved results, comparison views, and history features in the product.</li>
-              <li>Enforce daily usage limits and Pro plan entitlements.</li>
+              <li>Provide article extraction, framing analysis, and structured output.</li>
+              <li>Authenticate you and manage your account and usage limits.</li>
+              <li>Display saved results and history features in the product.</li>
+              <li>Enforce daily usage limits.</li>
               <li>Maintain, debug, secure, and improve the reliability of the service.</li>
               <li>Investigate errors, abuse, security incidents, or misuse of the service.</li>
               <li>Comply with legal obligations if required.</li>
@@ -64,9 +63,9 @@ export default function PrivacyPage() {
             <h2>How Information Is Shared</h2>
             <p>
               We may share submitted text, URLs, extracted content, and related request metadata with service providers
-              that help operate NeutralEye, such as hosting, authentication, logging, security, article extraction, AI
-              analysis, and payment providers. These providers process information so NeutralEye can deliver the
-              requested service.
+              that help operate NeutralEye, such as hosting, authentication, logging, security, article extraction, and
+              AI analysis. There is no payment provider, because NeutralEye is free and collects no billing
+              information. These providers process information so NeutralEye can deliver the requested service.
             </p>
             <p>
               We do not sell submitted article content or personal data. We do not share submitted article content for

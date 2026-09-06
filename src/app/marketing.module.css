@@ -129,6 +129,127 @@
   color: var(--fc-body);
 }
 
+/* Field list. The same hairline device as .rows, but two columns, because the
+   left side is a fixed vocabulary the reader looks up rather than a heading
+   they read. Used for the analyzer's output contract on /methodology. */
+.fields {
+  max-width: 46rem;
+  margin: 0;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: 0 1.5rem;
+  padding: 0.95rem 0;
+  border-top: 1px solid var(--fc-border);
+}
+
+.field:first-child { border-top: 0; padding-top: 0; }
+.field:last-child { padding-bottom: 0; }
+
+.fieldName {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--fc-heading);
+}
+
+.fieldBody {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--fc-body);
+}
+
+/* Below this the name column squeezes the body to about four words a line. */
+@media (max-width: 40rem) {
+  .field { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
+}
+
+/* Side-by-side comparison. Three columns: what is being compared, then the two
+   things. Same hairline as .rows and .fields, so it reads as another view of
+   the one device rather than a new one. */
+.compare {
+  max-width: 46rem;
+  margin: 0;
+}
+
+.compareHead,
+.compareRow {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 1.5rem;
+}
+
+.compareHead {
+  padding-bottom: 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+}
+
+.compareRow {
+  padding: 0.95rem 0;
+  border-top: 1px solid var(--fc-border);
+}
+
+.compareRow:last-child { padding-bottom: 0; }
+
+.compareLabel {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--fc-heading);
+}
+
+.compareCell {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--fc-body);
+}
+
+/* Named by the header row on screen, so the per-cell name is hidden from sight
+   but left in the accessibility tree, where it is the only column name there
+   is. */
+.compareTag {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Below this three columns leave each cell about three words a line. The row
+   becomes a stack, and the per-cell name has to come back into view. */
+@media (max-width: 44rem) {
+  .compareHead { display: none; }
+
+  .compareRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 1.1rem 0;
+  }
+
+  .compareTag {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    margin-bottom: 0.15rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--fc-muted);
+  }
+}
+
 /* Sequence. Used only where the content really is ordered, and set as a small
    inline numeral rather than a display number competing with the heading. */
 .step { position: relative; padding-left: 2.25rem; }

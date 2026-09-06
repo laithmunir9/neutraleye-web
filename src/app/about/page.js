@@ -16,7 +16,7 @@ const PRINCIPLES = [
   },
   {
     title: "Separate confidence from truth",
-    body: "A high confidence score means the signals were consistent, not that the article was dishonest, or that anyone is certain about a political judgment. Confidence describes pattern strength. What you do with that pattern is still your call.",
+    body: "High confidence means the signals were consistent, not that the article was dishonest, or that anyone is certain about a political judgment. Confidence describes pattern strength. What you do with that pattern is still your call.",
   },
   {
     title: "Keep the reader in control",
@@ -25,8 +25,8 @@ const PRINCIPLES = [
 ];
 
 const NOT = [
-  "It analyzes how stories are framed, not whether individual claims are true. Bias detection and fact-checking are different disciplines, and this does one of them.",
-  "It does not score outlets or maintain a list of biased publications. Every result is specific to the text submitted, and the same outlet can read very differently across two articles.",
+  "It analyzes how stories are framed, not whether individual claims are true. Checking what a story emphasises and checking whether it is accurate are different disciplines, and this does one of them.",
+  "It does not score outlets or keep a standing list of them. Every result is specific to the text submitted, and the same outlet can read very differently across two articles.",
   "The analysis is a starting point, not a final word. It surfaces patterns and suggests context. Deciding what to believe, and what to read next, stays with you.",
 ];
 

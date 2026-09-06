@@ -28,22 +28,25 @@ const DIVERGENCES = [
   },
 ];
 
+/* Four gates, each stated as the rule it applies rather than as a paragraph
+   about the rule. They run in this order and the order is the point: timing is
+   settled before an absence can count as one. */
 const GATES = [
   {
-    title: "It reproduced across two independent passes",
-    body: "The whole analysis runs twice. A finding that appears in one pass and not the other is reported as unstable rather than presented as a result.",
+    name: "Reproduced twice",
+    body: "A finding present in one pass and not the other is reported as unstable, not as a result.",
   },
   {
-    title: "Filing times were checked first",
-    body: "Every article’s first-published and last-updated timestamps are recorded. An absence explained by when an outlet filed is excluded, not counted as an omission.",
+    name: "Filing time first",
+    body: "An absence explained by when an outlet filed is excluded rather than counted against it.",
   },
   {
-    title: "Several outlets had to carry the claim",
-    body: "A gap counts only where other outlets reported the same fact. One outlet mentioning something the others did not is a difference in emphasis, not a coverage gap.",
+    name: "Carried by several",
+    body: "One outlet mentioning what the others did not is a difference in emphasis, not a coverage gap.",
   },
   {
-    title: "Every quote was checked against the source",
-    body: "Quotes are verified against the original article text before they reach a report, so nothing is attributed to the wrong outlet.",
+    name: "Quote located",
+    body: "Every quote is found verbatim in the original article text before it reaches a report.",
   },
 ];
 
@@ -114,14 +117,14 @@ export default function ReportsPage() {
 
         <section className={styles.section}>
           <h2>What had to be true before a finding appeared</h2>
-          <ul className={styles.rows}>
+          <dl className={styles.fields}>
             {GATES.map((g) => (
-              <li key={g.title} className={styles.row}>
-                <h3 className={styles.rowTitle}>{g.title}</h3>
-                <p className={styles.rowBody}>{g.body}</p>
-              </li>
+              <div key={g.name} className={styles.field}>
+                <dt className={styles.fieldName}>{g.name}</dt>
+                <dd className={styles.fieldBody}>{g.body}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </section>
 
         <section className={styles.cta}>

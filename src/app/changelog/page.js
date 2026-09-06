@@ -1,3 +1,4 @@
+import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import shell from "../marketing.module.css";
 import styles from "./page.module.css";
@@ -109,6 +110,20 @@ export default function ChangelogPage() {
             </div>
           </div>
         </header>
+
+        {/* A changelog is a historical record, so the entries below are left exactly
+            as they shipped. This note carries the correction instead, because a
+            buyer reads old entries as a description of current behaviour. */}
+        <aside className={styles.historyNote}>
+          <p className={styles.historyNoteDate}>6 September 2026</p>
+          <p className={styles.historyNoteBody}>
+            Earlier entries describe a direction label with left, centre and right values and a
+            0 to 100 score. Both were replaced. The analyzer now returns a framing strength, a
+            direction naming the subject the framing points at, and a confidence value. Entries
+            below are left as they shipped; current behaviour is documented on the{" "}
+            <Link href="/methodology">methodology page</Link>.
+          </p>
+        </aside>
 
         {/* ── Timeline ── */}
         <div className={styles.timeline}>

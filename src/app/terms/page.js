@@ -7,7 +7,7 @@ export const metadata = {
   description: "Terms for using the NeutralEye website and analysis service."
 };
 
-const LAST_UPDATED = "June 2, 2026";
+const LAST_UPDATED = "September 6, 2026";
 
 export default function TermsPage() {
   return (
@@ -16,8 +16,8 @@ export default function TermsPage() {
         <section className={styles.hero}>
           <h1>Terms & Conditions</h1>
           <p>
-            These terms apply to the NeutralEye website, analysis service, browser extension, and any paid plan
-            features. By using NeutralEye you agree to these terms.
+            These terms apply to the NeutralEye website, analysis service, and browser extension. By using
+            NeutralEye you agree to these terms.
           </p>
           <span>Last updated: {LAST_UPDATED}</span>
         </section>
@@ -51,17 +51,15 @@ export default function TermsPage() {
           </article>
 
           <article>
-            <h2>Paid Plans And Payments</h2>
+            <h2>Cost</h2>
             <p>
-              NeutralEye offers a free tier and a paid Pro plan. The Pro plan unlocks additional features, including
-              unlimited analyses, cloud history synced across devices, and Compare Analyses. Pro plan pricing and
-              available features are described on the <Link href="/tools">Tools page</Link>.
+              NeutralEye is free to use. There is no paid tier, no subscription, and no payment flow. We do not collect
+              payment details and we do not charge for analyses. Usage is capped at a daily limit described on the{" "}
+              <Link href="/tools">Tools page</Link> rather than metered against a plan.
             </p>
             <p>
-              Payments are processed by Stripe. By subscribing to a paid plan you authorize us to charge your payment
-              method on the applicable billing cycle. You may cancel at any time; cancellation takes effect at the end
-              of the current billing period. We do not offer refunds for unused portions of a billing period except
-              where required by law.
+              If a paid offering is introduced in the future, these terms will be updated before it becomes available,
+              and no existing free access will be charged for retroactively.
             </p>
           </article>
 
@@ -83,7 +81,7 @@ export default function TermsPage() {
               <li>Attempt to reverse engineer, overload, scrape, attack, or disrupt the service.</li>
               <li>Use results to harass, defame, threaten, or target another person or organization.</li>
               <li>Misrepresent NeutralEye output as a definitive factual ruling or official endorsement.</li>
-              <li>Share, resell, or transfer account access or Pro plan entitlements to others.</li>
+              <li>Share, resell, or transfer account access to others.</li>
             </ul>
           </article>
 
@@ -107,18 +105,17 @@ export default function TermsPage() {
           <article>
             <h2>Availability And Changes</h2>
             <p>
-              We may update, suspend, limit, or discontinue any part of NeutralEye at any time. Features, pricing, and
-              plan contents may change as the product evolves. We will provide reasonable notice of material changes to
-              paid plan terms where possible.
+              We may update, suspend, limit, or discontinue any part of NeutralEye at any time, including the daily
+              usage limit. We will provide reasonable notice of material changes where possible.
             </p>
           </article>
 
           <article>
             <h2>Third-Party Services</h2>
             <p>
-              NeutralEye relies on third-party services for hosting, authentication, analysis, extraction, payments,
-              security, and infrastructure. These include Supabase for authentication and data storage, and Stripe for
-              payment processing. Those services have their own terms and policies.
+              NeutralEye relies on third-party services for hosting, authentication, analysis, extraction, security,
+              and infrastructure. These include Supabase for authentication and data storage. No payment processor is
+              involved, because nothing is charged for. Those services have their own terms and policies.
             </p>
           </article>
 

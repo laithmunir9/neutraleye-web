@@ -5,47 +5,59 @@ import styles from "../marketing.module.css";
 export const metadata = {
   title: "Methodology | NeutralEye",
   description:
-    "How to read a NeutralEye result: what the direction label means, what confidence measures, and where the analysis has limits.",
+    "What the analyzer returns, what each field measures, and the thresholds it applies before it reports anything at all.",
 };
 
-const DIRECTION = [
+/* Every field below is the analyzer's real output contract, from the response
+   schema in src/lib/analysis.js. This page previously documented a
+   Left-leaning / Center / Right-leaning label with a 0.00-1.00 score, which the
+   analyzer has never returned. `bias_level` is an internal enum and never
+   reaches a reader, per the rule already stated in src/lib/biasLevel.js. */
+const FIELDS = [
   {
-    label: "Left-leaning",
-    body: "Tone, framing, sourcing, and omission consistently pointed in a direction associated with left-of-center interpretation. This describes the pattern found in the text, not a judgment about the subject matter.",
+    name: "Framing strength",
+    body: "None, slight, moderate, heavy, or uncertain.",
   },
   {
-    label: "Center",
-    body: "Signals were balanced, contradictory, or too sparse for a clear directional pattern. A center result does not certify fairness. It means no dominant lean was found.",
+    name: "Direction",
+    body: "Toward or against a named subject in the story, or non-directional.",
   },
   {
-    label: "Right-leaning",
-    body: "Signals consistently pointed in a direction associated with right-of-center interpretation. The same rule applies: the label describes this specific text, not the outlet or the author overall.",
+    name: "Confidence",
+    body: "0.00 to 1.00. How consistently the signals repeated.",
+  },
+  {
+    name: "Quoted excerpts",
+    body: "The journalist's own sentences, each tagged framing, language, sourcing, or attribution.",
+  },
+  {
+    name: "Article type",
+    body: "News, opinion, or analysis.",
+  },
+  {
+    name: "Other coverage",
+    body: "Articles on the same story from other outlets, never the one you submitted.",
   },
 ];
 
-const CONFIDENCE = [
+/* All four push toward saying nothing. Transcribed from the analysis rules in
+   the prompt, not paraphrased from memory. */
+const THRESHOLDS = [
   {
-    label: "High confidence",
-    body: "The same signal pattern repeated across most of the article, with tone, framing, and sourcing pointed the same way. A well-written opinion column can score high precisely because its structure is deliberately consistent.",
+    title: "Minimum impact",
+    body: "Signals that are minor, isolated, or purely stylistic set framing strength to none rather than being reported.",
   },
   {
-    label: "Low confidence",
-    body: "Signals were mixed, thin, or contradictory. That can mean the article is genuinely balanced, but it can also mean the text was short, the writing inconsistent, or the story still developing when it was filed.",
-  },
-];
-
-const STEPS = [
-  {
-    title: "Start with the summary",
-    body: "Read the top-level explanation first, then use the supporting sections to see what language and sourcing patterns shaped the result.",
+    title: "Weak evidence",
+    body: "Where the evidence is thin or ambiguous, the result is none or uncertain, and confidence is held below 0.40.",
   },
   {
-    title: "Use examples as evidence",
-    body: "Quoted examples show the exact phrases or structures that triggered the signal. They are evidence to check against the article, not proof on their own.",
+    title: "High values are rare",
+    body: "Above 0.85 is reserved for framing that is clear, repeated, and explicit in the text.",
   },
   {
-    title: "Treat recommendations as prompts",
-    body: "When the system suggests more reading, it is flagging a gap in context, not declaring the question settled.",
+    title: "No excerpt, no finding",
+    body: "When framing strength is none, the excerpt list is empty. There is no path that returns a finding with nothing to show for it.",
   },
 ];
 
@@ -76,59 +88,84 @@ export default function MethodologyPage() {
         <section className={styles.hero}>
           <h1>How to read a result</h1>
           <p className={styles.lead}>
-            A result has two numbers and a label, and all three are easy to misread. This page says
-            what each one measures, and just as importantly, what it does not.
+            The analyzer returns six fields, and every one of them is narrower than it looks. This
+            page says what each measures, what it refuses to measure, and the thresholds it applies
+            before it will say anything at all.
           </p>
         </section>
 
         <section className={styles.section}>
-          <h2>What the direction label means</h2>
+          <h2>What comes back</h2>
+          <dl className={styles.fields}>
+            {FIELDS.map((f) => (
+              <div key={f.name} className={styles.field}>
+                <dt className={styles.fieldName}>{f.name}</dt>
+                <dd className={styles.fieldBody}>{f.body}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section className={styles.section}>
+          <h2>There is no left, centre, or right</h2>
           <div className={styles.measure}>
             <p>
-              The label describes the pattern found in one piece of text. It is not a rating of the
-              outlet, and running the same outlet twice can return two different labels.
+              Direction names the subject the framing points at, not a political side. A result
+              reads &ldquo;toward Honeywell&rdquo;, or &ldquo;against the plaintiff&rdquo;, or
+              &ldquo;non-directional framing&rdquo;. It never reads &ldquo;left-leaning&rdquo;,
+              because that is not a value the analyzer can return.
+            </p>
+            <p>
+              That is a deliberate limit, not a missing feature. Placing an article on a political
+              spectrum requires a fixed idea of where the centre sits, and one piece of text gives
+              no way to establish that. Naming the subject the language favours is something you can
+              check against the article in front of you. Placing it on a spectrum is not.
+            </p>
+            <p>
+              Nothing here rates an outlet. The unit is one article, and the same publication
+              returns different results on different stories.
             </p>
           </div>
-          <ul className={styles.rows}>
-            {DIRECTION.map((d) => (
-              <li key={d.label} className={styles.row}>
-                <h3 className={styles.rowTitle}>{d.label}</h3>
-                <p className={styles.rowBody}>{d.body}</p>
-              </li>
-            ))}
-          </ul>
         </section>
 
         <section className={styles.section}>
           <h2>Confidence measures consistency, not truth</h2>
           <div className={styles.measure}>
             <p>
-              This is the number most often read backwards. A low score is not a clean article. It
-              is an article the analysis is less sure about, and saying so is more useful than
-              rounding to a confident answer.
+              This is the number most often read backwards. It describes how consistently the
+              signals repeated across the text. It is not a measure of how strongly framed the
+              article is, and not a measure of how certain anyone should be.
+            </p>
+            <p>
+              A well-written opinion column can return high confidence precisely because its
+              structure is deliberately consistent, and that is not a finding against it. A low
+              number is not a clean article either. It is an article the analysis is less sure
+              about, and saying so is more useful than rounding to a confident answer.
             </p>
           </div>
-          <ul className={styles.rows}>
-            {CONFIDENCE.map((c) => (
-              <li key={c.label} className={styles.row}>
-                <h3 className={styles.rowTitle}>{c.label}</h3>
-                <p className={styles.rowBody}>{c.body}</p>
-              </li>
-            ))}
-          </ul>
         </section>
 
         <section className={styles.section}>
-          <h2>Reading it in order</h2>
-          <ol className={styles.rows}>
-            {STEPS.map((s, i) => (
-              <li key={s.title} className={`${styles.row} ${styles.step}`}>
-                <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
-                <h3 className={styles.rowTitle}>{s.title}</h3>
-                <p className={styles.rowBody}>{s.body}</p>
+          <h2>What it does when the evidence is thin</h2>
+          <div className={styles.measure}>
+            <p>Four rules run before a result is produced, and all four push toward saying nothing.</p>
+          </div>
+          <ul className={styles.rows}>
+            {THRESHOLDS.map((t) => (
+              <li key={t.title} className={styles.row}>
+                <h3 className={styles.rowTitle}>{t.title}</h3>
+                <p className={styles.rowBody}>{t.body}</p>
               </li>
             ))}
-          </ol>
+          </ul>
+          <div className={styles.measure}>
+            <p>
+              The analyzer runs at temperature zero rather than sampling. That is what makes a
+              second run comparable to the first. It is not a guarantee of an identical one, which
+              is why a <Link href="/reports">coverage report</Link> runs the whole analysis twice
+              and publishes only what appears in both passes.
+            </p>
+          </div>
         </section>
 
         <section className={styles.section}>
@@ -146,7 +183,7 @@ export default function MethodologyPage() {
         <section className={styles.cta}>
           <h2>Run one and read it against this page</h2>
           <p>
-            The labels make more sense with a result in front of you.
+            The fields make more sense with a result in front of you.
           </p>
           <div className={styles.actions}>
             <Link href="/analyze" className={styles.btnInk}>Open the analyzer</Link>

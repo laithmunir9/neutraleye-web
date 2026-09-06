@@ -6,51 +6,38 @@ import styles from "./page.module.css";
 export const metadata = {
   title: "FAQ | NeutralEye",
   description:
-    "Reading results, what the scores mean, how data is handled, and the limits of the analysis.",
+    "Reading a result, what each field measures, how data is handled, and the limits of the analysis.",
 };
 
+/* The "Direction & scores" and "Confidence score" sections were merged. Both
+   described a Left-leaning / Center / Right-leaning label with a 0.00-1.00
+   score, which the analyzer does not return, and four of their eight questions
+   explained confidence twice. What the analyzer actually returns is documented
+   on /methodology and matches the schema in src/lib/analysis.js. */
 const SECTIONS = [
   {
-    id: "direction",
-    label: "Direction & scores",
+    id: "result",
+    label: "What the result says",
     questions: [
       {
-        q: "What does 'Left-leaning,' 'Center,' or 'Right-leaning' mean?",
-        a: "The direction label describes the dominant pattern of signals found in that specific article, covering tone, framing, source selection, and omission. It is not a political judgment about the outlet, author, or subject matter. The same publication can receive different labels across different articles depending on how a story is assembled.",
+        q: "What does the analyzer return?",
+        a: "Framing strength, a direction, a confidence value, the quoted sentences behind it, the article type, and links to other coverage of the same story. The methodology page lists every field and what each one measures.",
       },
       {
-        q: "What is the confidence score (0.00–1.00)?",
-        a: "The confidence score reflects how clearly and consistently the directional signal appeared. A score of 0.85 means the signals were clear and repeated across the article. A score of 0.30 means signals were present but faint or mixed. Read it alongside the direction label, since 0.70 on a Center result means something different from 0.70 on a Left-leaning result.",
+        q: "What does direction mean?",
+        a: "It names the subject the framing points at: toward or against a person, company, or position named in the story. It is not a political placement. There is no left, centre, or right result, because placing an article on a spectrum would require a fixed idea of where the centre sits.",
       },
       {
-        q: "Can a left-leaning article still be accurate and well-reported?",
-        a: "Yes. Bias direction describes framing patterns, not factual accuracy. A well-reported article can still use language, sourcing, or emphasis that leans in one direction. NeutralEye is not a fact-checker. It analyzes how a story is constructed, not whether its claims are true.",
+        q: "What does confidence measure?",
+        a: "How consistently the signals repeated across the text. Below 0.40 means the evidence was thin, mixed, or ambiguous. Above 0.85 is rare, and reserved for framing that is explicit and repeated in the journalist's own sentences.",
       },
       {
-        q: "Why does the same outlet get different labels on different articles?",
-        a: "Because NeutralEye analyzes the text you submit, not the outlet's overall reputation. A wire report and an opinion column from the same publication can produce very different results. That's intentional. Labeling by outlet would be a shortcut that ignores how individual stories are actually written.",
-      },
-    ],
-  },
-  {
-    id: "confidence",
-    label: "Confidence score",
-    questions: [
-      {
-        q: "What is the confidence score?",
-        a: "Confidence measures how clearly and consistently the bias signals appeared across the submitted text. A high confidence score means tone, framing, sourcing, and attribution all pointed in the same direction throughout the article. A low score means signals were mixed, sparse, or contradictory.",
+        q: "Does high confidence mean the article is dishonest?",
+        a: "No. A well-argued opinion column returns high confidence because its structure is deliberately consistent, and consistency is not dishonesty. Confidence describes how clear the pattern was, not what you should conclude from it.",
       },
       {
-        q: "Does high confidence mean the article is dishonest or wrong?",
-        a: "No. A well-written opinion column can score high confidence because its rhetorical structure is deliberately consistent, and that's not a flaw. High confidence means the pattern was clear, not that the article is manipulative. What matters is reading the direction, the score, and the evidence together.",
-      },
-      {
-        q: "What does a low confidence score mean, and did the article pass?",
-        a: "Not exactly. Low confidence can mean the article is genuinely balanced and signals cancel out. But it can also mean the text was too short, the writing was inconsistent, or the story was still developing when filed. A low score is a flag for caution, not a clean bill of health.",
-      },
-      {
-        q: "How should I use confidence alongside the direction label?",
-        a: "Think of confidence as a volume dial, not a pass/fail gate. A high-confidence Left-leaning result with multiple quoted examples carries more weight than a high-confidence label with thin evidence. The direction tells you which way; the confidence tells you how strongly; the examples tell you why.",
+        q: "Why does the same outlet get different results on different articles?",
+        a: "Because the unit of analysis is the text you submitted, not the outlet's reputation. A wire report and a column from the same publication are different objects and read differently. Labelling by outlet would be a shortcut that ignores how individual stories are written.",
       },
     ],
   },
@@ -77,24 +64,20 @@ const SECTIONS = [
     ],
   },
   {
-    id: "plans",
-    label: "Plans & limits",
+    id: "limits",
+    label: "Limits",
     questions: [
       {
-        q: "How many analyses can I run for free?",
-        a: "Everyone gets 10 free analyses per day during our beta, and a rate limit of 5 requests per minute applies to prevent abuse. The limit resets daily. No account is required to get started.",
-      },
-      {
-        q: "What does a Pro plan include?",
-        a: "Pro brings Compare Analyses, which lets you run two articles side by side and see where framing diverges. Cloud history synced across your devices is already included free when you sign in. Pro is coming soon. Join the waitlist on the pricing page to be notified at launch.",
+        q: "How many analyses can I run?",
+        a: "Ten per day, free, with a rate limit of 5 requests per minute to prevent abuse. The limit resets daily. There is no paid tier and nothing to buy.",
       },
       {
         q: "Does the extension have the same limits as the website?",
-        a: "Both the extension and website share the same limits: 10 analyses per day and a rate limit of 5 requests per minute. Signing in links both to your account so history saves across both.",
+        a: "Yes. Both share the same ten analyses per day and the same rate limit. Signing in links both to your account so history saves across the two.",
       },
       {
-        q: "Do I need an account to use NeutralEye?",
-        a: "No. You can run analyses on the website without an account. An account is needed to save history across devices and to access upcoming Pro features like Compare Analyses.",
+        q: "Do I need an account?",
+        a: "No. You can run analyses on the website without one. An account only adds saved history across devices.",
       },
     ],
   },
@@ -103,8 +86,8 @@ const SECTIONS = [
     label: "How it works",
     questions: [
       {
-        q: "How does NeutralEye determine bias direction?",
-        a: "It checks five signal families together in one pass: tone (emotional loading, verb choices), framing (what the article centers vs. backgrounds), attribution (who gets quoted and how), source balance (distribution and credibility of sources), and omission (context that's missing). The direction emerges from the pattern across all five, not any single signal in isolation.",
+        q: "How does the analyzer decide what to flag?",
+        a: "It checks five signal families together in one pass: tone (emotional loading, verb choices), framing (what the article centers vs. backgrounds), attribution (who gets quoted and how), source balance (distribution and credibility of sources), and omission (context that's missing). The result emerges from the pattern across all five, not any single signal in isolation.",
       },
       {
         q: "Can NeutralEye analyze any article or web page?",
@@ -112,7 +95,7 @@ const SECTIONS = [
       },
       {
         q: "How accurate is the analysis?",
-        a: "NeutralEye surfaces patterns. It doesn't claim certainty. Satire, irony, and unusual writing styles can resemble bias signals. The analysis should be treated as a structured second opinion that prompts closer reading, not as a definitive verdict. The evidence section exists precisely so you can check the reasoning yourself.",
+        a: "NeutralEye surfaces patterns. It doesn't claim certainty. Satire, irony, and unusual writing styles can resemble framing signals. The analysis should be treated as a structured second opinion that prompts closer reading, not as a definitive verdict. The evidence section exists precisely so you can check the reasoning yourself.",
       },
       {
         q: "Does NeutralEye work on paywalled articles?",
@@ -130,9 +113,9 @@ export default function FaqPage() {
         <section className={shell.hero}>
           <h1>Questions people actually ask</h1>
           <p className={shell.lead}>
-            Mostly about what the scores mean and what happens to the text you submit. The short
-            version of both: the score measures consistency, not truth, and the article text is not
-            kept unless you ask for it.
+            Mostly about what a result means and what happens to the text you submit. The short
+            version of both: confidence measures consistency rather than truth, and the article
+            text is not kept unless you ask for it.
           </p>
         </section>
 
