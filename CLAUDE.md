@@ -310,8 +310,16 @@ There is no CI (no GitHub Actions) — `npm run verify` is the whole safety net,
 rule: framing analysis only, never place an outlet or article on a spectrum,
 never score or rate one, never imply fact-checking, never advertise a route or
 feature that does not exist. It exits non-zero on a live hit. `/gating-check`
-runs it first, and the monthly positioning check should call the same script
-rather than an ad-hoc grep.
+runs it first.
+
+**The monthly check is not in this repo.** `neutraleye-positioning-check` is a
+Cowork routine, running on the 1st of each month, flag-only. Do not go looking
+for it on disk. It originally checked framing language and em dashes across the
+Chrome Web Store listing, the pricing page, and the FAQ; the pricing-page half
+went stale when that route started redirecting. It is being repointed at
+`scripts/positioning-sweep.mjs` with an updated scope. The Chrome Web Store
+listing stays part of that routine's job and not this script's, because it lives
+outside the repo.
 
 **It is written against the rule, not a phrase list, and it must stay that way.**
 The sweep it replaced tested for four marketing taglines

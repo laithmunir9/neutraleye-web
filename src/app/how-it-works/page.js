@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BOOKING_URL } from "@/lib/content";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import ClaimPipeline from "@/components/how-it-works/ClaimPipeline";
 import styles from "../marketing.module.css";
 
 export const metadata = {
@@ -8,33 +9,6 @@ export const metadata = {
   description:
     "How a coverage report is produced: how the articles are gathered, how claims are extracted, what is checked against filing times, and why the whole thing runs twice.",
 };
-
-const STEPS = [
-  {
-    title: "You send the story",
-    body: "A link to the story, and the coverage you want read if you already have it. If you do not, naming the story is enough and the coverage gets gathered for you.",
-  },
-  {
-    title: "Every article is captured with its timestamps",
-    body: "First published and last updated are recorded for each one. This is what later separates an outlet that chose not to report something from an outlet that had stopped updating before the fact existed.",
-  },
-  {
-    title: "Claims are extracted by code, not by judgment",
-    body: "Which claims get examined is decided deterministically, so the same set of articles produces the same set of claims. A model reads the articles; it does not get to choose what counts as a claim.",
-  },
-  {
-    title: "Each outlet is checked against each claim",
-    body: "Reported, omitted, contradicted, or not stated. A gap only counts where several other outlets carried the same fact, so one outlet mentioning something the rest did not is a difference in emphasis, not a coverage gap.",
-  },
-  {
-    title: "The whole analysis runs twice",
-    body: "Independently, end to end. Anything that appears in one pass and not the other is reported as unstable rather than presented as a finding.",
-  },
-  {
-    title: "Quotes are verified against the source",
-    body: "Every quote is checked against the original article text before it reaches the report, so nothing is attributed to the wrong outlet.",
-  },
-];
 
 const NOT = [
   {
@@ -75,19 +49,25 @@ export default function HowItWorksPage() {
           <h2>The sequence</h2>
           <div className={styles.measure}>
             <p>
-              You get the report back within two business days. It is delivered as a service, so
-              there is no account to create and nothing to learn.
+              You send a link to the story, and the coverage you want read if you already have it.
+              The report comes back within two business days. It is delivered as a service, so there
+              is no account to create and nothing to learn.
+            </p>
+            <p>
+              Before any of the below, every article&rsquo;s first-published and last-updated times
+              are recorded. That is what separates an outlet that chose not to report something from
+              one that had stopped updating before the fact existed, and it runs first, so an
+              absence with a scheduling explanation never reaches the comparison at all.
             </p>
           </div>
-          <ol className={styles.rows}>
-            {STEPS.map((s, i) => (
-              <li key={s.title} className={`${styles.row} ${styles.step}`}>
-                <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
-                <h3 className={styles.rowTitle}>{s.title}</h3>
-                <p className={styles.rowBody}>{s.body}</p>
-              </li>
-            ))}
-          </ol>
+        </section>
+
+        {/* Full width, so the diagram uses the column the section headings leave
+            empty rather than adding page length. */}
+        <section className={styles.section}>
+          <div className={styles.full}>
+            <ClaimPipeline />
+          </div>
         </section>
 
         <section className={styles.section}>
