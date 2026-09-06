@@ -73,7 +73,7 @@ export default function ReportsPage() {
               NBC News, Al Jazeera, Fox News, the Associated Press and the Detroit Free Press
               covered the Michigan Democratic Senate primary called on 5 August 2026. All five
               agreed on who won. The divergence was in which story it was: evidence about
-              progressive viability, a defeat for AIPAC, or a Republican opportunity.
+              progressive viability, a verdict on outside spending, or a Republican opportunity.
             </p>
             <p>
               The report describes what each outlet foregrounded and what it left out. It does not

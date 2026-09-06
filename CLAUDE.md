@@ -312,6 +312,13 @@ never score or rate one, never imply fact-checking, never advertise a route or
 feature that does not exist. It exits non-zero on a live hit. `/gating-check`
 runs it first.
 
+**No named lobbying or advocacy organisations in demo material.** Demo stories
+have to be politically neutral so a prospect reacts to the tool rather than the
+topic. Named outlets and named candidates are the subject of a coverage report
+and stay; a named advocacy organisation is not the subject and reads as a side
+being taken. `/reports` described one framing as "a defeat for AIPAC" until
+6 September 2026. The sweep's `NAMED ADVOCACY GROUP` category catches this.
+
 **The monthly check is not in this repo.** `neutraleye-positioning-check` is a
 Cowork routine, running on the 1st of each month, flag-only. Do not go looking
 for it on disk. It originally checked framing language and em dashes across the

@@ -30,6 +30,11 @@ const CATEGORIES = [
   ["BANNED TERM", /bias detection|detects? bias|bias comparison|bias checker|biased publications|bias signals?|bias level/i],
   ["FACT-CHECK IMPLIED", /\b(?:we|it|neutraleye) (?:fact[- ]checks?|verif(?:y|ies) (?:the )?(?:facts|claims))\b/i],
   ["DEAD ROUTE / FEATURE", /\/pricing|\/compare\b|pricing page|Pro plan|Compare Analyses|join the waitlist/i],
+  /* Demo material has to be politically neutral so a prospect reacts to the
+     tool rather than the topic. Named outlets and named candidates are the
+     subject of a coverage report and stay; a named lobbying or advocacy
+     organisation is not the subject and reads as a side being taken. */
+  ["NAMED ADVOCACY GROUP", /\bAIPAC\b|\bNRA\b|\bACLU\b|\bNAACP\b|Planned Parenthood|Heritage Foundation|Sierra Club|Club for Growth|Americans for Prosperity|Federalist Society|Human Rights Campaign|MoveOn|Emily's List|AFL-CIO|\bsuper ?PACs?\b|lobbying (?:group|organi[sz]ation)|advocacy (?:group|organi[sz]ation)/i],
 ];
 
 /* Copy that matches a pattern and is correct as written: the site disowning the
