@@ -71,6 +71,10 @@
   box-shadow: none;
 }
 
+/* Only rendered in the stacked layout below. While the header row is on screen
+   the cell would be naming a column that already names itself. */
+.cellOutlet { display: none; }
+
 .state { font-size: 0.875rem; }
 .reported { color: var(--fc-body); }
 .omitted,
@@ -180,4 +184,53 @@
   .claim { font-size: 0.9375rem; padding-right: 0.625rem; }
   .cell { padding: 0.75rem 0.25rem; }
   .state { font-size: 0.75rem; }
+}
+
+/* Below this the six columns stop fitting. On a 390px viewport the outlet
+   columns fall to 39px while "Reported" needs 57px, so every state word
+   overflowed its track and ran into its neighbour, and the header row
+   collapsed into QUARTZAEROTIME24/7.
+
+   The claim moves above its own five-column strip and each cell names its
+   outlet. The strips share one grid, so the columns still line up down the
+   page and CNBC's run of omissions still reads as a vertical column, which is
+   the whole point of showing a matrix rather than a list. */
+@media (max-width: 36rem) {
+  .grid { display: block; }
+  .head { display: none; }
+
+  .rowGroup {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    column-gap: 0.25rem;
+    padding: 1.125rem 0;
+  }
+
+  .rowGroup + .rowGroup { border-top: 1px solid var(--fc-border); }
+
+  .claim {
+    grid-column: 1 / -1;
+    padding: 0 0 0.75rem;
+    font-size: 1rem;
+  }
+
+  .cell { padding: 0.5rem 0.125rem; text-align: center; }
+
+  /* Two lines are reserved whether or not the name needs them, so the state
+     words sit on one baseline across the strip instead of stepping up and
+     down behind "Motley Fool" and "24/7 Wall St". */
+  .cellOutlet {
+    display: block;
+    min-height: 2.4em;
+    margin-bottom: 0.25rem;
+    font-size: 0.625rem;
+    line-height: 1.2;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fc-muted);
+  }
+
+  .state { font-size: 0.6875rem; }
+
+  .foot { gap: 0.375rem 2rem; }
 }

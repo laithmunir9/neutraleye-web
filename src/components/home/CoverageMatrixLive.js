@@ -67,6 +67,11 @@ const ROWS = [
 
 const LABEL = { reported: "Reported", omitted: "Omitted", diverges: "Diverges", none: "–" };
 
+/* On a phone the shared header row is hidden, so each cell has to name its own
+   outlet, and the state has to be spoken rather than shown: "–" is read out as
+   a dash, which tells a screen reader user nothing. */
+const SPOKEN = { reported: "Reported", omitted: "Omitted", diverges: "Diverges", none: "Not stated" };
+
 /* The panel describes the selected cell: this outlet, this claim, this state.
    Reading it off the row alone told you about whichever outlet the row happened
    to be written around, even when you had clicked a different column. */
@@ -136,7 +141,9 @@ export default function CoverageMatrixLive() {
                   className={`${styles.cell} ${sel.row === r && sel.col === c ? styles.cellOn : ""}`}
                   onClick={() => setSel({ row: r, col: c })}
                   aria-pressed={sel.row === r && sel.col === c}
+                  aria-label={`${FULL[c]}. ${row.claim} ${SPOKEN[state]}.`}
                 >
+                  <span className={styles.cellOutlet} aria-hidden="true">{OUTLETS[c]}</span>
                   <span className={`${styles.state} ${styles[state]}`}>{LABEL[state]}</span>
                 </button>
               ))}
