@@ -486,6 +486,17 @@ When building new UI, prefer extending existing components in `src/components/ui
   *marked* rather than *boxed* would mean dropping the accent border and letting
   the drawn rule be the whole selected state, which is a change to an established
   interaction and was judged the wrong trade for now.
+- **/methodology needs restructuring at page level, not more marginalia.** Recorded
+  6 September 2026 after trying the marginalia approach and measuring it. Putting a
+  figure in the empty left column fixes the section it sits in (that section went
+  from 78% empty column to 21%) and moves the page number barely: 78% to 68% empty,
+  because one aside on a seven-section page cannot carry a page-level total. Five of
+  the seven sections still hold about 70px of occupied column against 400 to 800px
+  of section height, and they have no real quantity to put there. **Do not retry
+  this by inventing quantities to fill columns.** A display-scale number is only
+  worth setting when it is a real parameter or finding, never a count of the list
+  beside it. Moving the page requires changing how the page is structured, which is
+  a larger decision than a marginalia pass.
 - **The Design System section above is still partly stale.** Deferred, not fixed. Three
   lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
   added; the rest still references deleted components (`MediaBarrier`, the `/extension`

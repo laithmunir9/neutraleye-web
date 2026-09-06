@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MarketingShell from "@/components/MarketingShell/MarketingShell";
 import Annotation from "@/components/Annotation/Annotation";
+import ConfidenceScale from "@/components/methodology/ConfidenceScale";
 import styles from "../marketing.module.css";
 
 export const metadata = {
@@ -156,8 +157,12 @@ export default function MethodologyPage() {
           </div>
         </section>
 
-        <section className={styles.section}>
+        <section className={`${styles.section} ${styles.sectionAside}`}>
           <h2>What it does when the evidence is thin</h2>
+          <div className={styles.aside}>
+            <ConfidenceScale />
+          </div>
+          <div className={styles.sectionBody}>
           <div className={styles.measure}>
             <p>Four rules run before a result is produced, and all four push toward saying nothing.</p>
           </div>
@@ -169,13 +174,17 @@ export default function MethodologyPage() {
               </li>
             ))}
           </ul>
-          <div className={styles.measure}>
-            <p>
-              The analyzer runs at temperature zero rather than sampling. That is what makes a
-              second run comparable to the first. It is not a guarantee of an identical one, which
-              is why a <Link href="/reports">coverage report</Link> runs the whole analysis twice
-              and publishes only what appears in both passes.
+          <figure className={styles.exhibit}>
+            <p className={styles.exhibitBody}>
+              The analyzer runs at <Annotation>temperature zero</Annotation> rather than sampling.
+              That is what makes a second run comparable to the first.
             </p>
+            <figcaption className={styles.exhibitMeta}>
+              It is not a guarantee of an identical one, which is why a{" "}
+              <Link href="/reports">coverage report</Link> runs the whole analysis twice and
+              publishes only what appears in both passes.
+            </figcaption>
+          </figure>
           </div>
         </section>
 

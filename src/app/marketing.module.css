@@ -129,6 +129,51 @@
   color: var(--fc-body);
 }
 
+/* A section that puts something in the margin column instead of leaving it
+   empty. The default .section spans its h2 down every row of column 1, which is
+   what keeps a tall heading from setting the first row's height, and that also
+   makes column 1 unavailable to anything else. This variant gives the heading
+   one row and hands the rest of the column to an aside, so the column 2 content
+   has to be wrapped in a single .sectionBody. */
+/* Row 1 is exactly the heading's height and row 2 takes the rest, so the aside
+   starts directly under the heading. Without this the body spanning both rows
+   redistributes the spare height into row 1 and pushes the aside down the
+   page. */
+.sectionAside { grid-template-rows: auto 1fr; }
+
+.sectionAside > h2 { grid-column: 1; grid-row: 1; }
+
+.sectionAside > .aside {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  margin-top: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.sectionAside > .sectionBody {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin-top: 0;
+}
+
+/* The `.section > * + *` rule spaces direct children, and wrapping column 2 in
+   .sectionBody moved its blocks out of that selector's reach, so the intro
+   paragraph collided with the first row beneath it. */
+.sectionBody > * + * { margin-top: 2.5rem; }
+.sectionBody .rows + .actions { margin-top: 2rem; }
+
+@media (max-width: 64rem) {
+  .sectionAside > h2,
+  .sectionAside > .aside,
+  .sectionAside > .sectionBody {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  /* Stacked, the aside reads better after the argument it illustrates. */
+  .sectionAside > .aside { order: 3; margin-top: 2rem; padding-right: 0; }
+}
+
 /* Field list. The same hairline device as .rows, but two columns, because the
    left side is a fixed vocabulary the reader looks up rather than a heading
    they read. Used for the analyzer's output contract on /methodology. */
