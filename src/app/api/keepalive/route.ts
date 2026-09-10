@@ -16,14 +16,36 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.from("waitlist").select("id").limit(1);
+    // public.keepalive() reads no tables and returns now(). The previous query
+    // was `select id from waitlist limit 1`, which anon has never had permission
+    // to run, so this cron has been failing since it was added. Fixing it by
+    // granting anon SELECT on waitlist would have published signup emails to
+    // anyone holding the public key; a function that touches nothing keeps the
+    // project awake without widening access to anything.
+    const { error } = await supabase.rpc("keepalive");
     if (error) throw error;
 
     const timestamp = new Date().toISOString();
     logEvent("info", "keepalive.success", { timestamp });
     return NextResponse.json({ ok: true, timestamp });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
+    // Supabase hands back a plain PostgrestError object, not an Error instance,
+    // so `err instanceof Error` was false on exactly the failure this route
+    // exists to catch and every real fault logged as "Unknown error". A
+    // keepalive that cannot say why it failed is a keepalive nobody can fix.
+    const message =
+      err instanceof Error
+        ? err.message
+        : typeof err === "object" && err !== null
+          ? [
+              (err as { message?: string }).message,
+              (err as { code?: string }).code && `code ${(err as { code?: string }).code}`,
+              (err as { hint?: string }).hint,
+            ]
+              .filter(Boolean)
+              .join(", ") || JSON.stringify(err)
+          : String(err);
+
     logEvent("error", "keepalive.failure", { error: message });
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
