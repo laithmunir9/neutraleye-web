@@ -468,20 +468,27 @@ When building new UI, prefer extending existing components in `src/components/ui
 
 - **Zoom / responsive scaling** — The canvas-frame guide lines (92rem, ≥1024px) are now implemented. General zoom/viewport edge cases may still exist — do not introduce layout patterns that rely on fixed pixel widths without testing at multiple zoom levels.
 - **OG image** — `src/app/opengraph-image.js` generates a 1200×630 social preview using `next/og`. Custom font loading on Vercel's edge runtime is unreliable (empty responses, timeouts). The current version uses the default Satori font. `PlayfairDisplay-Regular.woff2` is in `public/` if someone retries custom fonts in the future.
-- **`--radius-sm` / `--radius-md` are silently overridden by Tailwind.** Deferred, not
-  fixed. `globals.css` declares `--radius-sm: 0.375rem` and `--radius-md: 0.5rem`, but the
-  browser receives Tailwind v4's own defaults (`0.25rem` / `0.375rem`) because `--radius-*`
-  is a reserved theme namespace. Roughly 28 usages across the codebase are therefore
-  rendering at values nobody chose. The fix is to rename them out of the namespace, the way
-  `--control-radius` already is. Cosmetic, so it was left out of the pre-outreach push.
-- **`/analyze` empty state still uses the old vocabulary.** Deferred, not fixed, by
-  decision on 6 September 2026. `src/app/analyze/page.js:585` reads "No confidence
-  score is generated when no significant bias is detected." Both halves are wrong
-  against the current contract: `bias_level` is internal and never user-facing
-  (`src/lib/biasLevel.js`), and the analyzer returns a framing strength rather than
-  a score of the article. It is the live tool's own UI, so changing it is a product
-  change rather than a copy fix, and it goes with the next product change. It is in
-  the positioning sweep's `KNOWN, DEFERRED` list until then.
+- **`--radius-sm` / `--radius-md` are fine. This entry used to say they were broken.**
+  Corrected 10 September 2026 after measuring instead of trusting it. The browser
+  receives the declared values: `--radius-md` resolves to `.5rem` and `--radius-sm`
+  to `.375rem`, checked against `getComputedStyle` on a running build.
+
+  The original bug was real but narrower than this entry claimed. Tailwind v4
+  tree-shakes unreferenced variables declared **inside an `@theme` block**, which is
+  where `--radius-control` lived; it was stripped and every button fell back to 0px.
+  The name is what gets remembered, but moving it out of `@theme` is what fixed it.
+  `--radius-lg/md/sm` sit in the plain `:root` block, which Tailwind never touches.
+
+  This mattered: acting on the entry as written meant renaming roughly 28 usages
+  across 12 files to fix nothing. `--radius-xl` was deleted, it had no usages.
+- **The extension's store listing name is the one surviving use of the old category
+  vocabulary.** `manifest.json` is named "NeutralEye - Bias Checker", kept deliberately
+  for Chrome Web Store search discoverability, and `src/lib/biasLevel.js` names it as
+  the single exception to the framing-only rule. It sits in the positioning sweep's
+  `KNOWN, DEFERRED` list so it stays visible on every run rather than being silently
+  allowed. Note the cost: "checker" describes a one-shot utility, which is the mental
+  model the reading companion's retention problem is fighting. Revisit the name and the
+  discoverability trade together, not separately.
 - **The changelog is exempt from the positioning sweep, conditionally.** Entries are
   a historical record and are never rewritten to match current vocabulary. The
   correction is carried by a dated note above the timeline instead

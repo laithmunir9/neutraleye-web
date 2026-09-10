@@ -16,7 +16,7 @@ export default function OGImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(145deg, #f8f4ee 0%, #efe8dd 100%)",
+          background: "linear-gradient(145deg, #FFFFFF 0%, #E5F0F0 100%)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -41,7 +41,7 @@ export default function OGImage() {
             style={{
               fontSize: 56,
               fontWeight: 400,
-              color: "#1a1816",
+              color: "#0D0F10",
               letterSpacing: "-0.01em",
               fontStyle: "italic",
             }}
@@ -51,7 +51,7 @@ export default function OGImage() {
           <span
             style={{
               fontSize: 22,
-              color: "#8b6741",
+              color: "#0E5A5E",
               fontWeight: 400,
               maxWidth: 600,
               textAlign: "center",

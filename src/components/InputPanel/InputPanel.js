@@ -11,7 +11,6 @@ export default function InputPanel({
   onUrlChange,
   onAnalyze,
   onExample,
-  canAnalyze,
   loading,
   loadingStage,
   extractedPreview,
@@ -32,15 +31,12 @@ export default function InputPanel({
       ? "Ready to fetch"
       : "Invalid URL";
   const readinessLabel = analysisComplete ? "Analyzed!" : mode === "url" ? urlReadinessLabel : textReadinessLabel;
-  const analyzeLabel = loading
-    ? "Analyzing"
-    : mode === "url"
-      ? validUrl
-        ? "Fetch & Analyze"
-        : "Enter Article URL"
-      : remaining > 0
-        ? "Enter Article Text"
-        : "Analyze";
+  /* The button names the action it performs, in every state. It used to carry an
+     instruction ("Enter Article Text") while disabled, which made the highest
+     contrast control on the page a dead end for exactly the person who had not
+     worked out what to do yet. It stays live now, and pressing it without usable
+     input answers the question instead of ignoring the press. */
+  const analyzeLabel = loading ? "Analyzing" : mode === "url" ? "Fetch and analyze" : "Analyze";
 
   return (
     <section className={`${styles.panel} ${loading ? styles.isAnalyzing : ""}`} aria-busy={loading}>
@@ -130,9 +126,8 @@ export default function InputPanel({
         <button
           className={styles.primary}
           type="button"
-          disabled={!canAnalyze || loading}
+          disabled={loading}
           onClick={onAnalyze}
-          title={!canAnalyze && !loading ? readinessLabel : undefined}
         >
           {analyzeLabel}
         </button>

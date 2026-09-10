@@ -331,7 +331,7 @@ export function buildHumanResult(json) {
   if (explanation && explanation !== summary) parts.push(explanation);
 
   if (phrases.length) {
-    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}" — ${String(p.why || "").trim()}`).join("\n");
+    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}": ${String(p.why || "").trim()}`).join("\n");
     parts.push(`**Examples**\n${exLines}`);
   }
 
@@ -340,7 +340,7 @@ export function buildHumanResult(json) {
       const title = String(s.title || "").trim();
       const url = String(s.url || "").trim();
       const outlet = String(s.outlet || "").trim();
-      return `- ${[title, outlet].filter(Boolean).join(" — ")}${url ? ` — ${url}` : ""}`;
+      return `- ${[title, outlet].filter(Boolean).join(", ")}${url ? `, ${url}` : ""}`;
     }).join("\n");
     parts.push(`**Other Coverage**\n${srcLines}`);
   }

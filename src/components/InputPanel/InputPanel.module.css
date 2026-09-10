@@ -157,10 +157,13 @@
   margin-top: 1rem;
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--control-radius);
   font-size: 0.98rem;
   color: var(--text);
-  background: rgba(243, 237, 229, 0.76);
+  /* Was rgba(243, 237, 229, 0.76), a cream from the retired brown palette. It
+     survived a hex grep because it is written as rgba, and it was the largest
+     warm surface left in the product. */
+  background: rgb(var(--surface-rgb) / 0.9);
   padding: 0.95rem 1rem;
   box-shadow: inset 0 1px 0 rgb(var(--surface-rgb) / 0.86);
   transition:

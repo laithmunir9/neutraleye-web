@@ -67,11 +67,20 @@ const DEFERRED = [
     reason: "Historical record. Entries are never edited to match current vocabulary; the standing correction note above the timeline carries the fix.",
   },
   {
-    file: "src/app/analyze/page.js",
-    line: 585,
-    reason: "Live tool empty state. Changing it is a product change, not a copy fix. Deferred to the next product change.",
+    file: "../neutraleye-extension/manifest.json",
+    reason: "Deliberate exception, kept for Chrome Web Store search discoverability. Documented in src/lib/biasLevel.js. The store listing name is the only place the old category vocabulary is allowed to survive.",
   },
 ];
+
+/* The extension is a separate repo, so for as long as this sweep walked only
+   `src/` it could not have failed on the surface with the most installs. Its
+   store listing carries the banned category term in its own name, which is a
+   deliberate exception, but nothing else in that repo had ever been read by
+   this check. The files are listed rather than walked: the repo root holds
+   node_modules and two vendored minified libraries, and a walk would spend its
+   time there. */
+const EXTENSION_ROOT = "../neutraleye-extension";
+const EXTENSION_FILES = ["manifest.json", "popup.html", "popup.js", "content.js", "background.js"];
 
 const ROOTS = ["src/app", "src/components", "src/lib/content.js"];
 const SKIP = /(?:\/api\/|__tests__|\.test\.)/;
@@ -83,6 +92,7 @@ const EXT = /\.(?:js|jsx|ts|tsx)$/;
 function stripComments(src) {
   return src
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/(^|[^:])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
 }
 
@@ -126,7 +136,16 @@ function selfTest() {
 
 selfTest();
 
-const files = ROOTS.flatMap((r) => walk(r));
+const extensionFiles = EXTENSION_FILES.map((f) => join(EXTENSION_ROOT, f)).filter((f) => {
+  try {
+    return statSync(f).isFile();
+  } catch {
+    // The extension repo is a sibling checkout and may simply not be present.
+    return false;
+  }
+});
+
+const files = [...ROOTS.flatMap((r) => walk(r)), ...extensionFiles];
 const live = [];
 const deferred = [];
 
@@ -163,7 +182,14 @@ if (process.argv.includes("--json")) {
     console.log(`\n=== KNOWN, DEFERRED  (${deferred.length}) ===`);
     for (const h of deferred) console.log(`  ${h.file}:${h.line}  [${h.term}]  ${h.reason}`);
   }
-  console.log(`\n${live.length} live hit(s), ${deferred.length} deferred, across ${files.length} files.`);
+  /* The scope is printed with the result, never separately. "Clean" on its own
+     is what let the extension's store listing go unchecked for the life of the
+     sweep: the word was accurate and the reader supplied their own scope. */
+  const webCount = files.length - extensionFiles.length;
+  console.log(
+    `\n${live.length} live hit(s), ${deferred.length} deferred, across ${files.length} files: ` +
+      `${webCount} in neutraleye-web, ${extensionFiles.length} in neutraleye-extension.`
+  );
   if (noteMissing) console.log("FAIL: changelog is exempt but its correction note is gone.");
   if (!live.length && !noteMissing) console.log("Clean.");
 }

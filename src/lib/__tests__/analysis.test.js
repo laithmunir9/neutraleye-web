@@ -72,7 +72,7 @@ describe("buildHumanResult", () => {
       bias_level: "heavy",
       biased_phrases: [{ quote: "the reckless plan", why: "language" }],
     });
-    expect(result).toContain('**Examples**\n- "the reckless plan" — language');
+    expect(result).toContain('**Examples**\n- "the reckless plan": language');
   });
 
   it("renders suggested_sources with title, outlet, and url", () => {
@@ -80,7 +80,7 @@ describe("buildHumanResult", () => {
       bias_level: "slight",
       suggested_sources: [{ title: "Some Article", outlet: "Outlet", url: "https://example.com/a" }],
     });
-    expect(result).toContain("**Other Coverage**\n- Some Article — Outlet — https://example.com/a");
+    expect(result).toContain("**Other Coverage**\n- Some Article, Outlet, https://example.com/a");
   });
 
   it("renders recommendations as a bullet list", () => {
