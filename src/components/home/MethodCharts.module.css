@@ -5,6 +5,11 @@
   align-items: flex-start;
 }
 
+/* Anchoring both notes to the bottom of a stretched column was tried and
+   reverted: it squared off the section but opened a 90px hole between the
+   timeline axis and the note explaining it, which is worse than the 67px step
+   it closed. The columns hold different shapes and are allowed to end at
+   different heights. */
 .filing { flex: 1 1 43.75rem; min-width: 0; }
 .passes { flex: 0 0 22.5rem; }
 

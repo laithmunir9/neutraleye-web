@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell/AppShell";
 import HeaderBar from "@/components/HeaderBar/HeaderBar";
@@ -16,6 +16,8 @@ import styles from "./page.module.css";
 import { isNoBiasRecord, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 const STAGES = ["Reading", "Checking framing", "Reviewing tone", "Writing analysis"];
+/** Shared with InputPanel's readiness label. Below this there is not enough article to read. */
+const MIN_TEXT_CHARS = 200;
 const SETTINGS_KEY = "neutraleye.settings.v1";
 const DEFAULT_SUMMARY = "A focused summary of the detected framing will appear here after analysis.";
 const NEUTRAL_SUMMARY_TEMPLATE =
@@ -70,10 +72,26 @@ function contentTypeLabel(result, hasAnalysis) {
   return CONTENT_TYPE_LABELS[result?.contentType] || "";
 }
 
+/*
+ * The direction template in src/lib/analysis.js asks the model for
+ * "toward <entity>" / "against <entity>", and the model sometimes returns the
+ * placeholder unsubstituted. That string is the largest text on the result
+ * screen, so an unfilled template renders as "Moderate framing against
+ * <entity>" at display size. Strip any angle-bracket placeholder rather than
+ * print it; the framing level on its own is still true.
+ */
+function stripPlaceholders(value) {
+  return String(value || "")
+    .replace(/\s*(?:toward|towards|against)?\s*<[^>]*>/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function resultTitle(result, hasAnalysis) {
   if (!hasAnalysis) return "Ready to analyze";
   if (isNoBiasResult(result)) return `${NO_BIAS_LABEL}.`;
-  return result.directionLabel || result.direction;
+  const label = stripPlaceholders(result.directionLabel || result.direction);
+  return label || "Framing signal found";
 }
 
 function resultHelperText(result, hasAnalysis) {
@@ -110,12 +128,6 @@ function neutralSummaryText(result) {
   if (!drivers.length) return NEUTRAL_SUMMARY_TEMPLATE;
 
   return `This read stayed below the threshold for a meaningful framing flag. The review did not find a repeated framing signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
-}
-
-function formatConfidenceScore(value) {
-  const confidence = Number(value);
-  if (!Number.isFinite(confidence)) return "N/A";
-  return confidence.toFixed(2);
 }
 
 function confidenceLevel(value) {
@@ -228,12 +240,6 @@ function AnalyzePageContent() {
     return () => window.clearInterval(timer);
   }, [loading, reduceMotion]);
 
-  const canAnalyze = useMemo(() => {
-    if (loading) return false;
-    if (mode === "url") return Boolean(url.trim());
-    return text.trim().length >= 200;
-  }, [mode, text, url, loading]);
-
   function handleModeChange(nextMode) {
     setMode(nextMode);
     setErrorState(null);
@@ -256,6 +262,25 @@ function AnalyzePageContent() {
   }
 
   const handleAnalyze = useCallback(async () => {
+    // Pressing analyze without usable input answers the question rather than
+    // doing nothing. The button is live in every state, so this is where the
+    // requirement gets stated.
+    if (mode === "url" && !url.trim()) {
+      setErrorState({
+        title: "Add the article link",
+        message: "Paste the full link to the article you want read, including https://."
+      });
+      return;
+    }
+    if (mode === "text" && text.trim().length < MIN_TEXT_CHARS) {
+      const short = text.trim().length;
+      setErrorState({
+        title: short ? "That is not enough of the article yet" : "Paste the article text",
+        message: `Paste at least ${MIN_TEXT_CHARS} characters of the article body${short ? `, ${MIN_TEXT_CHARS - short} more to go` : ""}. Or press Try Example to see a finished read first.`
+      });
+      return;
+    }
+
     setErrorState(null);
     setLoading(true);
     if (mode === "url") {
@@ -433,7 +458,6 @@ function AnalyzePageContent() {
               onUrlChange={handleUrlChange}
               onAnalyze={handleAnalyze}
               onExample={handleExample}
-              canAnalyze={canAnalyze}
               loading={loading}
               loadingStage={loadingStage}
               extractedPreview={extractedPreview}
@@ -447,46 +471,30 @@ function AnalyzePageContent() {
               hasAnalysis ? styles.hasResult : styles.emptyState
             }`}
           >
-            <section className={`${styles.outputCard} ${styles.resultHero}`}>
-              <div className={styles.sectionHeader}>
-                <span>Analysis Result</span>
-                {contentTypeLabel(result, hasAnalysis) ? (
-                  <span className={styles.contentTypeBadge}>{contentTypeLabel(result, hasAnalysis)}</span>
-                ) : null}
-              </div>
-              <div className={`${styles.biasRow} ${!hasAnalysis ? styles.biasRowEmpty : ""}`}>
-                <strong>{resultTitle(result, hasAnalysis)}</strong>
-              </div>
+            {/* The finding leads, in the reading voice. It used to be the third
+                line of a card headed "Analysis Result", set smaller than the
+                confidence decimal below it, so the least meaningful number on
+                the screen was the largest thing on it. */}
+            <div className={styles.resultHead}>
+              <p className={styles.finding}>{resultTitle(result, hasAnalysis)}</p>
               <p className={styles.helperText}>{resultHelperText(result, hasAnalysis)}</p>
-            </section>
+              {contentTypeLabel(result, hasAnalysis) ? (
+                <p className={styles.contentTypeBadge}>{contentTypeLabel(result, hasAnalysis)}</p>
+              ) : null}
+            </div>
 
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Summary</span>
-              </div>
-              <p className={`${styles.bodyText} ${!hasAnalysis ? styles.placeholderText : ""}`}>
-                {summaryText(result, hasAnalysis)}
-              </p>
-            </section>
+            <p className={`${styles.bodyText} ${!hasAnalysis ? styles.placeholderText : ""}`}>
+              {summaryText(result, hasAnalysis)}
+            </p>
 
-            {hasAnalysis && isNoBiasResult(result) ? (
-              <section className={styles.outputCard}>
-                <div className={styles.sectionHeader}>
-                  <span>Why this was judged low-bias</span>
-                </div>
-                <ul className={styles.simpleList}>
-                  {neutralNoteItems(result).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Examples</span>
-              </div>
-              {result.examples.length ? (
+            {/* The evidence, promoted. This is the differentiator and it sat
+                fourth of seven, in a container identical to the ones holding
+                suggested reading. */}
+            {result.examples.length ? (
+              <div className={styles.evidence}>
+                <h2 className={styles.blockHeading}>
+                  {result.examples.length === 1 ? "1 marked passage" : `${result.examples.length} marked passages`}
+                </h2>
                 <div className={styles.examplesList}>
                   {result.examples.map((example, index) => (
                     <QuoteEvidence
@@ -498,96 +506,96 @@ function AnalyzePageContent() {
                     />
                   ))}
                 </div>
-              ) : (
-                <p className={`${styles.bodyText} ${styles.placeholderText}`}>
-                  {hasAnalysis && isNoBiasResult(result)
-                    ? "No strong language or framing examples crossed the threshold for a meaningful framing flag in this pass."
-                    : "Quoted language and framing examples will appear here."}
-                </p>
-              )}
-            </section>
-
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Other Coverage</span>
               </div>
-              {result.sources.length ? (
-                <ul className={styles.simpleList}>
-                  {result.sources.map((source, index) => (
-                    <li key={`${index}-${typeof source === "string" ? source : source?.url || source?.name}`}>
-                      {typeof source === "string" ? (
-                        source
-                      ) : source?.url ? (
-                        <a href={source.url} target="_blank" rel="noreferrer">
-                          {source.name || source.url}
-                        </a>
-                      ) : (
-                        source?.name || "Source"
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <ul className={styles.simpleList}>
-                  <li className={styles.placeholderText}>
-                    {hasAnalysis && isNoBiasResult(result)
-                      ? "No specific comparison sources were required to clarify a strong directional pattern. A second source may still be useful for high-stakes topics."
-                      : "Suggested sources will appear here when the analysis has comparison ideas."}
-                  </li>
-                </ul>
-              )}
-            </section>
+            ) : (
+              <p className={`${styles.bodyText} ${styles.placeholderText}`}>
+                {hasAnalysis && isNoBiasResult(result)
+                  ? "No passage crossed the threshold for a meaningful framing flag in this pass."
+                  : "Marked passages will appear here, each with the sentence that carries it."}
+              </p>
+            )}
 
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Recommendations</span>
-              </div>
-              {result.recommendations.length ? (
+            {hasAnalysis && isNoBiasResult(result) ? (
+              <details className={styles.more}>
+                <summary>Why nothing was flagged</summary>
                 <ul className={styles.simpleList}>
-                  {result.recommendations.map((item) => (
+                  {neutralNoteItems(result).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              ) : (
-                <ul className={styles.simpleList}>
-                  <li className={styles.placeholderText}>
-                    {hasAnalysis && isNoBiasResult(result)
-                      ? "No urgent follow-up steps were generated. For consequential topics, compare with one additional source and continue reading with normal judgment."
-                      : "Useful next reading steps will appear here."}
-                  </li>
-                </ul>
-              )}
-            </section>
+              </details>
+            ) : null}
 
-            <section className={styles.outputCard}>
-              <div className={styles.sectionHeader}>
-                <span>Analysis Confidence</span>
-              </div>
-              <div className={styles.confidenceScore}>
-                <strong>{hasAnalysis && !isNoBiasResult(result) ? formatConfidenceScore(result.confidence) : "N/A"}</strong>
-                {hasAnalysis && !isNoBiasResult(result) ? (
-                  <div className={styles.confBar}>
-                    <div className={styles.confTrack}>
-                      <div
-                        className={styles.confFill}
-                        style={{ width: `${Math.round(result.confidence * 100)}%` }}
-                      />
+            {/* Secondary by design. Front-loading seven equal sections is what
+                made this screen hard to read: everything arrived at once and
+                nothing said what to look at first. */}
+            {hasAnalysis ? (
+              <div className={styles.secondary}>
+                <details className={styles.more}>
+                  <summary>Other coverage of this story</summary>
+                  {result.sources.length ? (
+                    <ul className={styles.simpleList}>
+                      {result.sources.map((source, index) => (
+                        <li key={`${index}-${typeof source === "string" ? source : source?.url || source?.name}`}>
+                          {typeof source === "string" ? (
+                            source
+                          ) : source?.url ? (
+                            <a href={source.url} target="_blank" rel="noreferrer">
+                              {source.name || source.url}
+                            </a>
+                          ) : (
+                            source?.name || "Source"
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.bodyText}>
+                      No comparison sources were suggested for this read.
+                    </p>
+                  )}
+                </details>
+
+                <details className={styles.more}>
+                  <summary>What to read next</summary>
+                  {result.recommendations.length ? (
+                    <ul className={styles.simpleList}>
+                      {result.recommendations.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.bodyText}>
+                      No follow-up steps were generated for this read.
+                    </p>
+                  )}
+                </details>
+
+                <details className={styles.more}>
+                  <summary>How confident this read is</summary>
+                  {!isNoBiasResult(result) ? (
+                    <div className={styles.confidence}>
+                      <div className={styles.confTrack}>
+                        <div
+                          className={styles.confFill}
+                          style={{ width: `${Math.round(result.confidence * 100)}%` }}
+                        />
+                      </div>
+                      <p className={styles.bodyText}>
+                        {confidenceLevel(result.confidence)}. Confidence reflects how consistently the
+                        signals appear across tone, framing, sourcing and omission. It is not a claim
+                        of factual certainty.
+                      </p>
                     </div>
-                    <div className={styles.confScale}>
-                      <span className={styles.confScaleLabel}>Low</span>
-                      <span className={styles.confLevel}>{confidenceLevel(result.confidence)}</span>
-                      <span className={styles.confScaleLabel}>High</span>
-                    </div>
-                  </div>
-                ) : (
-                  <p>
-                    {hasAnalysis && isNoBiasResult(result)
-                      ? "No confidence score is generated when no significant bias is detected. The analysis found no strong directional pattern to measure against."
-                      : "Confidence reflects how consistently the analysis signals appear across tone, framing, sourcing, and omission. It is not a claim of factual certainty."}
-                  </p>
-                )}
+                  ) : (
+                    <p className={styles.bodyText}>
+                      Confidence is only reported when there is a framing pattern to measure. This
+                      read did not find one.
+                    </p>
+                  )}
+                </details>
               </div>
-            </section>
+            ) : null}
           </section>
         </section>
       </div>

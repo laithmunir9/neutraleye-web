@@ -1,50 +1,63 @@
+/* Not a card. Each passage used to sit in its own bordered, rounded, shadowed
+   box, so six pieces of evidence read as six identical objects and the marks
+   inside them had to compete with the container drawn around them. Separation
+   is a hairline and space, matching the extension popup. */
 .card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  background: rgb(var(--surface-rgb) / 0.88);
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid rgb(var(--border-rgb) / 0.12);
 }
 
+/* A structural label naming the signal on an interlinear note, which is the one
+   position the design system permits tracked caps. */
 .chip {
-  display: inline-flex;
-  border-radius: 2px;
-  border: 1px solid var(--border);
-  background: rgb(var(--muted-rgb) / 0.86);
-  padding: 0.35rem 0.65rem;
+  justify-self: start;
   font-size: 0.68rem;
-  letter-spacing: 0;
   font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   color: var(--accent-strong);
 }
 
 .quote {
-  margin: 0.9rem 0 0;
-  font-size: 0.96rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.06rem;
   line-height: 1.7;
   color: var(--text);
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.7rem;
 }
 
-.mark {
-  color: rgb(var(--brand-rgb) / 0.52);
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.quote mark {
-  background: rgba(205, 188, 163, 0.42);
+/*
+ * The annotation, matching src/components/Annotation. Two stacked background
+ * layers, the tint and a 2px rule along the baseline, painted as backgrounds so
+ * the mark survives a line wrap intact.
+ *
+ * This replaces a warm tan highlight (rgba(205, 188, 163, 0.42)) left over from
+ * the retired brown palette, on a rule that says that palette is gone.
+ */
+.annotation {
+  background-color: transparent;
+  background-image:
+    linear-gradient(rgb(var(--brand-rgb)), rgb(var(--brand-rgb))),
+    linear-gradient(rgb(var(--brand-rgb) / 0.13), rgb(var(--brand-rgb) / 0.13));
+  background-size: 100% 2px, 100% 100%;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
   color: inherit;
-  border-radius: 0.35rem;
-  padding: 0.05rem 0.2rem;
+  padding: 0.08em 0.14em;
+  border-radius: 2px 2px 0 0;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
+/* The note hangs off the line it belongs to rather than sitting under a divider
+   that spans the whole width. */
 .explanation {
-  margin: 0.8rem 0 0;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.82rem;
+  margin: 0;
+  padding-left: 0.7rem;
+  border-left: 2px solid rgb(var(--brand-rgb) / 0.13);
+  font-size: 0.86rem;
   color: var(--secondary-text);
   line-height: 1.6;
 }

@@ -92,15 +92,18 @@ describe("AnalyzePage – NETWORK_ERROR", () => {
       expect(screen.getByText("Moderate framing signal")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Summary")).toBeInTheDocument();
+    // The summary is a bare paragraph now, and the evidence is headed by its own
+    // count rather than the word "Examples", so these assert on the content that
+    // reaches the reader rather than on section headings that no longer exist.
     expect(screen.getByText(/repeated selective emphasis/i)).toBeInTheDocument();
-    expect(screen.getByText("Examples")).toBeInTheDocument();
+    expect(screen.getByText("1 marked passage")).toBeInTheDocument();
     expect(screen.getByText(/reckless and chaotic/i)).toBeInTheDocument();
-    expect(screen.getByText("Other Coverage")).toBeInTheDocument();
+    // Secondary material is present but behind disclosure.
+    expect(screen.getByText("Other coverage of this story")).toBeInTheDocument();
     expect(screen.getByText("Associated Press")).toBeInTheDocument();
-    expect(screen.getByText("Recommendations")).toBeInTheDocument();
+    expect(screen.getByText("What to read next")).toBeInTheDocument();
     expect(screen.getByText("Compare with wire-service reporting.")).toBeInTheDocument();
-    expect(screen.queryByText("Why this was judged low-bias")).not.toBeInTheDocument();
+    expect(screen.queryByText("Why nothing was flagged")).not.toBeInTheDocument();
   });
 
   test("renders a deliberate neutral result when no significant bias is detected", async () => {
@@ -138,11 +141,11 @@ describe("AnalyzePage – NETWORK_ERROR", () => {
 
     expect(screen.getByText("Please feel free to continue reading.")).toBeInTheDocument();
     expect(screen.getByText(/stayed below the threshold for a meaningful framing flag/i)).toBeInTheDocument();
-    expect(screen.getByText("Why this was judged low-bias")).toBeInTheDocument();
+    expect(screen.getByText("Why nothing was flagged")).toBeInTheDocument();
     expect(screen.getByText(/visible signals stayed below the threshold/i)).toBeInTheDocument();
-    expect(screen.getByText(/no strong language or framing examples crossed the threshold/i)).toBeInTheDocument();
-    expect(screen.getByText(/no specific comparison sources were required/i)).toBeInTheDocument();
-    expect(screen.getByText(/no urgent follow-up steps were generated/i)).toBeInTheDocument();
+    expect(screen.getByText(/no passage crossed the threshold/i)).toBeInTheDocument();
+    expect(screen.getByText(/no comparison sources were suggested/i)).toBeInTheDocument();
+    expect(screen.getByText(/no follow-up steps were generated/i)).toBeInTheDocument();
   });
 
   test("shows a readable validation error for repetitive text input", async () => {

@@ -25,316 +25,86 @@
   padding-left: 0;
 }
 
-.outputCard {
-  position: relative;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background:
-    linear-gradient(180deg, rgb(var(--surface-rgb) / 0.98), rgb(var(--surface-rgb) / 0.9)),
-    var(--surface);
-  box-shadow: var(--shadow);
-  padding: clamp(1.1rem, 1.8vw, 1.38rem);
-  transform: translateY(0);
-  animation: resultIn 440ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    background-color 220ms ease;
-}
+/* No cards. The result used to be seven identical bordered boxes with the same
+   radius and the same shadow, which flattened the hierarchy: the verdict, the
+   suggested reading and the confidence meta all looked equally important, and a
+   first-time reader had nothing telling them where to start. Separation here is
+   space and one hairline. */
 
-.outputCard:hover {
-  border-color: rgb(var(--border-rgb) / 0.14);
-}
-
-.outputCard:first-child {
-  border-color: rgb(var(--brand-rgb) / 0.2);
-  border-top: 3px solid rgb(var(--brand-rgb));
-  background:
-    linear-gradient(158deg, rgb(var(--surface-rgb)) 18%, rgba(236, 222, 202, 0.48) 100%),
-    var(--surface);
-  padding: clamp(1.6rem, 3vw, 2.4rem);
-  box-shadow:
-    0 2.2rem 4.8rem rgb(var(--shadow-rgb) / 0.1),
-    0 0.55rem 1.1rem rgb(var(--shadow-rgb) / 0.045);
-}
-
-.resultHero {
+.resultHead {
   display: grid;
   gap: 0.55rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid rgb(var(--border-rgb) / 0.12);
 }
 
-
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.8rem;
-  color: var(--accent-strong);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0;
+/* The finding, in the reading voice, and the largest thing on the screen. */
+.finding {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-wrap: balance;
 }
 
 .contentTypeBadge {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  padding: 0.22rem 0.7rem;
-  border-radius: 2px;
-  border: 1px solid rgb(var(--brand-rgb) / 0.25);
-  background: rgb(var(--brand-rgb) / 0.08);
-  color: var(--accent-strong);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
+  justify-self: start;
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--secondary-text);
 }
 
-.biasRow {
-  display: block;
-}
-
-.biasRow strong {
-  font-family: var(--font-sans);
-  font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+.blockHeading {
+  margin: 0 0 0.9rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
   color: var(--text);
 }
 
-.biasRowEmpty strong {
-  font-family: var(--font-sans);
-  font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--secondary-text);
-}
+.evidence { display: grid; }
 
-.helperText,
-.bodyText,
-.orderedList li p,
-.simpleList li {
-  margin: 0;
-  color: var(--secondary-text);
-  font-size: 0.98rem;
-  line-height: 1.7;
-}
-
-.helperText {
-  margin-top: 0.9rem;
-}
-
-.resultHero .helperText {
-  margin-top: 0;
-  padding-top: 0.9rem;
-  border-top: 1px solid rgb(var(--border-rgb) / 0.1);
-  max-width: 58rem;
-}
-
-.confidenceScore {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.confidenceScore strong {
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4vw, 3.1rem);
-  font-weight: 500;
-  line-height: 0.95;
-}
-
-.confidenceScore p {
-  max-width: 38rem;
-  margin: 0;
-  color: var(--secondary-text);
-  font-size: 0.98rem;
-  line-height: 1.72;
-}
-
-.confBar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.confTrack {
-  height: 4px;
-  border-radius: 2px;
-  background: rgb(var(--border-rgb) / 0.12);
-  overflow: hidden;
-}
-
-.confFill {
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(90deg, rgb(var(--brand-rgb) / 0.55), rgb(var(--brand-rgb)));
-  transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.confScale {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.confScaleLabel {
-  font-size: 0.68rem;
-  font-family: var(--font-mono);
-  color: var(--muted);
-  letter-spacing: 0.05em;
-}
-
-.confLevel {
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  color: rgb(var(--brand-rgb));
-  letter-spacing: 0.03em;
-}
-
-.bodyText {
-  color: var(--text);
-  font-size: 0.98rem;
-  line-height: 1.72;
-}
-
-.placeholderText {
-  color: var(--secondary-text);
-  font-size: 0.98rem;
-  line-height: 1.7;
-}
-
-.examplesList {
+/* Everything below the evidence is secondary and closed by default. Showing all
+   of it at once is what made this screen read as heavy. */
+.secondary {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.2rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgb(var(--border-rgb) / 0.12);
 }
 
-.orderedList,
-.simpleList {
-  display: grid;
-  gap: 0.72rem;
-  margin: 0;
-  padding: 0;
+.more { padding: 0.55rem 0; }
+
+.more > summary {
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text);
   list-style: none;
 }
 
-.orderedList li p {
-  color: var(--text);
-  font-size: 0.95rem;
-  line-height: 1.62;
-  padding-left: 0.85rem;
-  border-left: 2px solid rgb(var(--brand-rgb) / 0.16);
-}
+.more > summary::-webkit-details-marker { display: none; }
 
-.simpleList li {
-  position: relative;
-  color: var(--text);
-  font-size: 0.98rem;
-  line-height: 1.72;
-  padding-left: 1rem;
-}
-
-.simpleList li::before {
-  content: "";
-  position: absolute;
-  top: 0.68em;
-  left: 0;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 2px;
-  background: rgb(var(--brand-rgb) / 0.82);
-}
-
-.simpleList li.placeholderText::before {
-  display: none;
-}
-
-.simpleList li.placeholderText {
-  padding-left: 0;
+.more > summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1rem;
   color: var(--secondary-text);
+  font-variant-numeric: tabular-nums;
 }
 
-.simpleList a {
-  color: var(--accent-strong);
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.2em;
+.more[open] > summary::before { content: "\2212"; }
+
+.more > summary:focus-visible {
+  outline: 2px solid rgb(var(--brand-rgb));
+  outline-offset: 3px;
 }
 
-.simpleList a:hover {
-  color: rgb(var(--brand-dark-rgb));
-}
+.more > *:not(summary) { margin-top: 0.75rem; padding-left: 1rem; }
 
-.emptyState .outputCard {
-  box-shadow: none;
-  background: rgb(var(--surface-rgb) / 0.6);
-}
-
-.emptyState .outputCard:not(:first-child) {
-  opacity: 0.62;
-  transform: scale(0.996);
-}
-
-.emptyState .bodyText {
-  color: var(--secondary-text);
-}
-
-.isLoading .outputCard {
-  opacity: 0.76;
-}
-
-.isLoading .outputCard:first-child {
-  animation: softPulse 1.65s ease-in-out infinite;
-}
-
-.hasResult .outputCard:nth-child(2) {
-  animation-delay: 55ms;
-}
-
-.hasResult .outputCard:nth-child(3) {
-  animation-delay: 110ms;
-}
-
-.hasResult .outputCard:nth-child(4) {
-  animation-delay: 165ms;
-}
-
-.hasResult .outputCard:nth-child(5) {
-  animation-delay: 220ms;
-}
-
-.hasResult .outputCard:nth-child(6) {
-  animation-delay: 275ms;
-}
-
-@keyframes resultIn {
-  from {
-    opacity: 0;
-    transform: translateY(0.55rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes softPulse {
-  0%,
-  100% {
-    box-shadow: var(--shadow);
-  }
-
-  50% {
-    box-shadow: 0 1.1rem 2.4rem rgb(var(--shadow-rgb) / 0.095);
-  }
-}
+.confidence { display: grid; gap: 0.6rem; }
 
 .limitBanner {
   display: flex;
@@ -385,15 +155,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root,
-  .outputCard,
-  .isLoading .outputCard:first-child {
-    animation: none;
-  }
-
-  .outputCard {
-    transition: none;
-  }
+  .root { animation: none; }
 }
 
 @media (max-width: 980px) {
