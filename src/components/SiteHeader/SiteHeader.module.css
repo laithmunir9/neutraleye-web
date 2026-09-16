@@ -176,7 +176,7 @@
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 50%;
-  background: rgb(var(--brand-rgb));
+  background: var(--fc-heading);
   color: rgb(var(--offwhite-rgb));
   font-size: 0.85rem;
   font-weight: 600;
@@ -192,7 +192,7 @@
 }
 
 .avatarButton:hover {
-  background: rgb(var(--brand-dark-rgb));
+  background: var(--fc-ink-hover);
   transform: scale(1.05);
 }
 
