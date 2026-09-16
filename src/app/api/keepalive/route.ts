@@ -16,12 +16,15 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    // public.keepalive() reads no tables and returns now(). The previous query
-    // was `select id from waitlist limit 1`, which anon has never had permission
-    // to run, so this cron has been failing since it was added. Fixing it by
-    // granting anon SELECT on waitlist would have published signup emails to
-    // anyone holding the public key; a function that touches nothing keeps the
-    // project awake without widening access to anything.
+    // public.keepalive() writes to a dedicated public._keepalive_heartbeat row.
+    // An earlier version only ran `select now()` with no table I/O; that
+    // succeeded every day (confirmed in edge_logs) but Supabase's own inactivity
+    // scanner still flagged the project for pausing, so a pure computation
+    // apparently doesn't count as activity. A real write does. (An even earlier
+    // version queried `select id from waitlist limit 1`, which anon never had
+    // permission to run — granting that would have published signup emails to
+    // anyone holding the public key, which is why this uses a dedicated table
+    // instead of widening access to waitlist.)
     const { error } = await supabase.rpc("keepalive");
     if (error) throw error;
 
