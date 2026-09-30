@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 import { checkRedisRateLimit } from "@/lib/ratelimit";
 import { getClientIp } from "@/lib/apiLog";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 5);
 
@@ -59,7 +57,17 @@ export async function POST(req) {
     return NextResponse.json({ error: "Name or message is too long." }, { status: 400 });
   }
 
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    logEvent("error", "support.email.unconfigured");
+    return NextResponse.json(
+      { error: "Support email is temporarily unavailable." },
+      { status: 503 }
+    );
+  }
+
   try {
+    const resend = new Resend(resendApiKey);
     await resend.emails.send({
       from: "NeutralEye Support <contact@tryneutraleye.com>",
       to: "contact@tryneutraleye.com",
