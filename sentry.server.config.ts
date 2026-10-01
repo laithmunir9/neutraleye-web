@@ -5,7 +5,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: "https://e1c8341f1e517b590fe1196cc927387d@o4511531096014848.ingest.us.sentry.io/4511531149295616",
+  dsn: "https://d584bb0970067e4dd39cf4d5e4e22d22@o4512179528794112.ingest.us.sentry.io/4512179551600640",
 
   // Sample 10% of transactions — enough to spot slow endpoints without burning quota.
   tracesSampleRate: 0.1,
