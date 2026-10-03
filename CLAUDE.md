@@ -334,8 +334,7 @@ and report the measured number even when it contradicts what was promised.
 `node scripts/positioning-sweep.mjs` checks public copy against the positioning
 rule: framing analysis only, never place an outlet or article on a spectrum,
 never score or rate one, never imply fact-checking, never advertise a route or
-feature that does not exist. It exits non-zero on a live hit. `/gating-check`
-runs it first.
+feature that does not exist. It exits non-zero on a live hit.
 
 **No named lobbying or advocacy organisations in demo material.** Demo stories
 have to be politically neutral so a prospect reacts to the tool rather than the

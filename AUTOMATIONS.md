@@ -9,7 +9,6 @@ Quick reference for everything currently set up. Update this file whenever somet
 | Supabase keepalive | `neutraleye-web/src/app/api/keepalive/route.ts` | Automatic, daily 06:00 UTC via Vercel Cron (`vercel.json`) | Keeps the free-tier Supabase project from auto-pausing after 7 days of inactivity. The only scheduled job for this project |
 | Positioning sweep | `neutraleye-web/scripts/positioning-sweep.mjs` | Manual, `node scripts/positioning-sweep.mjs` after copy changes | Framing-only rule across `src/app`, `src/components` and the extension's files. Exits non-zero on a live hit |
 | debug-prod | `neutraleye-web/.claude/commands/debug-prod.md` | Manual, `/debug-prod [sentry-issue-url]`; with no URL it lists unresolved issues and asks which one | Pulls a Sentry issue, cross-references Vercel deploy history to find the deploy that introduced it, locates the code, proposes a root-cause fix. Applies only after confirmation, and never to guarded areas: auth, billing/gating, RLS, plus the OpenAI spend caps (`dailyLimit.js`, `ratelimit.js`). Runs `npm run verify` after applying. Never deploys, commits, or touches secrets. |
-| gating-check | `neutraleye-web/.claude/commands/gating-check.md` | Manual, `/gating-check [cws-listing-text]` | **Stale:** compares `useProAccess` gating against the pricing page and FAQ, both removed on 3 October 2026, and nothing imports `useProAccess` now. Only the CWS-listing half still has something to check. Rewrite or delete it before relying on it. |
 
 ## Notes
 
