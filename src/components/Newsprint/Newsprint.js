@@ -11,18 +11,17 @@ import styles from "./Newsprint.module.css";
  * the page moves on its own, and it shows what Read does before anyone reads a
  * word of copy.
  *
- * Purely decorative: aria-hidden, no pointer events, and masked away from the
- * centre column so it never sits behind the input or a result. Under
+ * Purely decorative: aria-hidden, no pointer events, and confined to the two
+ * margins so it never sits behind the input or a result. Under
  * prefers-reduced-motion the columns stand still and a few phrases are marked
  * from the start instead.
  */
 
-const COLUMN_COUNT = 7;
+// Per side. CSS shows only the ones that fit whole; the rest are clipped away.
+const COLUMNS_PER_SIDE = 4;
 const MAX_ACTIVE = 3;
 const TICK_MS = 1700;
 const HOLD_MS = 5200;
-// Half the width of the clear band in the middle, matching the mask in CSS.
-const CLEAR_HALF_WIDTH_PX = 400;
 
 function columnStories(index) {
   // Each column starts at a different story so neighbours never line up.
@@ -49,13 +48,12 @@ function Story({ paragraphs }) {
   );
 }
 
+// On screen, clear of the faded top and bottom, and in a column that is
+// actually showing (clipped overflow columns sit below the screen).
 function isInOpenArea(rect) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  if (rect.top < 130 || rect.bottom > vh - 80) return false;
   // Phones have no free margin; marks would land on the copy.
-  if (vw < 900) return false;
-  return rect.right < vw / 2 - CLEAR_HALF_WIDTH_PX || rect.left > vw / 2 + CLEAR_HALF_WIDTH_PX;
+  if (window.innerWidth < 900) return false;
+  return rect.width > 0 && rect.top >= 130 && rect.bottom <= window.innerHeight - 80;
 }
 
 export default function Newsprint() {
@@ -102,25 +100,30 @@ export default function Newsprint() {
   return (
     <div ref={rootRef} className={styles.newsprint} aria-hidden="true" data-newsprint="">
       <div className={styles.band}>
-        <div className={styles.columns}>
-          {Array.from({ length: COLUMN_COUNT }, (_, index) => {
-            const stories = columnStories(index);
-            return (
-              <div
-                key={index}
-                className={styles.column}
-                style={{ "--drift": `${150 + (index % 3) * 28}s`, "--offset": `${-index * 23}s` }}
-              >
-                {/* Two copies, so the drift loops without a seam. */}
-                <div className={styles.track}>
-                  {[...stories, ...stories].map((paragraphs, i) => (
-                    <Story key={i} paragraphs={paragraphs} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {["left", "right"].map((side, sideIndex) => (
+          <div key={side} className={styles.side}>
+            <div className={styles.columns}>
+              {Array.from({ length: COLUMNS_PER_SIDE }, (_, i) => {
+                const index = sideIndex * COLUMNS_PER_SIDE + i;
+                const stories = columnStories(index);
+                return (
+                  <div
+                    key={index}
+                    className={styles.column}
+                    style={{ "--drift": `${150 + (index % 3) * 28}s`, "--offset": `${-index * 23}s` }}
+                  >
+                    {/* Two copies, so the drift loops without a seam. */}
+                    <div className={styles.track}>
+                      {[...stories, ...stories].map((paragraphs, j) => (
+                        <Story key={j} paragraphs={paragraphs} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

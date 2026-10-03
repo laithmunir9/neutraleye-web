@@ -22,24 +22,38 @@
   user-select: none;
 }
 
-/* The paper colour stays on .newsprint, unmasked; only the type is masked,
-   so the clear band is plain paper rather than a white strip. Two nested
-   masks (horizontal on .band, vertical on .columns) multiply, which is more
-   dependable than compositing two images on one element. */
+/* Two margins, left and right of the reading column, each holding only as
+   many whole columns as fit. An earlier version laid seven columns across the
+   screen and masked out the middle, which left the innermost column on each
+   side half-erased in the fade: slivers of words that read as noise. Now a
+   column is either fully there or not there. The paper colour stays on
+   .newsprint so the middle is plain paper. */
 .band {
+  display: flex;
+  justify-content: space-between;
   height: 100%;
-  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - 32rem), transparent calc(50% - 24rem), transparent calc(50% + 24rem), #000 calc(50% + 32rem), #000 100%);
-  mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - 32rem), transparent calc(50% - 24rem), transparent calc(50% + 24rem), #000 calc(50% + 32rem), #000 100%);
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: repeat(7, 15.5rem);
-  justify-content: center;
-  gap: 2.75rem;
+.side {
+  width: calc(50% - 24rem);
   height: 100%;
+  padding: 0 2rem;
+  overflow: hidden;
+  /* Fade in under the header and out above the footer. */
   -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 3.5rem, #000 8rem, #000 calc(100% - 5rem), transparent 100%);
   mask-image: linear-gradient(180deg, transparent 0, transparent 3.5rem, #000 8rem, #000 calc(100% - 5rem), transparent 100%);
+}
+
+/* auto-fill only ever creates whole tracks. Columns that do not fit wrap onto
+   a second row, which is pushed below the screen and clipped. */
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  grid-template-rows: 100%;
+  grid-auto-rows: 100%;
+  justify-content: center;
+  column-gap: 2.5rem;
+  height: 100%;
 }
 
 .column {

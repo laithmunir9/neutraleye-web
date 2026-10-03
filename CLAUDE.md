@@ -88,6 +88,7 @@ src/
                             # backdrop click and Escape close it. No separate page. Its CSS module also styles /reset-password's form
     Newsprint/              # Homepage backdrop: faint drifting columns of invented, neutral local-news copy (copy.js) in the side
                             # margins, where loaded phrases get the annotation mark drawn on and off. Desktop only; phones get the paper tone
+                            # Each margin shows only whole columns (CSS grid auto-fill; extras wrap off-screen), never a half-faded one
     Workbench/
       Workbench.js          # The Read/Write tablist and the slot. All modes stay mounted (inactive ones hidden),
                             # so pasted text survives a switch. Switching rewrites ?mode with history.replaceState, no request
