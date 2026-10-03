@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import SiteShell from "@/components/SiteShell/SiteShell";
 import { createClient } from "@/lib/supabase/client";
 import { classifySignUpResult, reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 import shell from "../marketing.module.css";
@@ -20,7 +20,7 @@ import styles from "./page.module.css";
 function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/analyze";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
   const authError = searchParams.get("error");
   const resetSuccess = searchParams.get("reset") === "success";
@@ -131,7 +131,7 @@ function AuthForm() {
   const done = confirmed || (isForgot && forgotSent);
 
   return (
-    <MarketingShell>
+    <SiteShell>
       <main className={shell.page}>
         <section className={styles.wrap}>
           <h1 className={styles.title}>{title}</h1>
@@ -203,7 +203,7 @@ function AuthForm() {
           </p>
         </section>
       </main>
-    </MarketingShell>
+    </SiteShell>
   );
 }
 

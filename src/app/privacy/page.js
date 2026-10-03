@@ -1,5 +1,5 @@
 import Link from "next/link";
-import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import SiteShell from "@/components/SiteShell/SiteShell";
 import styles from "../legal.module.css";
 
 export const metadata = {
@@ -11,7 +11,7 @@ const LAST_UPDATED = "September 6, 2026";
 
 export default function PrivacyPage() {
   return (
-    <MarketingShell>
+    <SiteShell>
       <main className={styles.page}>
         <section className={styles.hero}>
           <h1>Website Privacy Policy</h1>
@@ -144,6 +144,6 @@ export default function PrivacyPage() {
           </article>
         </section>
       </main>
-    </MarketingShell>
+    </SiteShell>
   );
 }

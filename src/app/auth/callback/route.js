@@ -6,8 +6,8 @@ import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const rawNext = searchParams.get("next") ?? "/analyze";
-  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/analyze";
+  const rawNext = searchParams.get("next") ?? "/";
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
   if (code) {
     const cookieStore = await cookies();

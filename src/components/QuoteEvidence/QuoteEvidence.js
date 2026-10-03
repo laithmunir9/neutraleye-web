@@ -28,24 +28,28 @@ function markedParts(quote, highlights) {
     }));
 }
 
-export default function QuoteEvidence({ quote, label, explanation, highlight = [] }) {
+/* `sweep` draws each mark in once, staggered by `index`, like a pen moving
+   across the line. It is the one piece of motion on a result. */
+export default function QuoteEvidence({ quote, label, explanation, highlight = [], sweep = false, index = 0 }) {
   const parts = markedParts(quote, highlight);
+  const markClass = sweep ? `${styles.annotation} ${styles.sweep}` : styles.annotation;
+  const markStyle = sweep ? { animationDelay: `${0.15 + index * 0.35}s` } : undefined;
 
   return (
     <article className={styles.card}>
-      <div className={styles.chip}>{label}</div>
+      {label ? <div className={styles.chip}>{label}</div> : null}
       <blockquote className={styles.quote}>
-        {parts.map((part, index) =>
+        {parts.map((part, i) =>
           part.marked ? (
-            <mark className={styles.annotation} key={`${part.text}-${index}`}>
+            <mark className={markClass} style={markStyle} key={`${part.text}-${i}`}>
               {part.text}
             </mark>
           ) : (
-            <span key={`${part.text}-${index}`}>{part.text}</span>
+            <span key={`${part.text}-${i}`}>{part.text}</span>
           )
         )}
       </blockquote>
-      <p className={styles.explanation}>{explanation}</p>
+      {explanation ? <p className={styles.explanation}>{explanation}</p> : null}
     </article>
   );
 }

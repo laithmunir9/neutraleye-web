@@ -54,18 +54,12 @@ const ALLOW = [
   "It is not a political placement",
   "there is no left, centre, or right result",
   "It never reads",
-  // The changelog's standing correction has to name what it is correcting.
-  "describe a direction label with left, centre and right values",
 ];
 
 /* Known and deliberately not fixed. Printed every run so they stay visible,
    but they do not fail the sweep. Anything added here needs a reason and a
    matching entry in CLAUDE.md Known Issues. */
 const DEFERRED = [
-  {
-    file: "src/app/changelog/page.js",
-    reason: "Historical record. Entries are never edited to match current vocabulary; the standing correction note above the timeline carries the fix.",
-  },
   {
     file: "../neutraleye-extension/manifest.json",
     reason: "Deliberate exception, kept for Chrome Web Store search discoverability. Documented in src/lib/biasLevel.js. The store listing name is the only place the old category vocabulary is allowed to survive.",
@@ -82,7 +76,7 @@ const DEFERRED = [
 const EXTENSION_ROOT = "../neutraleye-extension";
 const EXTENSION_FILES = ["manifest.json", "popup.html", "popup.js", "content.js", "background.js"];
 
-const ROOTS = ["src/app", "src/components", "src/lib/content.js"];
+const ROOTS = ["src/app", "src/components"];
 const SKIP = /(?:\/api\/|__tests__|\.test\.)/;
 const EXT = /\.(?:js|jsx|ts|tsx)$/;
 
@@ -164,14 +158,8 @@ for (const file of files.sort()) {
   });
 }
 
-/* The changelog exemption is only honest while the correction note is actually
-   on the page. If someone deletes the note, the exemption must stop applying. */
-const changelog = readFileSync("src/app/changelog/page.js", "utf8");
-const noteMissing = deferred.some((h) => h.file === "src/app/changelog/page.js")
-  && !changelog.includes("historyNote");
-
 if (process.argv.includes("--json")) {
-  console.log(JSON.stringify({ filesScanned: files.length, live, deferred, noteMissing }, null, 2));
+  console.log(JSON.stringify({ filesScanned: files.length, live, deferred }, null, 2));
 } else {
   for (const [cat] of CATEGORIES) {
     const group = live.filter((h) => h.category === cat);
@@ -190,8 +178,7 @@ if (process.argv.includes("--json")) {
     `\n${live.length} live hit(s), ${deferred.length} deferred, across ${files.length} files: ` +
       `${webCount} in neutraleye-web, ${extensionFiles.length} in neutraleye-extension.`
   );
-  if (noteMissing) console.log("FAIL: changelog is exempt but its correction note is gone.");
-  if (!live.length && !noteMissing) console.log("Clean.");
+  if (!live.length) console.log("Clean.");
 }
 
-process.exit(live.length || noteMissing ? 1 : 0);
+process.exit(live.length ? 1 : 0);

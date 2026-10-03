@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import SiteShell from "@/components/SiteShell/SiteShell";
 import { createClient } from "@/lib/supabase/client";
 import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 import shell from "../marketing.module.css";
@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
   if (!ready) return null;
 
   return (
-    <MarketingShell>
+    <SiteShell>
       <main className={shell.page}>
         <section className={styles.wrap}>
           <h1 className={styles.title}>Set a new password</h1>
@@ -107,6 +107,6 @@ export default function ResetPasswordPage() {
           </div>
         </section>
       </main>
-    </MarketingShell>
+    </SiteShell>
   );
 }

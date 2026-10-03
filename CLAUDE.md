@@ -7,7 +7,9 @@ Read this before touching any code.
 
 ## Project Overview
 
-NeutralEye is an AI-powered media bias checker. Users paste article text or submit a URL and receive a structured bias analysis: direction, confidence score, bias drivers, example quotes, and source recommendations.
+NeutralEye is a consumer framing-analysis tool. The homepage is the product: a two-mode toggle, **Read** and **Write**, over one input slot. Read is the live analyzer (paste article text, get the framing analysis back, with marked passages). Write is the writing companion, not built yet; its tab shows a short description and an early-access email capture. The web analyzer is text only; `/api/analyze` still accepts URLs because the API supports them, but no web UI sends one.
+
+The site is the homepage plus legal pages and auth. There are no marketing or informational pages; every retired path permanently redirects to `/` (`RETIRED_PATHS` in `next.config.mjs`).
 
 There is no separate backend server. All backend logic lives as Next.js API Routes inside this repo, deployed on Vercel.
 
@@ -57,69 +59,44 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 ```
 src/
   app/
-    page.js                 # Home / landing page
-    analyze/page.js         # Core bias checker tool
-    pricing/page.js         # Pricing / upgrade to Pro
-    history/page.js         # User analysis history (Supabase-backed) — shows a locked gate when saveHistory setting is disabled in localStorage
-    how-it-works/page.js    # How NeutralEye works — canonical page, dark hero + SVG pipeline diagram + 3 feature rows
-    overview/page.js        # Redirects to /how-it-works
-    system/page.js          # Redirects to /how-it-works
-    methodology/page.js     # Post-result reading guide — NOT a signal explainer (that belongs in Overview)
-    extension/page.js       # Chrome extension marketing page — hero uses inline ExtensionMockup JSX (fictional article + NeutralEye popup overlay), no screenshot file
-    faq/page.js             # Two-column FAQ with <details>/<summary> accordions and sticky nav
-    about/page.js           # Founder story / mission — essay format with drop cap, no cards
-    changelog/page.js       # Vertical timeline of releases with New/Improved/Fixed type tags
-    support/page.js         # Contact form — POSTs to /api/support via Resend, requires "use client"
-    login/page.js           # Auth page — all four auth states use sign-in.tsx split layout: SignInPage (sign-in), SignUpPage (sign-up), ForgotPasswordPage (forgot-password email form), PasswordResetSentPage (link-sent confirmation); CheckEmailPage used after sign-up
-    reset-password/page.js  # Password reset — uses SetNewPasswordPage from sign-in.tsx; handles Supabase recovery redirect
-    blog/                   # Blog with dynamic [slug] routing — 3-col dark-thumbnail grid, chronological sort; post page reading layout (sidebar nav + content + footer) lives in [slug]/ReadingLayout.js
-    compare/page.js         # Compare Analyses — Pro-gated with blur overlay
-    settings/page.js        # User settings — Display (reduce motion) + Privacy (save analysis history toggle, stored in localStorage key `neutraleye.settings.v1`)
-    extension-privacy/      # Extension privacy policy
-    privacy/                # Website privacy policy
-    terms/                  # Terms of service
-    layout.js               # Root layout — fonts, ThemeProvider, metadata
-    globals.css             # Global styles
+    page.js                 # Homepage = the product. Server component: reads ?mode and ?id, renders SiteShell + Workbench
+    login/page.js           # Auth page (sign in / sign up / forgot password); ?callbackUrl defaults to /
+    signup/page.js          # Redirects into /login?mode=signup
+    reset-password/page.js  # Password reset; Supabase recovery redirect lands here
+    auth/callback/route.js  # Supabase code exchange; ?next defaults to /
+    privacy/, terms/        # Legal pages (legal.module.css)
+    extension-privacy/      # Extension privacy policy. The Chrome Web Store listing links here; keep it
+    not-found.js            # 404, links home
+    sitemap.js              # Only /, /privacy, /terms, /extension-privacy
+    opengraph-image.js      # Social preview
+    layout.js               # Root layout: Source Serif 4, ThemeProvider, AuthProvider, Analytics
+    globals.css             # Tokens (--fc-*, --control-radius) and base styles
 
-    api/
-      analyze/route.js      # Web bias analysis — text + URL modes
-      extension/route.js    # Extension bias analysis — text only
-      extension-auth/route.js # Extension login (email/password → Supabase)
-      extension-refresh/route.js # Extension token refresh — exchanges refresh token for new access token
-      usage/route.js        # Daily usage check + increment
+    api/                    # Unchanged by the restructure; the extension calls /api/extension and its auth routes
+      analyze/route.js      # Web framing analysis (text; URL still supported by the API)
+      extension/route.js    # Extension analysis
+      extension-auth/route.js, extension-refresh/route.js
+      usage/route.js        # Daily usage check
+      waitlist/route.js     # Early-access signups; used by Write mode with source "write"
+      support/route.js      # UNUSED: nothing calls it since the support page was removed. Kept, flagged
+      keepalive/route.ts    # Vercel cron, keeps Supabase awake
 
   components/
-    AppShell/               # App-mode layout wrapper
-    MarketingShell/         # Marketing/landing layout wrapper — includes `.canvasFrame` (position:fixed, 92rem max-width, z-index:200, visible at ≥1024px) with ::before/::after 1px vertical guide lines at rgba(128,128,128,0.12); `.shell` warm gradient background; `.ambientTop` top-edge fade overlay
-    MediaBarrier/           # "Reads content from" publication ticker — 3-row marquee duplicate for seamless loop (-33.3333% keyframe); background rgba(139,103,65,0.03) matching About pull-quote; edge fades via ::before/::after gradients clipped at canvas-frame lines via overflow:hidden on .track
-    HeaderBar/              # App header
-    SiteHeader/             # Grouped dropdown nav: Analyze (styled as accent CTA pill with eye-blink hover) + Product/Learn/Company hover dropdowns; scroll-aware dark/light theme; Radix account dropdown is also dark-mode aware; full-width `.header` wrapper (flex, border-bottom: 1px solid rgba(93,75,53,0.14)) contains `.headerInner` (max-width:92rem; margin:0 auto) for canvas-frame alignment. Avatar: shows the user's first initial (from full_name or email) in a styled circle.
-    SiteFooter/             # 4 columns: Product / Learn / Company / Legal; `.footer` is full-bleed (border-top, panel-strong bg); `.footerInner` (max-width:92rem; margin:0 auto; padding:2.15rem 2.25rem) aligns content to canvas-frame lines
-    Sidebar/                # App sidebar
-    InputPanel/             # Article URL / text input
-    ResultCard/             # Bias result display card
-    QuoteEvidence/          # Evidence quote display — used on analyze page for each biased_phrase: chip label (signal type) + blockquote with opening " mark + explanation row
-    HistoryTable/           # Analysis history list — shows "Extension" / "Website" source badge per row; hides Inspect button for extension rows (layout mismatch); `isNoBiasRecord()` unifies no-bias detection; Direction shows `NO_BIAS_LABEL`; Confidence shows "N/A" when no bias
-    AnalyzerCta/            # CTA heading + button — no card/box background
-    HeroSystemVisualization/ # Animated graph on home hero
-    ui/                     # shadcn/ui + custom animated components
-      sign-in.tsx           # Exports SignInPage, SignUpPage, CheckEmailPage, ForgotPasswordPage, PasswordResetSentPage, SetNewPasswordPage — all use the same split layout (warm beige LeftPanel / dark AnalysisPanel). LeftPanel renders a Back button only when showBack prop is passed (SignInPage + SignUpPage only); goBackToSite() skips auth paths and falls back to /. AnalysisPanel: heading/sub + ResultFeed (7 rows, opacity/translateY reveal, filling→complete→resetting loop) + SignalBars (bar chart fades in via globals.css barGrow keyframe). Google OAuth button is temporarily absent (removed 2026-07-02) — see Roadmap for restore steps. LegalSub in SiteHeader is a controlled DropdownMenu.Sub that opens on hover (mouse) or tap (touch) and closes 150ms after pointer leaves either element (mouse) or on second tap (touch).
+    SiteShell/              # The whole chrome: wordmark, Sign in or avatar (one-item Sign out menu), Privacy and Terms
+    Workbench/
+      Workbench.js          # The Read/Write tablist and the slot. All modes stay mounted (inactive ones hidden),
+                            # so pasted text survives a switch. Switching rewrites ?mode with history.replaceState, no request
+      modes.js              # Mode registry. When the writing companion ships, replacing WaitlistMode on the "write"
+                            # entry is the whole change
+      ReadMode.js           # The analyzer: input, validation, loading stages, errors, saved-result loading (?id=)
+      ReadResult.js         # Result rendering: finding, summary, signals, marked passages, disclosures
+      WaitlistMode.js       # Write placeholder: "It will not write for you." + email capture -> /api/waitlist
+    QuoteEvidence/          # A marked passage: signal label, the annotation mark, the note under it. `sweep` draws the mark in once
+    Annotation/             # Canonical definition of the mark (cited by docs/visual-language.md). Not imported by any page now
+    AuthDialog/             # Only AuthDialog.module.css survives; login and reset-password use it for form styles
+    ui/                     # shadcn/ui (theme-provider in use; avatar.tsx and button.tsx were already unused)
 
-  lib/
-    api.js                  # Frontend → API route calls
-    score.js                # Score/confidence normalization
-    storage.js              # Local storage helpers
-    content.js              # BLOG_POSTS array + EXTENSION_URL. Add showBrandTitle: true to a post for logo overlay on blog card. Blog list sorts at render time — do not rely on array order.
-    ratelimit.js            # Upstash Redis rate limiter — getRatelimiter() + checkRedisRateLimit(). Falls back to in-memory store when UPSTASH_REDIS_REST_URL/TOKEN are absent (local dev).
-    types.js                # Shared type definitions
-    utils.ts                # shadcn cn() utility
-    supabase/
-      client.js             # Browser Supabase client
-      server.js             # Server Supabase client (cookie-based)
-      analyses.js           # analyses table read/write
-      AuthProvider.js       # Auth context provider
-      useAnalysisLimit.js   # Daily usage limit hook
-      useProAccess.js       # Pro plan gate — always false until Stripe is wired up
+  lib/                      # api.js, analysis.js (prompts), biasLevel.js, storage.js, ratelimit.js, dailyLimit.js, supabase/
 ```
 
 ---
@@ -176,9 +153,7 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 **Never decide this by matching display copy.** `src/lib/biasLevel.js` is the single source of truth: `isNoBiasRecord()` keys off the `bias_level` enum stored in `request_meta`, and consults a label only for pre-rename rows that have no enum. All display strings live in that module too, so a copy change can never break the check.
 
 - **Extension API** (`buildDirectionLabel`): returns `NO_BIAS_LABEL` — not `"unknown"`
-- **HistoryTable**: uses the shared `isNoBiasRecord()`; confidence shows "N/A"
-- **Analyze page**: confidence section shows `"N/A"` with a no-bias-specific message instead of the score/bar
-- **Compare page**: uses the shared `isNoBiasRecord()`; confidence shows "N/A" for no-bias items
+- **Homepage Read result** (`ReadResult.js`): confidence section shows `"N/A"` with a no-bias-specific message instead of the score/bar
 
 ---
 
@@ -188,14 +163,14 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 
 **Tables:**
 - `analyses` — user analysis history (`id`, `user_id`, `created_at`, `input_type`, `url`, `title`, `direction`, `direction_label`, `confidence`, `score`, `summary`, `drivers`, `examples`, `sources`, `recommendations`, `request_meta`)
-  - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. HistoryTable reads this to show source badges and hide the Inspect button for extension rows.
+  - `request_meta` is a JSON column. Both routes tag saves: extension sets `{ source: "extension" }`, website sets `{ source: "website" }`. (The history page that displayed these was removed on 3 October 2026; the tag still records where a row came from.)
   - **Measurement fields — `biasLevel` and `contentType`.** Every save also records the model's raw `bias_level` and `content_type` enums, via `analysisMetaFields()` in `src/lib/analysisMeta.js`. Both paths use that one helper so the key names stay identical and a single query covers both: the extension route spreads it into `request_meta` server-side; the web path carries it through `normalizeResponse` in `src/lib/api.js` (the web save is client-side, and `analysisToRow` has no column for either field, so `request_meta` is the only way they persist).
     - **Deliberately not normalized.** `contentTypeFromAiJson` (`analysis.js`) and `normalizeContentType` (`api.js`) both coerce anything unrecognized to `"news"` — correct for display, fatal here, since a missing value would become indistinguishable from the model actually saying "news". Absent logs as `null`. `analysisMeta.test.js` pins this; do not "simplify" it by reusing those normalizers.
     - Rows saved before 2026-08-25 have neither key and come back `null`. Exclude them (`where request_meta->>'biasLevel' is not null`) rather than letting them read as a category.
     - Live since 2026-08-25, verified end-to-end on both paths. Purpose: establish whether the high `bias_level: "none"` rate is real, and which of the prompt's five one-directional suppression rules causes it, **before** any prompt rule is changed. For `none` rows, `content_type` plus the already-persisted `confidence` narrows it: `opinion`/`analysis` → content-type relaxation; `news` + confidence < 0.4 → weak-or-ambiguous clause; `news` + confidence >= 0.4 → minimum-impact threshold, by elimination. Quote exclusion stays invisible — it shrinks the evidence pool silently and surfaces as one of the others.
   - `examples` stores `[{ quote, label, explanation, highlights }]` for website saves; `[{ quote, why }]` for extension saves.
 - `daily_usage` — daily request count (`user_id`, `usage_date`, `count`)
-- `waitlist` — Pro-launch email waitlist (`id`, `email` unique, `created_at`). No `user_id` — signups are anonymous, from the Pro waitlist form on `/pricing` (`WaitlistForm.js` → `POST /api/waitlist`).
+- `waitlist` — email waitlist (`id`, `email` unique, `created_at`, `source`). No `user_id`, signups are anonymous. `source` says which list: `pro` for every row from the retired Pro form on `/pricing`, `write` for Write-mode early access on the homepage (`WaitlistMode.js` → `POST /api/waitlist` → `join_waitlist(p_email, p_source)`). The route allowlists sources. Email stays unique, so an address already on the Pro list keeps `pro`. Migration: `supabase/migrations/20261003000000_waitlist_source.sql`, applied to production 3 October 2026 and verified as `anon` inside a rolled-back transaction. The table held 0 rows at the time, so the `pro` backfill touched nothing.
 
 **Auth:** Email + password only. Sign up on website only; extension supports sign in only.
 
@@ -211,7 +186,7 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 
 Neither is an SMTP-provider limit, so switching email provider moves neither one. An earlier assumption that leaving Supabase's built-in sender would relax these was wrong on both counts.
 
-**RLS:** Enabled on all three tables. `analyses`/`daily_usage` policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`) — migration SQL at `supabase/migrations/20260601000000_rls_policies.sql`. `waitlist` has **no** anon INSERT policy at all — inserts go only through `public.join_waitlist(p_email text)`, a `SECURITY DEFINER` function (validates email format, `ON CONFLICT DO NOTHING` for dedup) called via `supabase.rpc("join_waitlist", ...)` from `/api/waitlist/route.js`. This gives that one public, unauthenticated write path a privileged route without needing a service-role key — migration SQL at `supabase/migrations/20260727000000_waitlist_rls_tighten.sql`. (Fixed 2026-07-27: the previous `waitlist` INSERT policy was `WITH CHECK (true)`, letting any unauthenticated caller insert arbitrary rows directly — the weekly ops-check flagged it three times before this was closed.)
+**RLS:** Enabled on all three tables. `analyses`/`daily_usage` policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`) — migration SQL at `supabase/migrations/20260601000000_rls_policies.sql`. `waitlist` has **no** anon INSERT policy at all — inserts go only through `public.join_waitlist(p_email text, p_source text default null)`, a `SECURITY DEFINER` function (validates email format, `ON CONFLICT DO NOTHING` for dedup) called via `supabase.rpc("join_waitlist", ...)` from `/api/waitlist/route.js`. This gives that one public, unauthenticated write path a privileged route without needing a service-role key — migration SQL at `supabase/migrations/20260727000000_waitlist_rls_tighten.sql`. (Fixed 2026-07-27: the previous `waitlist` INSERT policy was `WITH CHECK (true)`, letting any unauthenticated caller insert arbitrary rows directly — the weekly ops-check flagged it three times before this was closed.)
   - **Expected advisories, not regressions:** `get_advisors` (security) now shows `anon_security_definer_function_executable` and `authenticated_security_definer_function_executable` for `join_waitlist`. That's inherent to this pattern — a `SECURITY DEFINER` function callable by `anon`/`authenticated` is exactly the intended design for a public signup RPC without a service-role key — and does not need fixing. Don't let these two read as new problems in a weekly ops-check report. `rls_policy_always_true` on `waitlist` was the actual bug; if that specific one ever reappears, that's the one to investigate.
 
 **Client keys:** Publishable key only — no service role key. RLS must be correctly configured in Supabase dashboard. `join_waitlist` (see above) is how `waitlist` gets a privileged write path without introducing one.
@@ -224,10 +199,7 @@ Neither is an SMTP-provider limit, so switching email provider moves neither one
 
 Pro features are gated via `useProAccess` (`src/lib/supabase/useProAccess.js`). Currently `isPro` is hardcoded to `false` — no one has Pro access until Stripe is wired up.
 
-**Currently gated features:**
-- **Compare Analyses** (`/compare`) — shows a blur overlay with a Pro gate card and link to `/pricing`
-
-**When Stripe is ready:** Update `useProAccess.js` to check `user.app_metadata.plan === 'pro'`. No other files need changing.
+**Currently gated features:** none. `/compare` and `/pricing` are retired and redirect to `/`, so nothing imports `useProAccess` today. It is kept as the hook to wire when Stripe lands.
 
 ---
 
@@ -408,7 +380,7 @@ Issues below. Do not add to that list to make the sweep pass.
 - **`storage.js` `saveAnalysis`**: always tags website Supabase saves with `requestMeta.source = "website"` before persisting. The extension API tags its own saves with `source: "extension"` server-side.
 - **Avoiding `react-hooks/set-state-in-effect`:** don't call `setState` directly, synchronously, in an effect's top-level body — this rule is at `error`. Three patterns used in this codebase, pick based on the case:
   - **Syncing from a browser API (localStorage, media queries, etc.):** use `useSyncExternalStore` instead of `useState` + effect (see `saveHistory` in `history/page.js` for the SSR-safe pattern: real getSnapshot, a fixed `getServerSnapshot`, and a subscribe function that no-ops when `window` is undefined).
-  - **Resetting/adjusting state when a dependency changes (e.g. close a menu on route change):** compare against a previous value tracked via `useState`, and call `setState` conditionally directly in the render body (not inside `useEffect`) — see `prevPathname` in `SiteHeader.js`. This is React's own recommended pattern (https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes) and isn't flagged since it's not inside an effect.
+  - **Resetting/adjusting state when a dependency changes (e.g. close a menu on route change):** compare against a previous value tracked via `useState`, and call `setState` conditionally directly in the render body (not inside `useEffect`) (the old `SiteHeader.js` used this for `prevPathname`; it was deleted on 3 October 2026). This is React's own recommended pattern (https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes) and isn't flagged since it's not inside an effect.
   - **Data fetching / async work that legitimately belongs in an effect:** split "resolve the value" (a plain async function with no `setState` calls in its own body) from "commit the value" (`.then((next) => setState(...))`). The linter only flags a *direct* top-level `setState` call inside the effect's own body — a callback passed to `.then()`/`.catch()` is a separate closure and isn't scanned. See `resolveLimit` in `useAnalysisLimit.js`.
 
 ---
@@ -448,18 +420,12 @@ Issues below. Do not add to that list to make the sweep pass.
   rendering 0px. This already affects `--radius-sm` / `--radius-md` declared in
   `globals.css`: the browser gets Tailwind's defaults, not the declared values.
 - **Consistency:** Visual style must match the NeutralEye browser extension
+- **Homepage layout:** one centred column, `max-width: 42rem`. Chrome is `SiteShell` only: no nav links, no dropdown menus beyond the one-item account menu, a footer of Privacy and Terms. Controls are ink; the accent appears only in annotation marks on a result. The only authored motion is the mark sweep on a result and the tab rule sliding between modes.
 
 When building new UI, prefer extending existing components in `src/components/ui/` before creating new ones.
 
-- **Section width:** Hero, steps, principles, and CTA sections use `max-width: 92rem`. Feature rows (left/right split with visuals) use `max-width: 72rem` for a more compact, readable layout. Do not widen feature sections back to 92rem.
-- **Page identity rule:** Home (emotional sell) → How It Works `/how-it-works` (technical pipeline) → Methodology (reading guide). These three pages must not repeat each other's content. `/overview` redirects to `/how-it-works`.
-- **Dark hero pages:** Add `data-header-theme="dark"` on the hero section + pass `darkHeader` prop to `MarketingShell`. Used on Overview and Extension pages.
 - **CSS hover dropdowns:** Bridge the gap between trigger and panel with `padding-top` on the dropdown div — never use `top: calc(100% + gap)`. A gap breaks `:hover` continuity.
 - **Hover dropdown stuck open after click:** clicking a hover-dropdown trigger `<button>` keeps it open via `:focus-within` until the element loses focus. Add `onClick={(e) => e.currentTarget.blur()}` to the trigger to close it on click while preserving keyboard accessibility.
-- **Radix DropdownMenu dark mode:** `DropdownMenu.Portal` renders into `document.body`, so SiteHeader's CSS-module-scoped `.dark` class on `<header>` does not cascade to portaled content. Pass the header's `isDark` state directly as a conditional className on `DropdownMenu.Content`/`SubContent` (see `.dropdownContentDark` in `SiteHeader.module.css`).
-- **Canvas-frame guide lines:** `MarketingShell` renders a `position:fixed; inset:0; max-width:92rem; z-index:200; pointer-events:none` `.canvasFrame` div whose `::before`/`::after` pseudo-elements are 1px vertical lines in `rgba(128,128,128,0.12)`. Visible at ≥1024px viewports, they mark the 92rem content boundary at any zoom level and stay readable on both light and dark section backgrounds without blend modes.
-- **Aligning content to canvas-frame lines:** Header (`.headerInner`) and footer (`.footerInner`) both use `max-width:92rem; margin:0 auto; padding:0 2.25rem` so their content edges sit 2.25rem inside the guide lines. The `.header`/`.footer` wrappers are full-bleed.
-- **Section separators — no full-bleed border lines:** Avoid `border-top`/`border-bottom` on full-bleed sections that cross the canvas-frame guide lines. Use a subtle background tint instead — `rgba(139,103,65,0.03)` is the standard (used by About pull-quote and MediaBarrier). The one intentional exception is the header's `border-bottom` and footer's `border-top`, which are full-bleed by design and match each other in style (`rgba(93,75,53,0.14)`).
 - **Touch-safe hover dropdowns:** Gate `onPointerEnter`/`onPointerLeave` handlers behind `e.pointerType === "mouse"` so Radix's built-in tap behavior works on touch devices. For toggle-to-close, use a `justClosed` ref to suppress Radix's immediate re-open after `onOpenChange`. Scope `:hover` styles behind `@media (hover: hover)` to prevent sticky highlights on mobile.
 
 ---
@@ -489,103 +455,45 @@ When building new UI, prefer extending existing components in `src/components/ui
   allowed. Note the cost: "checker" describes a one-shot utility, which is the mental
   model the reading companion's retention problem is fighting. Revisit the name and the
   discoverability trade together, not separately.
-- **The changelog is exempt from the positioning sweep, conditionally.** Entries are
-  a historical record and are never rewritten to match current vocabulary. The
-  correction is carried by a dated note above the timeline instead
-  (`src/app/changelog/page.js`, `.historyNote`). The sweep fails if that note is
-  removed while the exemption stands, so the two cannot drift apart.
-- **The matrix's drawn selection rule is redundant in a still frame.** Accepted, not
-  fixed, by decision on 6 September 2026. Selecting a cell draws a 2px accent rule
-  along its bottom edge over 260ms, but `.cellOn` already turns the whole border
-  accent, so in a still frame at any width the rule reads as a slightly heavier
-  bottom border rather than as a mark. This is not width-specific; the motion is
-  where the value is, and it works at every width. Making the selection read as
-  *marked* rather than *boxed* would mean dropping the accent border and letting
-  the drawn rule be the whole selected state, which is a change to an established
-  interaction and was judged the wrong trade for now.
-- **/methodology needs restructuring at page level, not more marginalia.** Recorded
-  6 September 2026 after trying the marginalia approach and measuring it. Putting a
-  figure in the empty left column fixes the section it sits in (that section went
-  from 78% empty column to 21%) and moves the page number barely: 78% to 68% empty,
-  because one aside on a seven-section page cannot carry a page-level total. Five of
-  the seven sections still hold about 70px of occupied column against 400 to 800px
-  of section height, and they have no real quantity to put there. **Do not retry
-  this by inventing quantities to fill columns.** A display-scale number is only
-  worth setting when it is a real parameter or finding, never a count of the list
-  beside it. Moving the page requires changing how the page is structured, which is
-  a larger decision than a marginalia pass.
-- **/about, /reports and /tools sit at 64 to 72% empty left column, by decision.**
-  Closed as a known state on 6 September 2026, not an open task. Marginalia does not
-  move these pages: see the /methodology entry above for the measurement. /tools was
-  tested rather than assumed and failed twice. Its comparison table needs 736px in
-  three tracks and the margin column is 288px, so it cannot go there; and setting the
-  section full-width improved the metric (64% to 48% empty) while making the design
-  worse, leaving the table stranded with 416px of dead space beside it. Widening the
-  table to fill 1152px would put five-to-eight word cells in 450px columns. Changing
-  these pages means restructuring them, which is a larger decision than a density
-  pass. **Do not retry marginalia here.**
 - **The Design System section above is still partly stale.** Deferred, not fixed. Three
   lines (aesthetic, primary colour, fonts) were corrected when the CTA colour rule was
   added; the rest still references deleted components (`MediaBarrier`, the `/extension`
   page), Framer Motion, `next-themes`, and a `max-width: 92rem` section rule that the
   rebuilt pages do not follow. Treat entries below the CTA rule as unverified until
   someone re-reads them against the code.
-- **Three visual systems across the site.** Accepted deliberately, not a bug to fix
-  casually. Homepage is 1440px wide with a 92px h1, interior pages are 1152px with 44px,
-  `/for-comms` is a 560px centred landing page with 48px. They share the typeface, palette
-  and accent, so it reads as hierarchy rather than breakage. Unifying them is a later pass.
-
 ---
 
 ## Product Direction and Priority
 
-**Recorded 5 September 2026. Nothing here is settled, and the order below is a
-current judgment rather than a decision.**
+**Recorded 3 October 2026, superseding the 5 September entry.** The site is fully
+B2C. The B2B coverage report is no longer pitched anywhere on the site: no demo
+booking, no service pitch, no references to communications or investor relations
+teams. The `neutraleye-mvp` pipeline still exists locally; it simply has no public
+surface.
 
-Priority order as it stands:
+The homepage is one product with two modes:
 
-1. **The B2B coverage report**, for communications and investor relations teams.
-   This is where the site is pointed and the nearest thing to revenue. Live.
-2. **The writing companion.** Not built, not validated, contested. Could move
-   above B2B depending on validation. Treat it as a locked waitlist state on the
-   site, never as a shipped feature or a settled roadmap item.
-3. **The reading companion.** Live (analyzer plus Chrome extension), but not the
-   focus. It exists on the site as proof the method works, not as the product.
+1. **Read** (default, live): the framing analyzer, text input only.
+2. **Write** (not built): the writing companion. Its tab describes what it will
+   do, leading with the fact that it will not draft for you, and collects
+   early-access emails through `/api/waitlist` with `source: "write"`. No launch
+   date anywhere. When it is built it takes the same slot (see `modes.js`).
 
-**Why the order is contested.** Two advisers disagreed. One reviewed the deck,
-validated the methodology and put the B2B report highest on revenue potential,
-and advised treating reading and writing as one consumer product rather than
-two. The other argued for the writing companion on grounds of *access to users*
-rather than market size: classmates and a writing teacher are reachable today, a
-communications director is not.
+**A "Research" feature is planned behind login and deliberately absent.** No
+placeholder, link or route exists for it. Its input, flow and output have not
+been defined; do not guess at them.
 
-**What the market research found.** The writing-tool market is heavily
-saturated: more than 2,800 AI education startups in 2026, an 18x rise since
-2023, 4.2 billion dollars raised in 2025 (62 percent of all edtech funding).
-Grammarly has 40 million users, and Khanmigo's Writing Coach is free and already
-does guided writing with teacher insight. Critically, "the tool refuses to draft
-for you" is the category's standard design pattern, not a differentiator.
-
-So if the writing companion is built, it is not a general writing assistant. The
-only version where the existing framing-analysis work transfers is narrow:
-teaching how to research and write *political journalism* specifically. That
-needs a curriculum that does not exist yet, so it is blocked on a co-author.
-
-**Targeting advice worth acting on regardless of which product wins:** if
-pursuing B2B, target small and cost-sensitive organisations. Procurement and
-compliance close the door at large ones for a founder with no registered entity.
-
-**What this means for the site.** The two-doors structure holds either way: the
-consumer tools and the coverage report both exist today, and the writing
-companion is a locked waitlist state under any outcome. Do not build it out, do
-not add an email capture for it, and do not describe it as coming soon with a
-date.
+Context still worth knowing from the earlier market research: the writing-tool
+market is saturated, and "the tool refuses to draft for you" is the category's
+standard pattern rather than a differentiator. The version where the
+framing-analysis work transfers is narrow (research and writing for political
+journalism) and is blocked on curriculum.
 
 ## Roadmap
 
 - **Stripe** — Pro tier payments; `useProAccess.js` is ready to wire up (paused — not yet started)
 - **Transactional email** — Done. Auth email sends from `contact@tryneutraleye.com` through Resend SMTP, and the branded signup-confirm and password-reset templates are pasted into the dashboard and confirmed live (2026-08-21). Nothing outstanding; re-paste only if `supabase/email-templates/` changes.
-- **Supabase Pro + Google OAuth restore** — Google "Continue with Google" was temporarily removed (2026-07-02) because the OAuth consent screen showed `*.supabase.co` instead of `tryneutraleye.com`, which looks unprofessional. To restore: (1) upgrade Supabase to Pro, (2) set custom auth domain `auth.tryneutraleye.com` in Supabase dashboard → update DNS CNAME in Cloudflare, (3) update Google Cloud Console redirect URI, (4) re-add `GoogleIcon` + Google button to `sign-in.tsx` `SignUpPage`, (5) re-add `handleGoogleAuth` + `onGoogleSignIn` prop in `login/page.js`, (6) restore `lh3.googleusercontent.com` to CSP `img-src` and `next.config.mjs` `remotePatterns`, (7) restore `isGoogleUser` avatar branch in `SiteHeader.js`.
+- **Supabase Pro + Google OAuth restore** — Google "Continue with Google" was temporarily removed (2026-07-02) because the OAuth consent screen showed `*.supabase.co` instead of `tryneutraleye.com`, which looks unprofessional. To restore: (1) upgrade Supabase to Pro, (2) set custom auth domain `auth.tryneutraleye.com` in Supabase dashboard → update DNS CNAME in Cloudflare, (3) update Google Cloud Console redirect URI, (4) re-add `GoogleIcon` + Google button to `sign-in.tsx` `SignUpPage`, (5) re-add `handleGoogleAuth` + `onGoogleSignIn` prop in `login/page.js`, (6) restore `lh3.googleusercontent.com` to CSP `img-src` and `next.config.mjs` `remotePatterns`, (7) add an `isGoogleUser` avatar branch to `SiteShell.js` (it lived in the deleted `SiteHeader.js`).
 
 ## Infrastructure Status
 
@@ -619,7 +527,7 @@ src/lib/__tests__/analysis.test.js        # buildHumanResult, contentTypeFromAiJ
 src/lib/__tests__/promptContract.test.js  # pins load-bearing rules in the bias-analysis prompt (quote exclusion, content-type classification, minimum-impact threshold, JSON schema, response_format, source-domain exclusion)
 src/lib/__tests__/normalizeAiResult.test.js  # AI JSON -> response shape, no-bias case, malformed JSON fallback, driverLabelFromReason, scoreFromBiasLevel
 src/lib/__tests__/modelPins.test.js        # pins the OpenAI model IDs to the bare gpt-4o / gpt-4o-mini aliases — fails on a dated snapshot (gpt-4o-2024-05-13), a "-latest" rolling alias, or a "-preview" model
-src/app/analyze/__tests__/page.test.js
+src/components/Workbench/__tests__/Workbench.test.js  # Read mode results and errors, the mode toggle, Write early-access signup
 ```
 
 `analysis.test.js`, `promptContract.test.js`, `normalizeAiResult.test.js`, and `modelPins.test.js` run under `@jest-environment node` (not the default jsdom) — `analysis.js` imports `cheerio`, which only ships browser/ESM exports that jsdom's export-condition resolution can't `require()`.
