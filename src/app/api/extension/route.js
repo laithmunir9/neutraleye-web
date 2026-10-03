@@ -13,7 +13,7 @@ import {
   composeAnalysisText,
 } from "@/lib/analysis";
 import { analysisMetaFields } from "@/lib/analysisMeta";
-import { isNoBiasLevel, NO_BIAS_LABEL } from "@/lib/biasLevel";
+import { isNoBiasLevel, isNonDirectional, NO_BIAS_LABEL } from "@/lib/biasLevel";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -76,7 +76,9 @@ function buildDirectionLabel(parsedJson) {
   const direction = String(parsedJson?.direction || "").trim();
   const nd = direction.toLowerCase();
   if (isNoBiasLevel(biasLevel)) return NO_BIAS_LABEL;
-  if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown") return direction || "unknown";
+  // A legacy "non-directional framing bias" is shown as the current wording.
+  if (isNonDirectional(direction)) return "Non-directional framing";
+  if (biasLevel === "uncertain" || nd === "unknown") return direction || "unknown";
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   if (biasLevel && direction) return `${cap(biasLevel)} framing ${direction}`;
   if (biasLevel) return `${cap(biasLevel)} framing detected`;

@@ -88,3 +88,62 @@ describe("buildHumanResult", () => {
     expect(result).toContain("**Recommendations**\n- Check the primary source");
   });
 });
+
+describe("buildHumanResult direction wording", () => {
+  const { buildHumanResult: build } = require("../analysis");
+
+  test.each(["non-directional", "non-directional framing bias"])(
+    "omits a %s direction from the framing line rather than printing it",
+    (direction) => {
+      const text = build({ bias_level: "moderate", direction, summary: "The framing leans on one source." });
+      expect(text).toContain("**Framing**\nModerate framing.");
+      expect(text).not.toMatch(/bias/i);
+    }
+  );
+});
+
+describe("reader wording backstop", () => {
+  const { scrubReaderText, scrubReaderFields } = require("../analysis");
+
+  // Sentences the model actually produced on 3 October 2026 despite the prompt rule.
+  test.each([
+    ["detailing the events without evident framing or bias.", "detailing the events without evident framing."],
+    ["It does not show bias in its reporting.", "It does not show framing in its reporting."],
+    ["The writing shows meaningful bias against one side.", "The writing shows meaningful framing against one side."],
+    ["A biased account that relies on one source.", "A one-sided account that relies on one source."],
+    ["Bias appears in the headline.", "Framing appears in the headline."],
+    ["The report is free of bias.", "The report is free of loaded framing."],
+    ["There is no clear bias here.", "There is no clear loaded framing here."],
+    ["An unbiased summary of events.", "An even-handed summary of events."],
+    ["Moderate framing bias toward the council.", "Moderate framing toward the council."],
+  ])("%s", (input, expected) => {
+    const { text, replaced } = scrubReaderText(input);
+    expect(text).toBe(expected);
+    expect(replaced).toBeGreaterThan(0);
+    expect(text).not.toMatch(/\bbias/i);
+  });
+
+  test("leaves clean framing language untouched", () => {
+    const input = "The journalist's framing favours one side through loaded wording.";
+    expect(scrubReaderText(input)).toEqual({ text: input, replaced: 0 });
+  });
+
+  test("rewrites only reader-facing fields, never the article quotes or keys", () => {
+    const json = {
+      bias_level: "moderate",
+      direction: "non-directional framing bias",
+      summary: "The article is biased.",
+      explanation: "Shows bias through omission.",
+      recommendations: ["Compare with unbiased coverage."],
+      biased_phrases: [{ quote: "a biased council stacked the vote", why: "language" }],
+    };
+    const counts = scrubReaderFields(json);
+    expect(json.summary).toBe("The article is one-sided.");
+    expect(json.explanation).toBe("Shows framing through omission.");
+    expect(json.recommendations).toEqual(["Compare with even-handed coverage."]);
+    expect(json.direction).toBe("non-directional framing");
+    expect(json.biased_phrases[0].quote).toBe("a biased council stacked the vote");
+    expect(json.bias_level).toBe("moderate");
+    expect(counts.replaced).toBe(4);
+  });
+});

@@ -1,5 +1,5 @@
 import { buildHumanResult, contentTypeFromAiJson } from "./analysis";
-import { isNoBiasLevel, textLooksNoBias, NO_BIAS_LABEL, NO_BIAS_RESULT_TEXT } from "./biasLevel";
+import { isNoBiasLevel, isNonDirectional, textLooksNoBias, NO_BIAS_LABEL, NO_BIAS_RESULT_TEXT } from "./biasLevel";
 
 // AI-response → website result-shape normalization, shared home so it can be
 // unit-tested (Next.js route files may only export HTTP handlers).
@@ -96,7 +96,7 @@ export function directionLabelFromAiJson(aiJson, humanText) {
   const nd = direction.toLowerCase();
   if (isNoBiasLevel(biasLevel) || textLooksNoBias(humanText))
     return NO_BIAS_LABEL;
-  if (biasLevel === "uncertain" || nd === "non-directional framing bias" || nd === "unknown")
+  if (biasLevel === "uncertain" || isNonDirectional(direction) || nd === "unknown")
     return "Unclear framing (non-directional)";
   if (biasLevel && direction) return `${titleCase(biasLevel)} framing ${direction}`;
   if (biasLevel) return `${titleCase(biasLevel)} framing detected`;

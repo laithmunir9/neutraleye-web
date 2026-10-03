@@ -72,4 +72,18 @@ describe("generateBiasAnalysis prompt contract", () => {
     const withoutUrl = await capturePrompt();
     expect(withoutUrl).not.toMatch(/Do NOT suggest .* as a source/);
   });
+
+  test("keeps the word bias out of every reader-facing field", async () => {
+    const prompt = await capturePrompt();
+    expect(prompt).toMatch(/READER-FACING WORDING/);
+    expect(prompt).toMatch(/never use the words "bias", "biased", "slant", "slanted", or "partisan"/);
+    expect(prompt).toMatch(/never place the article or outlet on a political spectrum/i);
+    // The instructions that shape displayed text must not themselves ask for it.
+    const summaryLine = prompt.split("\n").find((line) => line.includes('"summary":'));
+    expect(summaryLine).not.toMatch(/shows meaningful bias/i);
+    expect(summaryLine).toMatch(/never calling it biased/);
+    const directionLine = prompt.split("\n").find((line) => line.includes('"direction":'));
+    expect(directionLine).toContain('"non-directional"');
+    expect(directionLine).not.toMatch(/bias/i);
+  });
 });
