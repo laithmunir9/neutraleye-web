@@ -253,10 +253,32 @@ export function scrubReaderText(value) {
 
 const READER_FIELDS = ["summary", "explanation", "direction"];
 
+/*
+ * The schema shows direction as "toward <entity>" / "against <entity>", and the
+ * model sometimes returns the template unfilled. That string becomes the
+ * headline on both surfaces ("Moderate framing against <entity>"), so an
+ * unfilled placeholder is removed along with the preposition it hangs off.
+ * The framing level on its own is still true; an empty direction makes every
+ * label builder fall back to "<Level> framing" / "<Level> framing detected".
+ */
+export function stripDirectionPlaceholder(direction) {
+  if (typeof direction !== "string") return { text: direction, stripped: false };
+  const text = direction
+    .replace(/\s*(?:toward|towards|against)?\s*<[^>]*>/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  return { text, stripped: text !== direction.trim() };
+}
+
 /** Rewrites the reader-facing fields of the model's JSON in place; returns counts. */
 export function scrubReaderFields(json) {
-  const counts = { replaced: 0, spectrum: 0 };
+  const counts = { replaced: 0, spectrum: 0, placeholder: 0 };
   if (!json || typeof json !== "object") return counts;
+  const { text: direction, stripped } = stripDirectionPlaceholder(json.direction);
+  if (stripped) {
+    json.direction = direction;
+    counts.placeholder += 1;
+  }
   for (const field of READER_FIELDS) {
     const { text, replaced } = scrubReaderText(json[field]);
     json[field] = text;
@@ -328,6 +350,7 @@ READER-FACING WORDING
 - In those fields, never use the words "bias", "biased", "slant", "slanted", or "partisan", and never place the article or outlet on a political spectrum (no "left-leaning", "right-leaning", "liberal", "conservative" as a label for the article).
 - Describe what the writing does instead: framing, emphasis, loaded wording, one-sided sourcing, missing attribution, omission. For example, write "the journalist's framing favours one side" rather than "the article is biased".
 - The JSON key names below are fixed and must stay exactly as written, even though some contain the word "bias".
+- In "direction", replace <entity> with the actual person, group, institution or side the framing favours or disfavours, as named in the article (for example "against the city council"). Never output the angle brackets or the word "<entity>". If no single entity fits, use "non-directional".
 
 OUTPUT
 Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outside the JSON.
@@ -372,7 +395,7 @@ TEXT_FOR_ANALYSIS:
       return content; // Unparseable output takes the existing fallback paths untouched.
     }
     const counts = scrubReaderFields(json);
-    if (counts.replaced || counts.spectrum) {
+    if (counts.replaced || counts.spectrum || counts.placeholder) {
       // Logged so the rate is measurable: if it stays high, the prompt needs work.
       logEvent("info", "analysis.reader_wording.rewritten", { requestId, ...counts });
     }

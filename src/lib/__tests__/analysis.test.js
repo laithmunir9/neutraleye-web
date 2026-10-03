@@ -147,3 +147,32 @@ describe("reader wording backstop", () => {
     expect(counts.replaced).toBe(4);
   });
 });
+
+describe("unfilled direction placeholder", () => {
+  const { stripDirectionPlaceholder, scrubReaderFields, buildHumanResult: build } = require("../analysis");
+
+  test.each([
+    ["against <entity>", ""],
+    ["toward <entity>", ""],
+    ["Towards <the group>", ""],
+    ["against the city council", "against the city council"],
+    ["non-directional", "non-directional"],
+  ])("%s", (input, expected) => {
+    expect(stripDirectionPlaceholder(input).text).toBe(expected);
+  });
+
+  test("the extension's framing line drops the placeholder instead of printing it", () => {
+    const json = { bias_level: "moderate", direction: "against <entity>", summary: "One-sided sourcing." };
+    const counts = scrubReaderFields(json);
+    expect(counts.placeholder).toBe(1);
+    const text = build(json);
+    expect(text).toContain("**Framing**\nModerate framing.");
+    expect(text).not.toMatch(/[<>]|entity/);
+  });
+
+  test("a filled direction is untouched", () => {
+    const json = { bias_level: "slight", direction: "toward the mayor" };
+    expect(scrubReaderFields(json).placeholder).toBe(0);
+    expect(json.direction).toBe("toward the mayor");
+  });
+});

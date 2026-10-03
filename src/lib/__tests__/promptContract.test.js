@@ -86,4 +86,10 @@ describe("generateBiasAnalysis prompt contract", () => {
     expect(directionLine).toContain('"non-directional"');
     expect(directionLine).not.toMatch(/bias/i);
   });
+
+  test("asks for a real entity in direction, never the template placeholder", async () => {
+    const prompt = await capturePrompt();
+    expect(prompt).toMatch(/replace <entity> with the actual person, group, institution or side/);
+    expect(prompt).toMatch(/Never output the angle brackets/);
+  });
 });
