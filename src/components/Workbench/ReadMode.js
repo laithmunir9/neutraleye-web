@@ -245,7 +245,7 @@ export default function ReadMode({ savedId = null }) {
           <div className={`${styles.frame} ${styles.collapsed}`}>
             <p className={styles.excerpt}>{text.trim() || "Saved analysis"}</p>
             <button type="button" className={styles.quiet} onClick={text.trim() ? handleEdit : handleStartOver}>
-              {text.trim() ? "Edit text" : "Analyze new text"}
+              {!text.trim() ? "Analyze new text" : url ? "Edit link" : "Edit text"}
             </button>
           </div>
         ) : (

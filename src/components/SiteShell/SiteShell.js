@@ -73,7 +73,7 @@ export default function SiteShell({ children, initialAuth = null, hideAccount = 
   }
 
   return (
-    <div className={styles.shell}>
+    <div className={`${styles.shell} ${backdrop ? styles.onPaper : ""}`}>
       {backdrop}
       <header className={styles.top}>
         <Link href="/" className={styles.brand} aria-label="NeutralEye home">

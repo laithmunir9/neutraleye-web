@@ -11,6 +11,12 @@
 
 /* No border under the bar: with nothing else in the chrome, a full-width rule
    would be the loudest line on the page. */
+/* With a backdrop the page is paper all the way down, so no white shows past
+   the fixed layer (long results, overscroll, full-page captures). */
+.onPaper {
+  background: var(--fc-surface);
+}
+
 /* Above any backdrop. */
 .top,
 .body,

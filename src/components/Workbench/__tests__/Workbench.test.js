@@ -363,6 +363,7 @@ describe("Read mode links", () => {
     await waitFor(() => expect(screen.getByText("Moderate framing signal")).toBeInTheDocument());
     expect(mockAnalyzeUrl).toHaveBeenCalledWith("https://example.com/news/story");
     expect(mockAnalyzeText).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Edit link" })).toBeInTheDocument();
   });
 
   test("a site's front page is turned away before any request", async () => {
