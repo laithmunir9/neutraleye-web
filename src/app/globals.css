@@ -154,6 +154,9 @@ body {
 }
 
 html {
+  /* iOS Safari otherwise inflates text after a rotation to landscape. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
   scrollbar-color: rgb(102 112 116 / 0.55) rgb(255 255 255 / 0.9);
   scrollbar-width: thin;
@@ -198,6 +201,8 @@ select {
 button,
 a {
   -webkit-font-smoothing: antialiased;
+  /* No grey flash on tap in iOS Safari; every control has its own states. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 button,

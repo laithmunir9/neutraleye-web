@@ -6,7 +6,8 @@
   width: 100%;
   max-width: 42rem;
   margin: 0 auto;
-  padding: clamp(2rem, 8vh, 5.5rem) 1rem 3rem;
+  padding: clamp(2rem, 8vh, 5.5rem) max(1rem, env(safe-area-inset-right)) 3rem
+    max(1rem, env(safe-area-inset-left));
 }
 
 /* ── Mode toggle ─────────────────────────────────────────────────────── */
@@ -73,31 +74,39 @@
   display: none;
 }
 
+/* The page's one display line, at full strength. */
 .prompt {
-  margin: 2.25rem auto 1.5rem;
-  max-width: 30ch;
+  margin: 2rem auto 1.75rem;
+  max-width: 15ch;
   color: var(--fc-heading);
   font-family: var(--font-display);
-  font-size: clamp(1.55rem, 3.4vw, 2.15rem);
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
+  font-size: clamp(2.35rem, 5.6vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
   text-align: center;
   text-wrap: balance;
 }
 
 /* ── The slot ────────────────────────────────────────────────────────── */
 
+/* A white sheet laid on the newsprint: it is the one surface on the page
+   with depth, so the eye goes to it first. */
 .frame {
   border: 1px solid var(--fc-border);
-  border-radius: var(--control-radius);
+  border-radius: calc(var(--control-radius) + 0.25rem);
   background: var(--fc-bg);
+  box-shadow:
+    0 0.15rem 0.35rem rgb(var(--shadow-rgb) / 0.04),
+    0 1.2rem 2.6rem rgb(var(--shadow-rgb) / 0.08);
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .frame:focus-within {
   border-color: var(--fc-border-input);
-  box-shadow: 0 0 0 3px rgb(var(--text-rgb) / 0.06);
+  box-shadow:
+    0 0 0 3px rgb(var(--text-rgb) / 0.06),
+    0 1.2rem 2.6rem rgb(var(--shadow-rgb) / 0.1);
 }
 
 .busy {
@@ -117,6 +126,8 @@
   line-height: 1.7;
   resize: vertical;
   caret-color: var(--fc-heading);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .textarea:focus,
@@ -254,7 +265,7 @@
     margin-top: 0;
     padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
     border-top: 1px solid var(--fc-border);
-    background: var(--fc-bg);
+    background: var(--fc-surface);
   }
 
   /* Status on its own line, then the buttons across the full width, so the
@@ -276,6 +287,18 @@
 
   .inputBlock .buttons .primary {
     margin-left: auto;
+  }
+}
+
+/* iPhone SE and other 320px screens: the pair must fit inside the input's
+   edges, not just the screen's. */
+@media (max-width: 380px) {
+  .buttons {
+    gap: 0.75rem;
+  }
+
+  .primary {
+    padding-inline: 1rem;
   }
 }
 
@@ -324,6 +347,8 @@
 }
 
 .email {
+  -webkit-appearance: none;
+  appearance: none;
   flex: 1;
   min-width: 0;
   padding: 0.68rem 0.9rem;

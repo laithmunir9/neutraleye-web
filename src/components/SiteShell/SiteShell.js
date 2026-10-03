@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useAuth } from "@/lib/supabase/AuthProvider";
+import AuthDialog from "@/components/AuthDialog/AuthDialog";
 import styles from "./SiteShell.module.css";
 
 /* The whole chrome of the site: a wordmark, an account control and two legal
@@ -16,21 +17,17 @@ function userInitial(user) {
   return name[0]?.toUpperCase() || "?";
 }
 
-// The auth pages are the sign-in form; a "Sign in" link above it goes nowhere.
-const AUTH_PATHS = ["/login", "/signup", "/reset-password"];
-
-function AccountControl() {
+function AccountControl({ onSignIn, hidden }) {
   const { user, loading, supabase } = useAuth();
-  const pathname = usePathname();
 
-  if (AUTH_PATHS.some((path) => pathname?.startsWith(path))) return null;
+  if (hidden) return null;
   if (loading) return <span className={styles.accountPlaceholder} aria-hidden="true" />;
 
   if (!user) {
     return (
-      <Link href="/login?callbackUrl=/" className={styles.signIn}>
+      <button type="button" className={styles.signIn} onClick={onSignIn}>
         Sign in
-      </Link>
+      </button>
     );
   }
 
@@ -53,15 +50,37 @@ function AccountControl() {
   );
 }
 
-export default function SiteShell({ children }) {
+/*
+ * `initialAuth` opens the sign-in overlay on arrival, for the addresses that
+ * used to land on /login (email links, the auth callback, old bookmarks); see
+ * src/app/login/page.js. Closing it strips those params so a refresh does not
+ * reopen it. `hideAccount` is for /reset-password, which is its own auth step.
+ * `backdrop` renders behind everything else (the homepage newsprint).
+ */
+export default function SiteShell({ children, initialAuth = null, hideAccount = false, backdrop = null }) {
+  const [auth, setAuth] = useState(
+    initialAuth ? { open: true, mode: initialAuth.mode, notice: initialAuth.notice } : { open: false, mode: "signin", notice: null }
+  );
+
+  function closeAuth() {
+    setAuth((current) => ({ ...current, open: false }));
+    if (initialAuth) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("auth");
+      url.searchParams.delete("notice");
+      window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+    }
+  }
+
   return (
     <div className={styles.shell}>
+      {backdrop}
       <header className={styles.top}>
         <Link href="/" className={styles.brand} aria-label="NeutralEye home">
           <Image src="/neutraleye-mark.svg" alt="" width={24} height={24} unoptimized />
           <span>NeutralEye</span>
         </Link>
-        <AccountControl />
+        <AccountControl hidden={hideAccount} onSignIn={() => setAuth({ open: true, mode: "signin", notice: null })} />
       </header>
 
       <div className={styles.body}>{children}</div>
@@ -70,6 +89,8 @@ export default function SiteShell({ children }) {
         <Link href="/privacy">Privacy</Link>
         <Link href="/terms">Terms</Link>
       </footer>
+
+      <AuthDialog open={auth.open} initialMode={auth.mode} notice={auth.notice} onClose={closeAuth} />
     </div>
   );
 }

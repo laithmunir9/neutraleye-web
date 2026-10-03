@@ -1,0 +1,131 @@
+/* A sheet of newsprint behind the page. The paper is the cool surface tone;
+   the type is ink at very low alpha, so it reads as texture until a mark
+   lands on it. */
+
+/* Overscroll and the iOS rubber band show the root, so paint it as paper
+   too, or a white band appears past the top and bottom of the page. */
+:global(html:has([data-newsprint])) {
+  background: var(--fc-surface);
+}
+
+:global(html:has([data-newsprint])) body {
+  background: transparent;
+}
+
+.newsprint {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--fc-surface);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The paper colour stays on .newsprint, unmasked; only the type is masked,
+   so the clear band is plain paper rather than a white strip. Two nested
+   masks (horizontal on .band, vertical on .columns) multiply, which is more
+   dependable than compositing two images on one element. */
+.band {
+  height: 100%;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - 32rem), transparent calc(50% - 24rem), transparent calc(50% + 24rem), #000 calc(50% + 32rem), #000 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(50% - 32rem), transparent calc(50% - 24rem), transparent calc(50% + 24rem), #000 calc(50% + 32rem), #000 100%);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(7, 15.5rem);
+  justify-content: center;
+  gap: 2.75rem;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 3.5rem, #000 8rem, #000 calc(100% - 5rem), transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, transparent 3.5rem, #000 8rem, #000 calc(100% - 5rem), transparent 100%);
+}
+
+.column {
+  overflow: hidden;
+}
+
+.track {
+  animation: drift var(--drift, 160s) linear infinite;
+  animation-delay: var(--offset, 0s);
+  will-change: transform;
+}
+
+@keyframes drift {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.story {
+  padding: 1.6rem 0 0.4rem;
+  border-top: 1px solid rgb(var(--text-rgb) / 0.07);
+}
+
+.story p {
+  margin: 0 0 0.9em;
+  color: rgb(var(--text-rgb) / 0.17);
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  line-height: 1.68;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  text-align: justify;
+}
+
+.story p:first-child {
+  color: rgb(var(--text-rgb) / 0.24);
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.38;
+  text-align: left;
+}
+
+/* The mark, as defined in src/components/Annotation: the tint and a 2px rule
+   on the baseline, painted as backgrounds so the width can draw in. At rest it
+   has zero width; data-on draws it and darkens the words under it. */
+.phrase {
+  padding: 0.06em 0.1em;
+  border-radius: 2px 2px 0 0;
+  background-image:
+    linear-gradient(var(--fc-accent), var(--fc-accent)),
+    linear-gradient(var(--fc-tint), var(--fc-tint));
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  background-size: 0% 2px, 0% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition:
+    background-size 1.1s cubic-bezier(0.55, 0, 0.75, 0.2),
+    color 1.1s ease;
+}
+
+.phrase[data-on] {
+  color: rgb(var(--text-rgb) / 0.78);
+  background-size: 100% 2px, 100% 100%;
+  transition:
+    background-size 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.5s ease;
+}
+
+/* On narrow screens there is no free margin: any strip of newsprint lands
+   behind the wordmark, the tabs or the headline. Phones get the paper tone and
+   the raised sheet without the type. No marks are scheduled there either (see
+   isInOpenArea). */
+@media (max-width: 899px) {
+  .band {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+
+  .phrase,
+  .phrase[data-on] {
+    transition: none;
+  }
+}

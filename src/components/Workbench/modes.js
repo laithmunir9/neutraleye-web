@@ -13,7 +13,7 @@ export const MODES = [
   {
     id: "read",
     label: "Read",
-    prompt: "Paste an article to see how it frames the story.",
+    prompt: "See how any article frames the story.",
     Component: ReadMode,
   },
   {

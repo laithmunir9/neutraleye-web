@@ -17,6 +17,15 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AuthProvider } from "@/lib/supabase/AuthProvider";
 
+/* viewport-fit=cover lets the page run under the iPhone notch and home
+   indicator, which is what makes the env(safe-area-inset-*) padding in the
+   shell and the pinned action bar take effect. Without it they read as 0. */
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata = {
   title: "NeutralEye | See How an Article Frames the Story",
   description: "NeutralEye shows how an article frames a story, checking tone, sourcing, and omission, with quoted evidence and suggested sources to read next.",

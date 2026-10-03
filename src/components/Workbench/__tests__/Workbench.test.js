@@ -86,7 +86,7 @@ describe("Read mode", () => {
       "The content is only a fixture, but it should pass the frontend quality checks before the mocked request succeeds."
     ].join(" ");
 
-    const textarea = screen.getByPlaceholderText("Paste the article text here");
+    const textarea = screen.getByPlaceholderText("Paste a link or the article text");
     await user.click(textarea);
     await user.paste(longText);
     await user.click(screen.getByRole("button", { name: "Analyze framing" }));
@@ -133,7 +133,7 @@ describe("Read mode", () => {
       "The content is only a fixture, but it should pass the frontend quality checks before the mocked request succeeds."
     ].join(" ");
 
-    const textarea = screen.getByPlaceholderText("Paste the article text here");
+    const textarea = screen.getByPlaceholderText("Paste a link or the article text");
     await user.click(textarea);
     await user.paste(longText);
     await user.click(screen.getByRole("button", { name: "Analyze framing" }));
@@ -157,7 +157,7 @@ describe("Read mode", () => {
 
     const repetitiveText = `${"bias ".repeat(220)}This fragment is still repetitive and should not pass as a real article body.`;
 
-    const textarea = screen.getByPlaceholderText("Paste the article text here");
+    const textarea = screen.getByPlaceholderText("Paste a link or the article text");
     await user.click(textarea);
     await user.paste(repetitiveText);
     await user.click(screen.getByRole("button", { name: "Analyze framing" }));
@@ -193,7 +193,7 @@ describe("Read mode", () => {
       "It includes enough sentence structure to look like article body text while still being short enough for the test.",
       "The content is only a fixture, but it should pass the frontend quality checks before the mocked request fails."
     ].join(" ");
-    const textarea = screen.getByPlaceholderText("Paste the article text here");
+    const textarea = screen.getByPlaceholderText("Paste a link or the article text");
     await user.click(textarea);
     await user.paste(longText);
 
@@ -225,7 +225,7 @@ describe("Mode toggle", () => {
 
     expect(screen.getByRole("tab", { name: "Read" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tab", { name: "Write" })).toHaveAttribute("aria-selected", "false");
-    expect(screen.getByPlaceholderText("Paste the article text here")).toBeVisible();
+    expect(screen.getByPlaceholderText("Paste a link or the article text")).toBeVisible();
     expect(screen.queryByText("It will not write for you.")).not.toBeVisible();
   });
 
@@ -256,14 +256,14 @@ describe("Mode toggle", () => {
     const user = userEvent.setup();
     render(<Workbench />);
 
-    await user.click(screen.getByPlaceholderText("Paste the article text here"));
+    await user.click(screen.getByPlaceholderText("Paste a link or the article text"));
     await user.paste("Draft text that should still be here.");
 
     await user.click(screen.getByRole("tab", { name: "Write" }));
     expect(screen.getByText("It will not write for you.")).toBeVisible();
 
     await user.click(screen.getByRole("tab", { name: "Read" }));
-    expect(screen.getByPlaceholderText("Paste the article text here")).toHaveValue(
+    expect(screen.getByPlaceholderText("Paste a link or the article text")).toHaveValue(
       "Draft text that should still be here."
     );
   });
@@ -320,5 +320,75 @@ describe("Write mode early access", () => {
         body: JSON.stringify({ email: "reader@example.com", source: "write" }),
       })
     );
+  });
+});
+
+describe("Read mode links", () => {
+  const { detectUrl } = require("../ReadMode");
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("treats a single address as a link and anything with spaces as text", () => {
+    expect(detectUrl("https://example.com/news/story")?.href).toBe("https://example.com/news/story");
+    expect(detectUrl("example.com/news/story")?.href).toBe("https://example.com/news/story");
+    expect(detectUrl("  www.example.co.uk/a/b?x=1  ")?.hostname).toBe("www.example.co.uk");
+    expect(detectUrl("The council voted on Tuesday.")).toBeNull();
+    expect(detectUrl("hello")).toBeNull();
+  });
+
+  test("a pasted link is fetched, without the text minimum", async () => {
+    mockAnalyzeUrl.mockResolvedValue({
+      id: "url-1",
+      inputType: "url",
+      url: "https://example.com/news/story",
+      directionLabel: "Moderate framing signal",
+      direction: "Moderate framing signal",
+      confidence: 0.7,
+      summary: "Fetched and read.",
+      drivers: ["Framing"],
+      examples: [],
+      sources: [],
+      recommendations: []
+    });
+    const user = userEvent.setup();
+    render(<Workbench />);
+
+    await user.click(screen.getByPlaceholderText("Paste a link or the article text"));
+    await user.paste("example.com/news/story");
+    expect(screen.getByText("Link to example.com")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Analyze link" }));
+
+    await waitFor(() => expect(screen.getByText("Moderate framing signal")).toBeInTheDocument());
+    expect(mockAnalyzeUrl).toHaveBeenCalledWith("https://example.com/news/story");
+    expect(mockAnalyzeText).not.toHaveBeenCalled();
+  });
+
+  test("a site's front page is turned away before any request", async () => {
+    const user = userEvent.setup();
+    render(<Workbench />);
+
+    await user.click(screen.getByPlaceholderText("Paste a link or the article text"));
+    await user.paste("https://example.com");
+    await user.click(screen.getByRole("button", { name: "Analyze link" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Link to the article itself");
+    expect(mockAnalyzeUrl).not.toHaveBeenCalled();
+  });
+
+  test("an unreadable page suggests pasting the text instead", async () => {
+    mockAnalyzeUrl.mockRejectedValue(
+      new ApiError("Could not fetch", { status: 422, code: "URL_FETCH_FAILED", endpoint: "/api/analyze" })
+    );
+    const user = userEvent.setup();
+    render(<Workbench />);
+
+    await user.click(screen.getByPlaceholderText("Paste a link or the article text"));
+    await user.paste("https://example.com/paywalled/story");
+    await user.click(screen.getByRole("button", { name: "Analyze link" }));
+
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Could not read that page"));
+    expect(screen.getByRole("alert")).toHaveTextContent("Paste the article text instead");
   });
 });

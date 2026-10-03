@@ -37,5 +37,5 @@ export async function GET(request) {
     reportAuthError(error, "code_exchange", { route: "auth-callback" });
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+  return NextResponse.redirect(`${origin}/?auth=signin&notice=auth_failed`);
 }

@@ -7,7 +7,7 @@ Read this before touching any code.
 
 ## Project Overview
 
-NeutralEye is a consumer framing-analysis tool. The homepage is the product: a two-mode toggle, **Read** and **Write**, over one input slot. Read is the live analyzer (paste article text, get the framing analysis back, with marked passages). Write is the writing companion, not built yet; its tab shows a short description and an early-access email capture. The web analyzer is text only; `/api/analyze` still accepts URLs because the API supports them, but no web UI sends one.
+NeutralEye is a consumer framing-analysis tool. The homepage is the product: a two-mode toggle, **Read** and **Write**, over one input slot. Read is the live analyzer: one box takes a link or the article text (a single web address is fetched, anything else is read as text) and returns the framing analysis with marked passages. Write is the writing companion, not built yet; its tab shows a short description and an early-access email capture.
 
 The site is the homepage plus legal pages and auth. There are no marketing or informational pages; every retired path permanently redirects to `/` (`RETIRED_PATHS` in `next.config.mjs`).
 
@@ -59,11 +59,11 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 ```
 src/
   app/
-    page.js                 # Homepage = the product. Server component: reads ?mode and ?id, renders SiteShell + Workbench
-    login/page.js           # Auth page (sign in / sign up / forgot password); ?callbackUrl defaults to /
-    signup/page.js          # Redirects into /login?mode=signup
+    page.js                 # Homepage = the product. Server component: reads ?mode, ?id and ?auth/?notice; renders SiteShell (with the Newsprint backdrop) + Workbench
+    login/page.js           # Redirect only: sign-in is an overlay. Maps ?mode/?reset/?error to /?auth=...&notice=... (email links, old bookmarks)
+    signup/page.js          # Redirects to /?auth=signup
     reset-password/page.js  # Password reset; Supabase recovery redirect lands here
-    auth/callback/route.js  # Supabase code exchange; ?next defaults to /
+    auth/callback/route.js  # Supabase code exchange; ?next defaults to /; failure opens the overlay with notice=auth_failed
     privacy/, terms/        # Legal pages (legal.module.css)
     extension-privacy/      # Extension privacy policy. The Chrome Web Store listing links here; keep it
     not-found.js            # 404, links home
@@ -82,18 +82,22 @@ src/
       keepalive/route.ts    # Vercel cron, keeps Supabase awake
 
   components/
-    SiteShell/              # The whole chrome: wordmark, Sign in or avatar (one-item Sign out menu), Privacy and Terms
+    SiteShell/              # The whole chrome: wordmark, Sign in (opens AuthDialog) or avatar (one-item Sign out menu), Privacy and Terms.
+                            # `backdrop` renders behind it; `initialAuth` opens the overlay on arrival; `hideAccount` for /reset-password
+    AuthDialog/             # Sign in / create account / forgot password as a native <dialog> overlay on the current page. X top left,
+                            # backdrop click and Escape close it. No separate page. Its CSS module also styles /reset-password's form
+    Newsprint/              # Homepage backdrop: faint drifting columns of invented, neutral local-news copy (copy.js) in the side
+                            # margins, where loaded phrases get the annotation mark drawn on and off. Desktop only; phones get the paper tone
     Workbench/
       Workbench.js          # The Read/Write tablist and the slot. All modes stay mounted (inactive ones hidden),
                             # so pasted text survives a switch. Switching rewrites ?mode with history.replaceState, no request
       modes.js              # Mode registry. When the writing companion ships, replacing WaitlistMode on the "write"
                             # entry is the whole change
-      ReadMode.js           # The analyzer: input, validation, loading stages, errors, saved-result loading (?id=)
+      ReadMode.js           # The analyzer: link-or-text input (detectUrl), validation, loading stages, errors, saved-result loading (?id=)
       ReadResult.js         # Result rendering: finding, summary, signals, marked passages, disclosures
       WaitlistMode.js       # Write placeholder: "It will not write for you." + email capture -> /api/waitlist
     QuoteEvidence/          # A marked passage: signal label, the annotation mark, the note under it. `sweep` draws the mark in once
     Annotation/             # Canonical definition of the mark (cited by docs/visual-language.md). Not imported by any page now
-    AuthDialog/             # Only AuthDialog.module.css survives; login and reset-password use it for form styles
     ui/                     # shadcn/ui (theme-provider in use; avatar.tsx and button.tsx were already unused)
 
   lib/                      # api.js, analysis.js (prompts), biasLevel.js, storage.js, ratelimit.js, dailyLimit.js, supabase/
@@ -420,7 +424,9 @@ Issues below. Do not add to that list to make the sweep pass.
   rendering 0px. This already affects `--radius-sm` / `--radius-md` declared in
   `globals.css`: the browser gets Tailwind's defaults, not the declared values.
 - **Consistency:** Visual style must match the NeutralEye browser extension
-- **Homepage layout:** one centred column, `max-width: 42rem`. Chrome is `SiteShell` only: no nav links, no dropdown menus beyond the one-item account menu, a footer of Privacy and Terms. Controls are ink; the accent appears only in annotation marks on a result. The only authored motion is the mark sweep on a result and the tab rule sliding between modes.
+- **Homepage layout:** one centred column, `max-width: 42rem`, on the cool paper tone (`--fc-surface`), with the input as the one raised white sheet. The display line is Source Serif 4 at 600, up to 3.75rem. Chrome is `SiteShell` only: no nav links, no dropdowns beyond the one-item account menu, a footer of Privacy and Terms. Controls are ink; the accent appears only in annotation marks (on a result, and in the Newsprint backdrop, where the marks are the point). Motion: the backdrop's drift and marks, the mark sweep on a result, the tab rule sliding between modes. All of it stops under prefers-reduced-motion.
+- **iPhone rules.** `viewport-fit=cover` is set in `layout.js`, so pinned and edge elements must pad with `env(safe-area-inset-*)` (the shell, the column and the mobile action bar already do). Every text input stays at 16px or larger, or iOS Safari zooms the page on focus. Inputs reset `-webkit-appearance`. Checked 3 October 2026 in Playwright WebKit on iPhone SE, 13, 15 Pro Max and 13 landscape: no sideways scroll, inputs at 16px or more, 44px tap targets, the action bar pinned while long text is open, the sign-in overlay fitting the screen with its X top left.
+- **Sign-in is never a page.** It is the AuthDialog overlay over whatever page the reader is on. Anything that used to link to /login should open the overlay instead.
 
 When building new UI, prefer extending existing components in `src/components/ui/` before creating new ones.
 
