@@ -23,15 +23,22 @@ There is no separate backend server. All backend logic lives as Next.js API Rout
 
 | Service        | Location                          | Notes                                                        |
 |----------------|-----------------------------------|--------------------------------------------------------------|
-| Frontend       | `neutraleye-web` → Vercel         | Next.js 16, React 19                                         |
+| Frontend       | `neutraleye-web` → Vercel         | Next.js 16, React 19. Vercel team `laithmunir9s-projects`    |
 | API Routes     | `src/app/api/` → Vercel           | All backend logic lives here, no separate server             |
 | Database       | Supabase                          | Auth + analyses + daily_usage tables, RLS active             |
 | Rate limiting  | Upstash Redis                     | Sliding window via `@upstash/ratelimit`; falls back to in-memory locally |
-| Email          | Resend                            | Support form + Supabase Auth email via custom SMTP           |
+| Email (send)   | Resend                            | Supabase Auth email via custom SMTP only — the support form is retired |
+| Email (receive)| Cloudflare Email Routing          | `contact@tryneutraleye.com` forwards to the founder's Gmail  |
 | Payments       | Stripe                            | Not yet set up                                               |
-| Security       | Cloudflare                        | Planned                                                      |
-| Monitoring     | Sentry                            | Set up — frontend + backend verified                         |
+| DNS / registrar| Cloudflare                        | Registrar and DNS for `tryneutraleye.com`; site is proxied (orange cloud) in front of Vercel |
+| Monitoring     | Sentry                            | Org `laith-munir`, project `neutraleye-web` (moved 2026-10-01) |
 | Analytics      | Vercel Web Analytics              | `<Analytics />` in layout.js — enable in Vercel dashboard → project → Analytics |
+
+### Account ownership (migrated 2026-10-01/02)
+
+Every service now sits under the founder's `laithmunir9` identity: GitHub (`laithmunir9/neutraleye-web`), Vercel, Sentry, Supabase (org "laithmunir9's Org", project `hkxtymihsyegrmqnvdvn`), Resend, Upstash, OpenAI, Cloudflare, Chrome Web Store, Google Search Console. The old `biaschecker.app@gmail.com` identity, the old `biascheckerapp-svg` GitHub account, and the old Vercel/Sentry accounts are retired — never point anything at them. The weekly ops-check and Gmail-digest routines that referenced them were deleted on 2026-10-02.
+
+**Canonical host is the apex `tryneutraleye.com`.** `next.config.mjs` redirects `www` → apex. In Vercel, the apex domain must stay connected to Production with **no** redirect. On 2026-10-02 the domain was re-added with Vercel's default (apex → www), which combined with the code's www → apex redirect produced a redirect loop and took the site down. If you touch domain settings in Vercel, keep the apex un-redirected.
 
 ---
 
@@ -144,10 +151,10 @@ src/
 ### `POST /api/usage` — Increment daily usage (authenticated)
 - Legacy: the web frontend no longer calls this — `/api/analyze` increments server-side and `useAnalysisLimit.increment()` just refetches GET
 
-### `POST /api/support` — Contact form
-- Accepts `{ name, email, subject, message }` from the support page
-- Sends email via Resend to `contact@tryneutraleye.com` with sender as `replyTo`
-- Validates all fields, email format, and length limits (name: 100, message: 5000)
+### `POST /api/support` — Contact form (retired, dead code)
+- `/support` permanently redirects to `/faq` and nothing in the app calls this route anymore.
+- `RESEND_API_KEY` is deliberately **not** set in Vercel, so the route returns 503 `Support email is temporarily unavailable.` Do not treat that as an outage, and do not add the key back to "fix" it.
+- If the contact form is ever revived: accepts `{ name, email, subject, message }`, sends via Resend to `contact@tryneutraleye.com` with sender as `replyTo`, validates length limits (name: 100, message: 5000).
 
 ---
 
@@ -182,7 +189,7 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 
 **Password reset:** Uses Supabase `resetPasswordForEmail` with `redirectTo: /auth/callback?next=/reset-password`. The existing `/auth/callback` route handles the code exchange; `/reset-password` calls `updateUser({ password })`.
 
-**Auth email:** Supabase Auth already sends through **custom SMTP wired to Resend**. Verified 2026-08-20 from the Resend sent log, not inferred from docs. Sender is `"NeutralEye" <contact@tryneutraleye.com>`; domain `tryneutraleye.com` is verified in `us-east-1` with **sending enabled and receiving disabled**, so never invite a reply in email copy because it lands nowhere anyone reads. Branded HTML for Confirm signup and Reset password lives in `supabase/email-templates/`. **Both are applied and live in production, verified 2026-08-21** by fetching the actual sent HTML from the Resend log for a real signup and a real reset and diffing it against these files. Those files remain the source of truth, but they are applied by hand in the dashboard (Auth → Email Templates); no migration or MCP tool can push them, so any edit to these files must be re-pasted there or production keeps sending the old version. Only those two flows are in use: magic link, change email, and invite are not.
+**Auth email:** Supabase Auth already sends through **custom SMTP wired to Resend**. Verified 2026-08-20 from the Resend sent log, not inferred from docs. Sender is `"NeutralEye" <contact@tryneutraleye.com>`; domain `tryneutraleye.com` is verified in `us-east-1` with **sending enabled and receiving disabled** in Resend. Replies to `contact@` do arrive: since 2026-10-02 Cloudflare Email Routing forwards `contact@tryneutraleye.com` to the founder's Gmail (Google Workspace was cancelled the same day). Only `contact@` has a rule; the catch-all is disabled, so mail to any other address on the domain is not delivered. Branded HTML for Confirm signup and Reset password lives in `supabase/email-templates/`. **Both are applied and live in production, verified 2026-08-21** by fetching the actual sent HTML from the Resend log for a real signup and a real reset and diffing it against these files. Those files remain the source of truth, but they are applied by hand in the dashboard (Auth → Email Templates); no migration or MCP tool can push them, so any edit to these files must be re-pasted there or production keeps sending the old version. Only those two flows are in use: magic link, change email, and invite are not.
 
 **Email OTP expiry is 3600 seconds (1 hour)**, confirmed from the dashboard 2026-08-20. It covers both the signup confirmation link and the password recovery link, and both templates state the hour explicitly.
 
@@ -237,7 +244,7 @@ EXT_RATE_LIMIT_MAX=5
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 
-# Resend — transactional email (support form)
+# Resend — only used by the retired /api/support route. Intentionally unset in Vercel.
 RESEND_API_KEY=
 
 # Sentry — error monitoring (set by Sentry wizard, also add to Vercel)
@@ -510,12 +517,12 @@ journalism) and is blocked on curriculum.
 |------|--------|
 | Domain (`tryneutraleye.com`) | ✅ Live, connected to Vercel |
 | Supabase Auth redirect URLs | ✅ Updated to `tryneutraleye.com` |
-| `contact@tryneutraleye.com` inbox | ✅ Exists |
+| `contact@tryneutraleye.com` inbox | ✅ Cloudflare Email Routing → founder's Gmail (Google Workspace cancelled 2026-10-02) |
 | Cloudflare | ✅ Done |
-| Sentry | ✅ Done |
+| Sentry | ✅ Done — org `laith-munir` |
 | OG / metadata URLs | ✅ Updated to `tryneutraleye.com` |
 | Sitemap | ✅ Updated to `tryneutraleye.com` |
-| Resend (support form + Auth SMTP) | ✅ Live |
+| Resend (Auth SMTP) | ✅ Live |
 | Branded auth email templates | ✅ Applied and verified live (2026-08-21) |
 | Supabase Pro + custom auth domain | ⏸ Pending |
 | Stripe | ⏸ Paused |
