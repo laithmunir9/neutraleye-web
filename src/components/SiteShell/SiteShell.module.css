@@ -5,7 +5,10 @@
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--fc-bg);
+  /* The page colour, shared with the pinned header so it reads as the same
+     sheet whether or not anything has scrolled under it. */
+  --page-bg: var(--fc-bg);
+  background: var(--page-bg);
   color: var(--fc-heading);
 }
 
@@ -14,7 +17,7 @@
 /* With a backdrop the page is paper all the way down, so no white shows past
    the fixed layer (long results, overscroll, full-page captures). */
 .onPaper {
-  background: var(--fc-surface);
+  --page-bg: var(--fc-surface);
 }
 
 /* Above any backdrop. */
@@ -25,7 +28,14 @@
   z-index: 1;
 }
 
+/* Pinned: the wordmark and the account control stay in reach while a long
+   result scrolls under them. The footer deliberately does not pin; see
+   CLAUDE.md (Design System, homepage layout). */
 .top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--page-bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
