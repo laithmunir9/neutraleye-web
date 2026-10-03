@@ -1,0 +1,154 @@
+.shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* The page colour, shared with the pinned header so it reads as the same
+     sheet whether or not anything has scrolled under it. */
+  --page-bg: var(--fc-bg);
+  background: var(--page-bg);
+  color: var(--fc-heading);
+}
+
+/* No border under the bar: with nothing else in the chrome, a full-width rule
+   would be the loudest line on the page. */
+/* With a backdrop the page is paper all the way down, so no white shows past
+   the fixed layer (long results, overscroll, full-page captures). */
+.onPaper {
+  --page-bg: var(--fc-surface);
+}
+
+/* Above any backdrop. */
+.top,
+.body,
+.foot {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pinned: the wordmark and the account control stay in reach while a long
+   result scrolls under them. The footer deliberately does not pin; see
+   CLAUDE.md (Design System, homepage layout). */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--page-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-right)) 1.1rem
+    max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left));
+  padding-top: max(1.1rem, env(safe-area-inset-top));
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fc-heading);
+}
+
+.signIn {
+  padding: 0.3rem 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--fc-body);
+  text-decoration: underline;
+  text-decoration-color: var(--fc-border);
+  text-underline-offset: 0.3em;
+}
+
+@media (hover: hover) {
+  .signIn:hover {
+    color: var(--fc-heading);
+    text-decoration-color: var(--fc-heading);
+  }
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accountPlaceholder {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+}
+
+.menu {
+  z-index: 50;
+  min-width: 13rem;
+  padding: 0.35rem;
+  border: 1px solid var(--fc-border);
+  border-radius: var(--control-radius);
+  background: var(--fc-bg);
+  box-shadow: 0 0.6rem 1.6rem rgb(var(--shadow-rgb) / 0.1);
+  font-family: var(--font-sans);
+}
+
+.menuEmail {
+  margin: 0;
+  padding: 0.45rem 0.6rem 0.55rem;
+  border-bottom: 1px solid var(--fc-border);
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--fc-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuItem {
+  padding: 0.5rem 0.6rem;
+  border-radius: calc(var(--control-radius) - 0.15rem);
+  font-size: 0.92rem;
+  color: var(--fc-heading);
+  cursor: pointer;
+  outline: none;
+}
+
+.menuItem[data-highlighted] {
+  background: var(--fc-surface);
+}
+
+.body {
+  min-width: 0;
+}
+
+.foot {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem calc(1.6rem + env(safe-area-inset-bottom));
+  font-size: 0.85rem;
+}
+
+.foot a {
+  color: var(--fc-muted);
+}
+
+@media (hover: hover) {
+  .foot a:hover {
+    color: var(--fc-heading);
+  }
+}

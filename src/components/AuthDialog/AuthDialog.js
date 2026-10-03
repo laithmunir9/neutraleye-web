@@ -1,29 +1,50 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useAuth } from "@/lib/supabase/AuthProvider";
+import { createClient } from "@/lib/supabase/client";
+import { classifySignUpResult, reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 import styles from "./AuthDialog.module.css";
 
 /**
- * Sign in and sign up as an overlay rather than a page.
+ * Sign in, create an account and reset a password, as a surface over whatever
+ * page the reader is on rather than a page of its own. Closing it (the X, the
+ * backdrop, Escape) leaves them exactly where they were.
  *
- * Built on the native <dialog> element, so focus trapping, Escape to close,
- * and inertness of the page behind it come from the platform rather than from
- * hand-rolled key handlers.
+ * Built on the native <dialog>, so focus trapping, Escape and the inert page
+ * behind it come from the platform. The auth calls are the ones the retired
+ * /login page made, unchanged; /login now redirects here.
  *
- * The /login route is deliberately left in place: the Supabase password
- * recovery flow redirects there, and it is a valid deep link.
+ * `notice` carries the states that arrive from outside: "reset" after a
+ * password change, "auth_failed" when an email link could not be exchanged.
  */
-export default function AuthDialog({ open, onClose, mode: initialMode = "signin" }) {
+const NOTICES = {
+  reset: { title: "Password updated", blurb: "You can now sign in with your new password." },
+};
+
+export default function AuthDialog({ open, onClose, initialMode = "signin", notice = null }) {
   const ref = useRef(null);
-  const { supabase } = useAuth();
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [activeNotice, setActiveNotice] = useState(notice);
+
+  // Each opening starts clean, in the mode it was opened in. Adjusted during
+  // render rather than in an effect, per the codebase's set-state rule.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setMode(initialMode);
+      setError(notice === "auth_failed" ? "That link could not be used. Sign in, or request a new one." : "");
+      setConfirmed(false);
+      setForgotSent(false);
+      setLoading(false);
+      setActiveNotice(notice);
+    }
+  }
 
   useEffect(() => {
     const el = ref.current;
@@ -32,37 +53,93 @@ export default function AuthDialog({ open, onClose, mode: initialMode = "signin"
     if (!open && el.open) el.close();
   }, [open]);
 
-  useEffect(() => {
-    if (open) {
-      setMode(initialMode);
-      setError(null);
-      setSent(false);
-    }
-  }, [open, initialMode]);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (busy || !supabase) return;
-    setBusy(true);
-    setError(null);
-    try {
-      if (mode === "signup") {
-        const { error: err } = await supabase.auth.signUp({ email, password });
-        if (err) throw err;
-        setSent(true);
-      } else {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
-        onClose?.();
-      }
-    } catch (err) {
-      setError(err?.message || "Something went wrong. Try again.");
-    } finally {
-      setBusy(false);
-    }
+  function switchMode(next) {
+    setMode(next);
+    setError("");
+    setForgotSent(false);
+    setConfirmed(false);
+    setActiveNotice(null);
   }
 
-  const signup = mode === "signup";
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const emailValue = String(new FormData(e.currentTarget).get("email") || "");
+    setEmail(emailValue);
+    const supabase = createClient();
+    const { error: err } = await safeAuthCall("password_reset_request", () =>
+      supabase.auth.resetPasswordForEmail(emailValue, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      })
+    );
+    setLoading(false);
+    if (err) setError(reportAuthError(err, "password_reset_request"));
+    else setForgotSent(true);
+  }
+
+  async function handleSignUp(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const fd = new FormData(e.currentTarget);
+    const emailValue = String(fd.get("email") || "");
+    const supabase = createClient();
+    // The confirmation link brings the reader back to the page they signed up on.
+    const back = `${window.location.pathname}${window.location.search}` || "/";
+    const result = await safeAuthCall("signup", () =>
+      supabase.auth.signUp({
+        email: emailValue,
+        password: String(fd.get("password") || ""),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(back)}`,
+        },
+      })
+    );
+    const { showConfirmationScreen, message } = classifySignUpResult(result);
+    setLoading(false);
+    if (!showConfirmationScreen) {
+      setError(message);
+      return;
+    }
+    setEmail(emailValue);
+    setConfirmed(true);
+  }
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const fd = new FormData(e.currentTarget);
+    const supabase = createClient();
+    const { error: err } = await safeAuthCall("signin", () =>
+      supabase.auth.signInWithPassword({
+        email: String(fd.get("email") || ""),
+        password: String(fd.get("password") || ""),
+      })
+    );
+    setLoading(false);
+    if (err) setError(reportAuthError(err, "signin"));
+    else onClose?.();
+  }
+
+  const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
+  const done = confirmed || (isForgot && forgotSent);
+
+  let title = isSignup ? "Create an account" : isForgot ? "Reset your password" : "Sign in";
+  let blurb = isForgot
+    ? "Enter the address you signed up with and we will send a reset link to it."
+    : "Saves your reads across devices. NeutralEye works without an account either way.";
+  if (confirmed) {
+    title = "Check your email";
+    blurb = `A confirmation link is on its way to ${email}. It works for one hour.`;
+  } else if (isForgot && forgotSent) {
+    title = "Reset link sent";
+    blurb = `If an account exists for ${email}, a reset link is on its way. It works for one hour.`;
+  } else if (activeNotice && NOTICES[activeNotice]) {
+    ({ title, blurb } = NOTICES[activeNotice]);
+  }
 
   return (
     <dialog
@@ -70,94 +147,86 @@ export default function AuthDialog({ open, onClose, mode: initialMode = "signin"
       className={styles.dialog}
       onClose={() => onClose?.()}
       onKeyDown={(e) => {
-        // Radix's dismissable layer preventDefaults the Escape keydown at the
-        // document level, so the dialog never gets its native close. Handle it
-        // here rather than depending on that default surviving.
+        // A Radix layer elsewhere on the page can swallow the native Escape,
+        // so close explicitly rather than depending on the default.
         if (e.key === "Escape") {
           e.stopPropagation();
           onClose?.();
         }
       }}
       onClick={(e) => {
-        // Clicking the backdrop closes; clicks inside the panel do not.
+        // The backdrop closes; clicks inside the panel do not.
         if (e.target === ref.current) onClose?.();
       }}
       aria-labelledby="auth-dialog-title"
     >
       <div className={styles.panel}>
         <button type="button" className={styles.close} onClick={() => onClose?.()} aria-label="Close">
-          &times;
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
         </button>
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/neutraleye-mark.svg" alt="" width={32} height={32} className={styles.mark} />
+        <h2 id="auth-dialog-title" className={styles.title}>{title}</h2>
+        <p className={styles.sub}>{blurb}</p>
 
-        <h2 id="auth-dialog-title" className={styles.title}>
-          {signup ? "Create an account" : "Sign in"}
-        </h2>
-        <p className={styles.sub}>
-          Saves your history across devices. The tools work without an account either way.
-        </p>
+        {error ? <p className={styles.error} role="alert">{error}</p> : null}
 
-        {sent ? (
-          <p className={styles.notice}>
-            Check your email for a confirmation link. You can close this and carry on using the
-            tools in the meantime.
-          </p>
+        {done ? (
+          <button type="button" className={styles.switch} onClick={() => switchMode("signin")}>
+            Back to sign in
+          </button>
         ) : (
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form
+            key={mode}
+            className={styles.form}
+            onSubmit={isForgot ? handleForgotPassword : isSignup ? handleSignUp : handleSignIn}
+          >
             <label className={styles.field}>
               <span className={styles.label}>Email</span>
-              <input
-                type="email"
-                className={styles.input}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                autoFocus
-                required
-              />
+              <input name="email" type="email" className={styles.input} autoComplete="email" autoFocus required />
             </label>
 
-            <label className={styles.field}>
-              <span className={styles.label}>Password</span>
-              <input
-                type="password"
-                className={styles.input}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={signup ? "new-password" : "current-password"}
-                minLength={8}
-                required
-              />
-            </label>
+            {!isForgot && (
+              <label className={styles.field}>
+                <span className={styles.label}>Password</span>
+                <input
+                  name="password"
+                  type="password"
+                  className={styles.input}
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                  minLength={8}
+                  required
+                />
+              </label>
+            )}
 
-            {error && <p className={styles.error}>{error}</p>}
-
-            <button type="submit" className={styles.submit} disabled={busy}>
-              {busy ? "Working" : signup ? "Create account" : "Sign in"}
+            <button type="submit" className={styles.submit} disabled={loading}>
+              {loading ? "Working" : isForgot ? "Send reset link" : isSignup ? "Create account" : "Sign in"}
             </button>
           </form>
         )}
 
-        <div className={styles.foot}>
-          <button
-            type="button"
-            className={styles.switch}
-            onClick={() => {
-              setMode(signup ? "signin" : "signup");
-              setError(null);
-              setSent(false);
-            }}
-          >
-            {signup ? "Already have an account? Sign in" : "No account? Create one"}
-          </button>
-          {!signup && (
-            <Link href="/login" className={styles.switch} onClick={() => onClose?.()}>
-              Forgot your password?
-            </Link>
-          )}
-        </div>
+        {!done && (
+          <div className={styles.foot}>
+            {isForgot ? (
+              <button type="button" className={styles.switch} onClick={() => switchMode("signin")}>
+                Back to sign in
+              </button>
+            ) : (
+              <>
+                <button type="button" className={styles.switch} onClick={() => switchMode(isSignup ? "signin" : "signup")}>
+                  {isSignup ? "Already have an account? Sign in" : "No account? Create one"}
+                </button>
+                {!isSignup && (
+                  <button type="button" className={styles.switch} onClick={() => switchMode("forgot")}>
+                    Forgot your password?
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </dialog>
   );

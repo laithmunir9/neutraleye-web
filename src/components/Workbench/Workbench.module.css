@@ -1,0 +1,555 @@
+/* The homepage is this one column: the mode toggle, a prompt line, and the
+   slot each mode fills. Ink carries every control; the accent appears only
+   in the marks on a result, which is the one job the design system gives it. */
+
+.workbench {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 8vh, 5.5rem) max(1rem, env(safe-area-inset-right)) 3rem
+    max(1rem, env(safe-area-inset-left));
+}
+
+/* ── Mode toggle ─────────────────────────────────────────────────────── */
+
+.tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--tab-count), minmax(6.5rem, 1fr));
+  width: max-content;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.tab {
+  padding: 0.55rem 1rem 0.7rem;
+  border: 0;
+  background: none;
+  color: var(--fc-muted);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--fc-heading);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--fc-heading);
+  }
+}
+
+.tab:focus-visible {
+  border-radius: var(--control-radius) var(--control-radius) 0 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--text-rgb) / 0.18);
+}
+
+/* One rule that slides between the tabs, so the switch shows where it went. */
+.tabRule {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: calc(100% / var(--tab-count));
+  height: 2px;
+  background: var(--fc-heading);
+  transform: translateX(calc(var(--tab-index) * 100%));
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabRule {
+    transition: none;
+  }
+}
+
+.panel {
+  min-width: 0;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+/* The page's one display line, at full strength. */
+.prompt {
+  margin: 2rem auto 1.75rem;
+  max-width: 15ch;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: clamp(2.35rem, 5.6vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ── The slot ────────────────────────────────────────────────────────── */
+
+/* A white sheet laid on the newsprint: it is the one surface on the page
+   with depth, so the eye goes to it first. */
+.frame {
+  border: 1px solid var(--fc-border);
+  border-radius: calc(var(--control-radius) + 0.25rem);
+  background: var(--fc-bg);
+  box-shadow:
+    0 0.15rem 0.35rem rgb(var(--shadow-rgb) / 0.04),
+    0 1.2rem 2.6rem rgb(var(--shadow-rgb) / 0.08);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.frame:focus-within {
+  border-color: var(--fc-border-input);
+  box-shadow:
+    0 0 0 3px rgb(var(--text-rgb) / 0.06),
+    0 1.2rem 2.6rem rgb(var(--shadow-rgb) / 0.1);
+}
+
+.busy {
+  border-style: dashed;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: clamp(14rem, 38vh, 22rem);
+  padding: 1.1rem 1.25rem;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--fc-heading);
+  font-size: 1.06rem;
+  line-height: 1.7;
+  resize: vertical;
+  caret-color: var(--fc-heading);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.textarea:focus,
+.textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.textarea::placeholder {
+  color: var(--fc-muted);
+}
+
+.busy .textarea {
+  color: var(--fc-body);
+}
+
+.collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--fc-surface);
+}
+
+.excerpt {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--fc-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+.status {
+  margin: 0;
+  color: var(--fc-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-shrink: 0;
+}
+
+.primary {
+  padding: 0.72rem 1.3rem;
+  border: 1px solid var(--fc-heading);
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 0.98rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .primary:hover:not(:disabled) {
+    border-color: var(--fc-ink-hover);
+    background: var(--fc-ink-hover);
+  }
+}
+
+.primary:disabled {
+  opacity: 0.62;
+  cursor: progress;
+}
+
+.primary:focus-visible {
+  box-shadow: 0 0 0 3px var(--fc-bg), 0 0 0 5px rgb(var(--text-rgb) / 0.35);
+}
+
+.quiet {
+  padding: 0.2rem 0;
+  border: 0;
+  background: none;
+  color: var(--fc-body);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-color: var(--fc-border-input);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .quiet:hover {
+    color: var(--fc-heading);
+    text-decoration-color: var(--fc-heading);
+  }
+}
+
+.error {
+  margin-top: 0.75rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--error-border);
+  border-radius: var(--control-radius);
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.error strong {
+  display: block;
+  font-size: 0.98rem;
+}
+
+.error p {
+  margin: 0.2rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* On a phone the action row stays reachable while the article is long. It is
+   sticky inside the input block only, so it lets go once the result starts. */
+@media (max-width: 640px) {
+  .inputBlock .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-top: 0;
+    padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--fc-border);
+    background: var(--fc-surface);
+  }
+
+  /* Status on its own line, then the buttons across the full width, so the
+     primary action is never pushed off the edge. */
+  .inputBlock .actions {
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .inputBlock .status {
+    width: 100%;
+    font-size: 0.84rem;
+  }
+
+  .inputBlock .buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .inputBlock .buttons .primary {
+    margin-left: auto;
+  }
+}
+
+/* iPhone SE and other 320px screens: the pair must fit inside the input's
+   edges, not just the screen's. */
+@media (max-width: 380px) {
+  .buttons {
+    gap: 0.75rem;
+  }
+
+  .primary {
+    padding-inline: 1rem;
+  }
+}
+
+/* ── Write mode ──────────────────────────────────────────────────────── */
+
+.writeFrame {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-height: clamp(14rem, 38vh, 22rem);
+  padding: 1.6rem 1.5rem 1.4rem;
+}
+
+.writeLead {
+  margin: 0;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.writeBody {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--fc-body);
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.writeForm {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.6rem;
+}
+
+.writeNote {
+  color: var(--fc-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.writeActions {
+  margin-top: 0;
+}
+
+.email {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  padding: 0.68rem 0.9rem;
+  border: 1px solid var(--fc-border-input);
+  border-radius: var(--control-radius);
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  font-size: 1rem;
+}
+
+.email::placeholder {
+  color: var(--fc-muted);
+}
+
+.email:focus-visible {
+  border-color: var(--fc-heading);
+  box-shadow: 0 0 0 3px rgb(var(--text-rgb) / 0.08);
+}
+
+.fieldError {
+  margin: 0;
+  color: var(--error-text);
+  font-size: 0.9rem;
+}
+
+.writeDone {
+  margin: 0.6rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--fc-border);
+  color: var(--fc-heading);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .writeActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Read result ─────────────────────────────────────────────────────── */
+
+.resultWrap {
+  margin-top: 3rem;
+  outline: none;
+}
+
+.result {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.resultHead {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.finding {
+  margin: 0;
+  color: var(--fc-heading);
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.2vw, 2rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.helper {
+  margin: 0;
+  color: var(--fc-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.contentType {
+  margin-right: 0.5em;
+  color: var(--fc-heading);
+  font-weight: 600;
+}
+
+.summary {
+  margin: 0;
+  max-width: 65ch;
+  color: var(--fc-body);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signals li {
+  padding: 0.22rem 0.6rem;
+  border: 1px solid var(--fc-border);
+  border-radius: calc(var(--control-radius) - 0.15rem);
+  color: var(--fc-body);
+  font-size: 0.86rem;
+}
+
+.evidence {
+  margin-top: 0.75rem;
+}
+
+.blockHeading {
+  margin: 0 0 0.2rem;
+  color: var(--fc-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.muted {
+  margin: 0;
+  color: var(--fc-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.more {
+  margin-top: 1rem;
+}
+
+.more details {
+  border-top: 1px solid var(--fc-border);
+}
+
+.more details:last-child {
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.more summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0;
+  color: var(--fc-heading);
+  font-size: 0.98rem;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.more summary::-webkit-details-marker {
+  display: none;
+}
+
+.more summary::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.2rem;
+  border-right: 1.5px solid var(--fc-muted);
+  border-bottom: 1.5px solid var(--fc-muted);
+  transform: rotate(45deg) translateY(-0.15rem);
+  transition: transform 200ms ease;
+}
+
+.more details[open] summary::after {
+  transform: rotate(225deg) translateY(-0.15rem);
+}
+
+.more summary:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(var(--text-rgb) / 0.18);
+}
+
+.more details p,
+.more details ul {
+  margin: 0 0 1rem;
+  color: var(--fc-body);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.more details ul {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1.1rem;
+}
+
+.more details a {
+  color: var(--fc-heading);
+  text-decoration: underline;
+  text-decoration-color: var(--fc-border-input);
+  text-underline-offset: 0.25em;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

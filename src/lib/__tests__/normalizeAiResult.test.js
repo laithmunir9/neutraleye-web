@@ -84,6 +84,15 @@ describe("parseAiResponse + normalizeAiResult", () => {
   });
 });
 
+test("the current non-directional value gets the same label as the legacy one", () => {
+  const normalized = normalizeAiResult(
+    parseAiResponse(JSON.stringify({ bias_level: "moderate", direction: "non-directional", analysis_confidence: 0.6, summary: "x" }))
+  );
+  expect(normalized.directionLabel).toBe("Unclear framing (non-directional)");
+  expect(normalized.directionLabel).not.toMatch(/bias/i);
+  expect(scoreFromBiasLevel("moderate", "non-directional")).toBe(0);
+});
+
 describe("driverLabelFromReason", () => {
   test("maps known taxonomy values to display labels", () => {
     expect(driverLabelFromReason("language")).toBe("Loaded wording");

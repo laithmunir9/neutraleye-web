@@ -1,5 +1,5 @@
 import Link from "next/link";
-import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import SiteShell from "@/components/SiteShell/SiteShell";
 import styles from "../legal.module.css";
 
 export const metadata = {
@@ -11,7 +11,7 @@ const LAST_UPDATED = "September 6, 2026";
 
 export default function TermsPage() {
   return (
-    <MarketingShell>
+    <SiteShell>
       <main className={styles.page}>
         <section className={styles.hero}>
           <h1>Terms & Conditions</h1>
@@ -54,8 +54,8 @@ export default function TermsPage() {
             <h2>Cost</h2>
             <p>
               NeutralEye is free to use. There is no paid tier, no subscription, and no payment flow. We do not collect
-              payment details and we do not charge for analyses. Usage is capped at a daily limit described on the{" "}
-              <Link href="/tools">Tools page</Link> rather than metered against a plan.
+              payment details and we do not charge for analyses. Usage is capped at a daily limit rather than metered
+              against a plan.
             </p>
             <p>
               If a paid offering is introduced in the future, these terms will be updated before it becomes available,
@@ -162,6 +162,6 @@ export default function TermsPage() {
           </article>
         </section>
       </main>
-    </MarketingShell>
+    </SiteShell>
   );
 }

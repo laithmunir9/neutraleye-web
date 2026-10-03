@@ -24,6 +24,32 @@ const csp = [
   "form-action 'self'",
 ].join("; ");
 
+// Retired public paths, all permanently redirected to the homepage. The first
+// group was removed in the 3 October 2026 restructure; the second had already
+// been retired and used to point at pages that are now gone themselves.
+// /for-comms, /pricing, /compare, /extension and /support were linked in
+// outreach, so never reuse them for anything else (see CLAUDE.md).
+const RETIRED_PATHS = [
+  "/about",
+  "/methodology",
+  "/how-it-works",
+  "/reports",
+  "/tools",
+  "/faq",
+  "/changelog",
+  "/overview",
+  "/system",
+  "/history",
+  "/settings",
+  "/blog",
+  "/blog/:slug*",
+  "/pricing",
+  "/compare",
+  "/extension",
+  "/support",
+  "/for-comms",
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   devIndicators: false,
@@ -56,33 +82,14 @@ const nextConfig = {
         destination: "https://tryneutraleye.com/:path*",
         permanent: true,
       },
-      // Pages removed in the site design pass. They were live and indexed, so
-      // they redirect to the page that now answers the same question rather
-      // than dead-ending a visitor arriving from search.
-      { source: "/pricing", destination: "/reports", permanent: true },
-      { source: "/compare", destination: "/reports", permanent: true },
-      { source: "/extension", destination: "/tools", permanent: true },
-      { source: "/support", destination: "/faq", permanent: true },
-      // Built when the homepage was still the old consumer site, so it had to
-      // carry the whole B2B argument alone. The homepage now makes that case
-      // with the same worked example in the current design system, and
-      // /how-it-works carries the positioning and delivery terms, so keeping it
-      // meant two pages saying one thing with one of them visually behind.
-      { source: "/for-comms", destination: "/", permanent: true },
-      // Unpublished: its whole argument was how to read a confidence score and
-      // a direction label, neither of which the analysis produces. /methodology
-      // covers how to read a result without either.
-      {
-        source: "/blog/what-confidence-scores-actually-measure",
-        destination: "/methodology",
-        permanent: true,
-      },
-      // Renamed so the banned phrase does not survive in the URL.
-      {
-        source: "/blog/how-to-detect-bias-in-news",
-        destination: "/blog/how-to-read-framing-in-news",
-        permanent: true,
-      },
+      // Retired pages. The site is the homepage tool plus legal pages, so
+      // every page that used to explain or sell it lands on the tool itself
+      // rather than dead-ending a visitor arriving from search or an old link.
+      // Each one points straight at "/" so no request takes two hops.
+      ...RETIRED_PATHS.map((source) => ({ source, destination: "/", permanent: true })),
+      // Its job moved onto the homepage. Next carries the query string across,
+      // so a saved /analyze?id= link opens the same result on "/".
+      { source: "/analyze", destination: "/", permanent: true },
     ];
   },
 };

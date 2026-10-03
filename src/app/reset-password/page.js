@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import MarketingShell from "@/components/MarketingShell/MarketingShell";
+import SiteShell from "@/components/SiteShell/SiteShell";
 import { createClient } from "@/lib/supabase/client";
 import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
 import shell from "../marketing.module.css";
 import form from "@/components/AuthDialog/AuthDialog.module.css";
-import styles from "../login/page.module.css";
+import styles from "./page.module.css";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
         return;
       }
       if (!data?.session) {
-        router.replace("/login");
+        router.replace("/?auth=signin");
       } else {
         setReady(true);
       }
@@ -53,14 +53,14 @@ export default function ResetPasswordPage() {
       setError(reportAuthError(authError, "password_update"));
       setLoading(false);
     } else {
-      router.push("/login?reset=success");
+      router.push("/?auth=signin&notice=reset");
     }
   }
 
   if (!ready) return null;
 
   return (
-    <MarketingShell>
+    <SiteShell hideAccount>
       <main className={shell.page}>
         <section className={styles.wrap}>
           <h1 className={styles.title}>Set a new password</h1>
@@ -101,12 +101,12 @@ export default function ResetPasswordPage() {
           </form>
 
           <div className={form.foot}>
-            <button type="button" className={form.switch} onClick={() => router.push("/login")}>
+            <button type="button" className={form.switch} onClick={() => router.push("/?auth=signin")}>
               Back to sign in
             </button>
           </div>
         </section>
       </main>
-    </MarketingShell>
+    </SiteShell>
   );
 }

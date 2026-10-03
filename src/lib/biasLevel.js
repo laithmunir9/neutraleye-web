@@ -24,6 +24,20 @@ export function isNoBiasLevel(biasLevel) {
   return String(biasLevel || "").trim().toLowerCase() === NO_BIAS;
 }
 
+/**
+ * The model's "no single direction" value. The prompt asked for
+ * "non-directional framing bias" until 3 October 2026 and "non-directional"
+ * since, so the reader-facing direction never carries the word "bias". Stored
+ * rows and cached results still hold the old string, so both match.
+ */
+export const NON_DIRECTIONAL = "non-directional";
+const LEGACY_NON_DIRECTIONAL = "non-directional framing bias";
+
+export function isNonDirectional(direction) {
+  const value = String(direction || "").trim().toLowerCase();
+  return value === NON_DIRECTIONAL || value === LEGACY_NON_DIRECTIONAL;
+}
+
 // Text-only fallback for the paths where no enum exists at all -- i.e. the model
 // returned unparseable JSON and only its prose survives. Keyed off the constants
 // above rather than literals so the copy stays in one place.

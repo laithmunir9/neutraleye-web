@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { logEvent, reportToSentry } from "./apiLog";
 import { assertUrlIsSafe, MAX_REDIRECTS } from "./ssrf";
-import { isNoBiasLevel, NO_BIAS_RESULT_TEXT } from "./biasLevel";
+import { isNoBiasLevel, isNonDirectional, NO_BIAS_RESULT_TEXT } from "./biasLevel";
 
 // Shared analysis pipeline used by both /api/analyze and /api/extension.
 // This is the single home of the article-detection and bias-analysis prompts —
@@ -200,6 +200,102 @@ Text:
   }
 }
 
+/*
+ * Reader-facing wording backstop. The prompt tells the model never to call an
+ * article biased, and it mostly complies, but sampled output still slipped in
+ * negatives ("without evident framing or bias") and the explanation field.
+ * NeutralEye describes framing; it does not label bias. So the fields a reader
+ * sees are rewritten into framing language before they leave this module.
+ *
+ * Ordered most specific first, so "framing or bias" collapses to "framing"
+ * rather than becoming "framing or framing". Only reader-facing fields are
+ * touched: biased_phrases quotes are verbatim article text and must never be
+ * edited, and the JSON keys are a fixed contract.
+ */
+const READER_WORDING = [
+  [/\b(?:framing|slant)\s+(?:or|and)\s+bias\b/gi, "framing"],
+  [/\bbias\s+(?:or|and)\s+(?:framing|slant)\b/gi, "framing"],
+  [/\bframing\s+bias\b/gi, "framing"],
+  [/\bwithout\s+(?:any\s+|evident\s+|clear\s+|obvious\s+|significant\s+|apparent\s+)?bias\b/gi, "without loaded framing"],
+  [/\bfree\s+(of|from)\s+bias\b/gi, "free $1 loaded framing"],
+  [/\bno\s+(evident\s+|clear\s+|obvious\s+|significant\s+|apparent\s+)?bias\b/gi, "no $1loaded framing"],
+  [/\bunbiased\b/gi, "even-handed"],
+  [/\bbiased\b/gi, "one-sided"],
+  [/\bbiases\b/gi, "framing choices"],
+  [/\bbias\b/gi, "framing"],
+  [/\bslanted\b/gi, "one-sided"],
+  [/\bslant\b/gi, "framing"],
+  [/\bpartisan\b/gi, "one-sided"],
+];
+// Placing an article on a spectrum cannot be reworded into something true, so
+// it is only counted, for the log; the prompt is the control for it.
+const SPECTRUM_TERMS = /\b(?:left|right)-leaning\b/i;
+
+function matchCase(original, replacement) {
+  return original[0] === original[0].toUpperCase() && original[0] !== original[0].toLowerCase()
+    ? replacement[0].toUpperCase() + replacement.slice(1)
+    : replacement;
+}
+
+export function scrubReaderText(value) {
+  if (typeof value !== "string" || !value) return { text: value, replaced: 0 };
+  let replaced = 0;
+  let text = value;
+  for (const [pattern, replacement] of READER_WORDING) {
+    text = text.replace(pattern, (match, ...groups) => {
+      replaced += 1;
+      const filled = replacement.replace(/\$(\d)/g, (_, n) => groups[Number(n) - 1] || "");
+      return matchCase(match, filled);
+    });
+  }
+  return { text, replaced };
+}
+
+const READER_FIELDS = ["summary", "explanation", "direction"];
+
+/*
+ * The schema shows direction as "toward <entity>" / "against <entity>", and the
+ * model sometimes returns the template unfilled. That string becomes the
+ * headline on both surfaces ("Moderate framing against <entity>"), so an
+ * unfilled placeholder is removed along with the preposition it hangs off.
+ * The framing level on its own is still true; an empty direction makes every
+ * label builder fall back to "<Level> framing" / "<Level> framing detected".
+ */
+export function stripDirectionPlaceholder(direction) {
+  if (typeof direction !== "string") return { text: direction, stripped: false };
+  const text = direction
+    .replace(/\s*(?:toward|towards|against)?\s*<[^>]*>/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  return { text, stripped: text !== direction.trim() };
+}
+
+/** Rewrites the reader-facing fields of the model's JSON in place; returns counts. */
+export function scrubReaderFields(json) {
+  const counts = { replaced: 0, spectrum: 0, placeholder: 0 };
+  if (!json || typeof json !== "object") return counts;
+  const { text: direction, stripped } = stripDirectionPlaceholder(json.direction);
+  if (stripped) {
+    json.direction = direction;
+    counts.placeholder += 1;
+  }
+  for (const field of READER_FIELDS) {
+    const { text, replaced } = scrubReaderText(json[field]);
+    json[field] = text;
+    counts.replaced += replaced;
+    if (SPECTRUM_TERMS.test(String(text || ""))) counts.spectrum += 1;
+  }
+  if (Array.isArray(json.recommendations)) {
+    json.recommendations = json.recommendations.map((item) => {
+      const { text, replaced } = scrubReaderText(item);
+      counts.replaced += replaced;
+      if (SPECTRUM_TERMS.test(String(text || ""))) counts.spectrum += 1;
+      return text;
+    });
+  }
+  return counts;
+}
+
 export async function generateBiasAnalysis(openai, text, requestId, sourceUrl = null) {
   logEvent("info", "openai.call.start", { requestId, operation: "generateBiasAnalysis" });
   const sourceDomain = sourceUrl ? extractDomain(sourceUrl) : null;
@@ -249,6 +345,13 @@ SUGGESTED_SOURCES RULES
 - Do NOT provide homepage links or general topic pages.
 - If you cannot verify relevant specific articles, use an empty array for suggested_sources.${sourceDomain ? `\n- Do NOT suggest ${sourceDomain} as a source — the article being analyzed is already from that outlet.` : ""}
 
+READER-FACING WORDING
+- "summary", "explanation", "recommendations", and "direction" are shown to readers. NeutralEye describes framing; it does not label articles as biased.
+- In those fields, never use the words "bias", "biased", "slant", "slanted", or "partisan", and never place the article or outlet on a political spectrum (no "left-leaning", "right-leaning", "liberal", "conservative" as a label for the article).
+- Describe what the writing does instead: framing, emphasis, loaded wording, one-sided sourcing, missing attribution, omission. For example, write "the journalist's framing favours one side" rather than "the article is biased".
+- The JSON key names below are fixed and must stay exactly as written, even though some contain the word "bias".
+- In "direction", replace <entity> with the actual person, group, institution or side the framing favours or disfavours, as named in the article (for example "against the city council"). Never output the angle brackets or the word "<entity>". If no single entity fits, use "non-directional".
+
 OUTPUT
 Respond with ONLY a valid JSON object. No prose, no markdown, no commentary outside the JSON.
 
@@ -256,17 +359,17 @@ Required schema:
 {
   "content_type": "news" | "opinion" | "analysis",
   "bias_level": "none" | "slight" | "moderate" | "heavy" | "uncertain",
-  "direction": "toward <entity>" | "against <entity>" | "non-directional framing bias" | "unknown",
+  "direction": "toward <entity>" | "against <entity>" | "non-directional" | "unknown",
   "analysis_confidence": <number 0.00–1.00>,
-  "summary": "<one or two neutral sentences. If bias_level is 'none', state plainly that the writing itself is neutral/clean. If bias_level is not 'none', state plainly that the journalist's writing shows meaningful bias and briefly why.>",
+  "summary": "<one or two neutral sentences in framing terms; do not use the word bias, even to deny it. If bias_level is 'none', say plainly that the journalist's own writing does not meaningfully frame the story. If bias_level is not 'none', state plainly how the journalist's own writing frames the story and briefly why, never calling it biased.>",
   "biased_phrases": [
     { "quote": "<exact excerpt of the journalist's own writing — never a quote attributed to a person in the article>", "why": "framing|language|source|attribution" }
   ],
   "suggested_sources": [
     { "title": "Article title here", "url": "https://outlet.com/article-path", "outlet": "Outlet Name" }
   ],
-  "recommendations": ["<procedural verification or reading suggestion>"],
-  "explanation": "<1–3 sentence rationale>"
+  "recommendations": ["<procedural verification or reading suggestion, in framing terms>"],
+  "explanation": "<1–3 sentence rationale in framing terms; do not use the word bias, even to deny it>"
 }
 
 Rules:
@@ -285,7 +388,18 @@ TEXT_FOR_ANALYSIS:
     });
     const content = (completion.choices?.[0]?.message?.content || "").trim();
     logEvent("info", "openai.call.end", { requestId, operation: "generateBiasAnalysis" });
-    return content;
+    let json;
+    try {
+      json = JSON.parse(content);
+    } catch {
+      return content; // Unparseable output takes the existing fallback paths untouched.
+    }
+    const counts = scrubReaderFields(json);
+    if (counts.replaced || counts.spectrum || counts.placeholder) {
+      // Logged so the rate is measurable: if it stays high, the prompt needs work.
+      logEvent("info", "analysis.reader_wording.rewritten", { requestId, ...counts });
+    }
+    return JSON.stringify(json);
   } catch (error) {
     logEvent("error", "openai.call.error", {
       requestId,
@@ -324,7 +438,7 @@ export function buildHumanResult(json) {
 
   const parts = [];
   const levelLabel = biasLevel ? `${biasLevel.charAt(0).toUpperCase()}${biasLevel.slice(1)} framing` : "Framing detected";
-  const directionText = direction && direction !== "unknown" ? ` ${direction}` : "";
+  const directionText = direction && direction !== "unknown" && !isNonDirectional(direction) ? ` ${direction}` : "";
   parts.push(`**Framing**\n${levelLabel}${directionText}.`);
 
   if (summary) parts.push(`**Summary**\n${summary}`);
