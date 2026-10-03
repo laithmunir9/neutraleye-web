@@ -200,7 +200,7 @@ When the model returns `bias_level === "none"`, every surface must show `NO_BIAS
 Neither is an SMTP-provider limit, so switching email provider moves neither one. An earlier assumption that leaving Supabase's built-in sender would relax these was wrong on both counts.
 
 **RLS:** Enabled on all three tables. `analyses`/`daily_usage` policies: users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`) — migration SQL at `supabase/migrations/20260601000000_rls_policies.sql`. `waitlist` has **no** anon INSERT policy at all — inserts go only through `public.join_waitlist(p_email text, p_source text default null)`, a `SECURITY DEFINER` function (validates email format, `ON CONFLICT DO NOTHING` for dedup) called via `supabase.rpc("join_waitlist", ...)` from `/api/waitlist/route.js`. This gives that one public, unauthenticated write path a privileged route without needing a service-role key — migration SQL at `supabase/migrations/20260727000000_waitlist_rls_tighten.sql`. (Fixed 2026-07-27: the previous `waitlist` INSERT policy was `WITH CHECK (true)`, letting any unauthenticated caller insert arbitrary rows directly — the weekly ops-check flagged it three times before this was closed.)
-  - **Expected advisories, not regressions:** `get_advisors` (security) now shows `anon_security_definer_function_executable` and `authenticated_security_definer_function_executable` for `join_waitlist`. That's inherent to this pattern — a `SECURITY DEFINER` function callable by `anon`/`authenticated` is exactly the intended design for a public signup RPC without a service-role key — and does not need fixing. Don't let these two read as new problems in a weekly ops-check report. `rls_policy_always_true` on `waitlist` was the actual bug; if that specific one ever reappears, that's the one to investigate.
+  - **Expected advisories, not regressions:** `get_advisors` (security) now shows `anon_security_definer_function_executable` and `authenticated_security_definer_function_executable` for `join_waitlist`. That's inherent to this pattern — a `SECURITY DEFINER` function callable by `anon`/`authenticated` is exactly the intended design for a public signup RPC without a service-role key — and does not need fixing. Don't let these two read as new problems the next time advisors are run. `rls_policy_always_true` on `waitlist` was the actual bug; if that specific one ever reappears, that's the one to investigate.
 
 **Client keys:** Publishable key only — no service role key. RLS must be correctly configured in Supabase dashboard. `join_waitlist` (see above) is how `waitlist` gets a privileged write path without introducing one.
 
@@ -344,14 +344,12 @@ and stay; a named advocacy organisation is not the subject and reads as a side
 being taken. `/reports` described one framing as "a defeat for AIPAC" until
 6 September 2026. The sweep's `NAMED ADVOCACY GROUP` category catches this.
 
-**The monthly check is not in this repo.** `neutraleye-positioning-check` is a
-Cowork routine, running on the 1st of each month, flag-only. Do not go looking
-for it on disk. It originally checked framing language and em dashes across the
-Chrome Web Store listing, the pricing page, and the FAQ; the pricing-page half
-went stale when that route started redirecting. It is being repointed at
-`scripts/positioning-sweep.mjs` with an updated scope. The Chrome Web Store
-listing stays part of that routine's job and not this script's, because it lives
-outside the repo.
+**Nothing runs this sweep on a schedule.** The monthly Cowork routine
+(`neutraleye-positioning-check`) that used to check external copy was deleted
+on 3 October 2026, along with every other routine; it does not exist, so do not
+go looking for it. Run the sweep by hand after copy changes. It reads the
+extension's `manifest.json` description, but the Chrome Web Store listing's long
+description lives only in the store dashboard and nothing checks it.
 
 **It is written against the rule, not a phrase list, and it must stay that way.**
 The sweep it replaced tested for four marketing taglines
