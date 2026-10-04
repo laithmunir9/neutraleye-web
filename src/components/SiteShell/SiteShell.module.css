@@ -45,6 +45,19 @@
   padding-top: max(1.1rem, env(safe-area-inset-top));
 }
 
+/* A short fade under the pinned header, so content scrolling up disappears
+   into it rather than being sliced by a hard edge. */
+.top::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 1.25rem;
+  background: linear-gradient(var(--page-bg), transparent);
+  pointer-events: none;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
