@@ -20,12 +20,6 @@
   backdrop-filter: blur(3px);
 }
 
-/* Keep the page behind still while the surface is up. iOS Safari otherwise
-   scrolls the page underneath a modal dialog. */
-:global(html:has(dialog[open])) {
-  overflow: hidden;
-}
-
 /* The surface rises into place rather than cutting in. */
 .dialog[open] .panel {
   animation: rise 220ms cubic-bezier(0.22, 1, 0.36, 1);

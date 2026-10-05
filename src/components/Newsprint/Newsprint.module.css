@@ -2,16 +2,6 @@
    the type is ink at very low alpha, so it reads as texture until a mark
    lands on it. */
 
-/* Overscroll and the iOS rubber band show the root, so paint it as paper
-   too, or a white band appears past the top and bottom of the page. */
-:global(html:has([data-newsprint])) {
-  background: var(--fc-surface);
-}
-
-:global(html:has([data-newsprint])) body {
-  background: transparent;
-}
-
 .newsprint {
   position: fixed;
   inset: 0;

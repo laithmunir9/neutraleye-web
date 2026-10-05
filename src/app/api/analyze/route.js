@@ -10,6 +10,7 @@ import {
   extractArticleTextFromUrl,
 } from "@/lib/analysis";
 import { normalizeAiResult, parseAiResponse } from "@/lib/normalizeAiResult";
+import { createAnalysisCache, textCacheKey, urlCacheKey } from "@/lib/analysisCache";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -32,7 +33,7 @@ const MIN_TEXT_LENGTH = Number(process.env.MIN_TEXT_LENGTH || 200);
 const MIN_EXTRACTED_TEXT_LENGTH = Number(process.env.MIN_EXTRACTED_TEXT_LENGTH || 300);
 
 // In-memory stores — reset on cold start (acceptable for serverless)
-const inMemoryCache = new Map();
+const inMemoryCache = createAnalysisCache();
 const rateLimitStore = new Map();
 const dailyLimitStore = new Map();
 
@@ -140,7 +141,13 @@ export async function POST(request) {
   const supabase = await createClient();
   const { data: { user: authUser } } = await supabase.auth.getUser();
   if (authUser) {
-    const dailyCount = await getUserDailyCount(supabase, authUser.id);
+    let dailyCount;
+    try {
+      dailyCount = await getUserDailyCount(supabase, authUser.id);
+    } catch (error) {
+      reportToSentry(error, "DAILY_USAGE_ERROR");
+      return errResponse(503, "Usage is temporarily unavailable.", "DAILY_USAGE_ERROR");
+    }
     if (dailyCount >= DAILY_ANALYSIS_LIMIT) {
       logEvent("warn", "daily_limit.reached", { requestId, userId: authUser.id, dailyCount });
       return errResponse(
@@ -184,17 +191,23 @@ export async function POST(request) {
       if (textError) return errResponse(400, textError, "VALIDATION_ERROR");
 
       const text = body.text.trim();
-      const key = `text:${text.slice(0, 500)}`;
-      if (inMemoryCache.has(key)) {
+      const key = textCacheKey(text);
+      const cached = !authUser && inMemoryCache.get(key);
+      if (cached) {
         logEvent("info", "cache.hit", { requestId, mode: "text" });
-        return Response.json(inMemoryCache.get(key));
+        return Response.json(cached);
       }
 
       logEvent("info", "analysis.start", { requestId, mode: "text", inputLength: text.length, ip });
       const result = await runAnalysisPipeline(text, requestId);
-      inMemoryCache.set(key, result);
+      if (!authUser) inMemoryCache.set(key, result);
       if (authUser) {
-        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
+        try {
+          await incrementUserDailyUsage(supabase);
+        } catch (error) {
+          logEvent("error", "daily_usage.increment_failed", { requestId, userId: authUser.id, message: String(error?.message || error) });
+          reportToSentry(error, "DAILY_USAGE_ERROR");
+        }
       }
       return Response.json(result);
     }
@@ -209,10 +222,11 @@ export async function POST(request) {
       if (urlError) return errResponse(400, urlError, "VALIDATION_ERROR");
 
       const url = body.url.trim();
-      const key = `url:${url}`;
-      if (inMemoryCache.has(key)) {
+      const key = urlCacheKey(url);
+      const cached = !authUser && inMemoryCache.get(key);
+      if (cached) {
         logEvent("info", "cache.hit", { requestId, mode: "url" });
-        return Response.json(inMemoryCache.get(key));
+        return Response.json(cached);
       }
 
       logEvent("info", "analysis.start", { requestId, mode: "url", url, ip });
@@ -241,9 +255,14 @@ export async function POST(request) {
       }
 
       const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle);
-      inMemoryCache.set(key, result);
+      if (!authUser) inMemoryCache.set(key, result);
       if (authUser) {
-        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
+        try {
+          await incrementUserDailyUsage(supabase);
+        } catch (error) {
+          logEvent("error", "daily_usage.increment_failed", { requestId, userId: authUser.id, message: String(error?.message || error) });
+          reportToSentry(error, "DAILY_USAGE_ERROR");
+        }
       }
       return Response.json(result);
     }

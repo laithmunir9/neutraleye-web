@@ -14,6 +14,7 @@ import {
 } from "@/lib/analysis";
 import { analysisMetaFields } from "@/lib/analysisMeta";
 import { isNoBiasLevel, isNonDirectional, NO_BIAS_LABEL } from "@/lib/biasLevel";
+import { createAnalysisCache, textCacheKey, urlCacheKey } from "@/lib/analysisCache";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -34,7 +35,7 @@ const RATE_LIMIT_WINDOW_MS = Number(process.env.EXT_RATE_LIMIT_WINDOW_MS || proc
 const RATE_LIMIT_MAX = Number(process.env.EXT_RATE_LIMIT_MAX || process.env.RATE_LIMIT_MAX || 5);
 
 // In-memory stores — reset on cold start (acceptable for serverless)
-const inMemoryCache = new Map();
+const inMemoryCache = createAnalysisCache();
 const rateLimitStore = new Map();
 const dailyLimitStore = new Map();
 
@@ -187,7 +188,13 @@ export async function POST(request) {
   // Daily cap — checked before any OpenAI spend. Returned as a normal result
   // (HTTP 200) so the currently shipped popup renders it as a readable message.
   if (authUser) {
-    const dailyCount = await getUserDailyCount(authedSupabase, authUser.id);
+    let dailyCount;
+    try {
+      dailyCount = await getUserDailyCount(authedSupabase, authUser.id);
+    } catch (error) {
+      reportToSentry(error, "DAILY_USAGE_ERROR");
+      return Response.json({ error: "Usage is temporarily unavailable.", code: "DAILY_USAGE_ERROR" }, { status: 503, headers });
+    }
     if (dailyCount >= DAILY_ANALYSIS_LIMIT) {
       logEvent("warn", "daily_limit.reached", { requestId, userId: authUser.id, dailyCount });
       return Response.json(
@@ -241,9 +248,10 @@ export async function POST(request) {
         return Response.json({ error: "Invalid URL. Must start with http:// or https://." }, { status: 400, headers });
       }
 
-      const cacheKey = `url:${url.trim()}`;
-      if (inMemoryCache.has(cacheKey)) {
-        return Response.json(inMemoryCache.get(cacheKey), { headers });
+      const cacheKey = urlCacheKey(url.trim());
+      const cached = !authUser && inMemoryCache.get(cacheKey);
+      if (cached) {
+        return Response.json(cached, { headers });
       }
 
       let extracted;
@@ -276,15 +284,18 @@ export async function POST(request) {
     // that branch reassigns text, so it still reflects what the client actually sent.
     if (hasText) text = composeAnalysisText(headline, text);
 
-    const cacheKey = hasUrl ? `url:${url}` : `text:${text.slice(0, 500)}`;
-    if (!authUser && inMemoryCache.has(cacheKey)) {
-      return Response.json(inMemoryCache.get(cacheKey), { headers });
+    // The extension sends both text and its source URL. Only URL mode, which
+    // actually fetches that page, may use a URL cache entry.
+    const cacheKey = hasText ? textCacheKey(text, hasUrl ? url.trim() : "") : urlCacheKey(url.trim());
+    const cached = !authUser && inMemoryCache.get(cacheKey);
+    if (cached) {
+      return Response.json(cached, { headers });
     }
 
     const verdict = await detectIfArticle(getOpenAI(), text, requestId);
     if (verdict !== "article") {
       const payload = { result: "⚠️ Could not analyze this page. Please open a real article and try again." };
-      inMemoryCache.set(cacheKey, payload);
+      if (!authUser) inMemoryCache.set(cacheKey, payload);
       return Response.json(payload, { headers });
     }
 
@@ -295,7 +306,7 @@ export async function POST(request) {
     const humanResult = buildHumanResult(parsedJson) || aiResponse;
     const contentType = contentTypeFromAiJson(parsedJson);
     const payload = { result: humanResult, contentType };
-    inMemoryCache.set(cacheKey, payload);
+    if (!authUser) inMemoryCache.set(cacheKey, payload);
 
     // Save to cloud history and track usage for authenticated users.
     // A failed save must not discard the analysis the user already paid the
@@ -305,7 +316,7 @@ export async function POST(request) {
       try {
         await Promise.all([
           saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null),
-          incrementUserDailyUsage(authedSupabase, authUser.id),
+          incrementUserDailyUsage(authedSupabase),
         ]);
         saved = true;
       } catch (error) {

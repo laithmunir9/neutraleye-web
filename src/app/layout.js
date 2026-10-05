@@ -1,16 +1,17 @@
 import "./globals.css";
-import { Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 
 /* One family throughout, per the approved homepage design: Source Serif 4 sets
    the headings, the body, and the small tracked labels. It replaces a Newsreader
    and Public Sans pairing, and before that "Iowan Old Style", a macOS-only
    system font that silently fell back to Palatino or Georgia everywhere else. */
-const serif = Source_Serif_4({
-  subsets: ["latin"],
+const serif = localFont({
+  src: [
+    { path: "../fonts/SourceSerif4-Latin-Roman.woff2", weight: "300 700", style: "normal" },
+    { path: "../fonts/SourceSerif4-Latin-Italic.woff2", weight: "300 700", style: "italic" },
+  ],
   display: "swap",
-  weight: ["300", "400", "600", "700"],
-  style: ["normal", "italic"],
   variable: "--font-source-serif",
 });
 import { Analytics } from "@vercel/analytics/next";
