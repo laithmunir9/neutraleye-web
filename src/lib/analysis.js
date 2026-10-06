@@ -1,6 +1,8 @@
 import * as cheerio from "cheerio";
+import http from "node:http";
+import https from "node:https";
 import { logEvent, reportToSentry } from "./apiLog";
-import { assertUrlIsSafe, MAX_REDIRECTS } from "./ssrf";
+import { resolveSafeAddress, MAX_REDIRECTS } from "./ssrf";
 import { isNoBiasLevel, isNonDirectional, NO_BIAS_RESULT_TEXT } from "./biasLevel";
 
 // Shared analysis pipeline used by both /api/analyze and /api/extension.
@@ -57,48 +59,96 @@ export function extractDomain(url) {
 
 const FETCH_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+export const MAX_HTML_BYTES = 2_000_000;
+
+function fetchValidatedPage(url, address, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(url);
+    const transport = parsed.protocol === "https:" ? https : http;
+    let settled = false;
+    let timer;
+    const finish = (error, result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (error) reject(error);
+      else resolve(result);
+    };
+    const req = transport.get(parsed, {
+      headers: {
+        "User-Agent": FETCH_USER_AGENT,
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Encoding": "identity",
+      },
+      // Keep Host and TLS verification tied to the URL while connecting only
+      // to the address that passed the SSRF check.
+      lookup: (_hostname, _options, callback) => callback(null, address.address, address.family),
+    }, (response) => {
+      const status = response.statusCode || 0;
+      if (status >= 300 && status < 400 && response.headers.location) {
+        response.resume();
+        finish(null, { redirect: new URL(response.headers.location, parsed).toString() });
+        return;
+      }
+      if (status < 200 || status >= 300) {
+        response.resume();
+        const error = new Error(`Fetch failed with status ${status}`);
+        error.code = "URL_FETCH_FAILED";
+        error.status = status;
+        finish(error);
+        return;
+      }
+
+      const contentLength = Number(response.headers["content-length"]);
+      if (contentLength > MAX_HTML_BYTES ||
+          ![undefined, "identity"].includes(response.headers["content-encoding"])) {
+        response.destroy();
+        const error = new Error("The requested page is too large or compressed.");
+        error.code = "URL_FETCH_FAILED";
+        error.status = 413;
+        finish(error);
+        return;
+      }
+
+      const chunks = [];
+      let bytes = 0;
+      response.on("data", (chunk) => {
+        bytes += chunk.length;
+        if (bytes > MAX_HTML_BYTES) {
+          response.destroy();
+          const error = new Error("The requested page is too large.");
+          error.code = "URL_FETCH_FAILED";
+          error.status = 413;
+          finish(error);
+          return;
+        }
+        chunks.push(chunk);
+      });
+      response.on("end", () => finish(null, { html: Buffer.concat(chunks).toString("utf8") }));
+      response.on("error", (error) => finish(error));
+    });
+
+    req.on("error", (error) => finish(error));
+    timer = setTimeout(() => {
+      const error = new Error("Timed out while fetching URL content.");
+      error.code = "URL_FETCH_TIMEOUT";
+      req.destroy(error);
+      finish(error);
+    }, timeoutMs);
+  });
+}
 
 export async function fetchHtml(url, timeoutMs = 12000) {
   let currentUrl = url;
 
   for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects++) {
-    await assertUrlIsSafe(currentUrl);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(currentUrl, {
-        method: "GET",
-        redirect: "manual",
-        signal: controller.signal,
-        headers: {
-          "User-Agent": FETCH_USER_AGENT,
-          Accept: "text/html,application/xhtml+xml",
-        },
-      });
-
-      if (response.status >= 300 && response.status < 400 && response.headers.get("location")) {
-        currentUrl = new URL(response.headers.get("location"), currentUrl).toString();
-        continue;
-      }
-
-      if (!response.ok) {
-        const error = new Error(`Fetch failed with status ${response.status}`);
-        error.code = "URL_FETCH_FAILED";
-        error.status = response.status;
-        throw error;
-      }
-      return await response.text();
-    } catch (error) {
-      if (error?.name === "AbortError") {
-        const e = new Error("Timed out while fetching URL content.");
-        e.code = "URL_FETCH_TIMEOUT";
-        throw e;
-      }
-      throw error;
-    } finally {
-      clearTimeout(timeoutId);
+    const address = await resolveSafeAddress(currentUrl);
+    const page = await fetchValidatedPage(currentUrl, address, timeoutMs);
+    if (page.redirect) {
+      currentUrl = page.redirect;
+      continue;
     }
+    return page.html;
   }
 
   const error = new Error("Too many redirects while fetching URL content.");

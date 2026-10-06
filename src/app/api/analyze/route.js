@@ -10,6 +10,7 @@ import {
   extractArticleTextFromUrl,
 } from "@/lib/analysis";
 import { normalizeAiResult, parseAiResponse } from "@/lib/normalizeAiResult";
+import { createAnalysisCache, textCacheKey, urlCacheKey } from "@/lib/analysisCache";
 
 // Vercel: allow up to 60s for OpenAI calls (requires Pro plan; hobby cap is 10s)
 export const maxDuration = 60;
@@ -32,7 +33,7 @@ const MIN_TEXT_LENGTH = Number(process.env.MIN_TEXT_LENGTH || 200);
 const MIN_EXTRACTED_TEXT_LENGTH = Number(process.env.MIN_EXTRACTED_TEXT_LENGTH || 300);
 
 // In-memory stores — reset on cold start (acceptable for serverless)
-const inMemoryCache = new Map();
+const inMemoryCache = createAnalysisCache();
 const rateLimitStore = new Map();
 const dailyLimitStore = new Map();
 
@@ -76,7 +77,7 @@ function validateUrlInput(value) {
 
 // ── Analysis pipeline ──────────────────────────────────────────────────────
 
-async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle = null) {
+async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle = null, reserveUsage = null) {
   const verdict = await detectIfArticle(getOpenAI(), text, requestId);
   if (verdict !== "article") {
     const error = new Error("Submitted content does not look like a readable article.");
@@ -84,6 +85,7 @@ async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle 
     error.code = "ARTICLE_VALIDATION_FAILED";
     throw error;
   }
+  if (reserveUsage) await reserveUsage();
   const aiResponse = await generateBiasAnalysis(getOpenAI(), text, requestId, sourceUrl);
   const parsed = parseAiResponse(aiResponse);
   const normalized = normalizeAiResult(parsed);
@@ -140,7 +142,13 @@ export async function POST(request) {
   const supabase = await createClient();
   const { data: { user: authUser } } = await supabase.auth.getUser();
   if (authUser) {
-    const dailyCount = await getUserDailyCount(supabase, authUser.id);
+    let dailyCount;
+    try {
+      dailyCount = await getUserDailyCount(supabase, authUser.id);
+    } catch (error) {
+      reportToSentry(error, "DAILY_USAGE_ERROR");
+      return errResponse(503, "Usage is temporarily unavailable.", "DAILY_USAGE_ERROR");
+    }
     if (dailyCount >= DAILY_ANALYSIS_LIMIT) {
       logEvent("warn", "daily_limit.reached", { requestId, userId: authUser.id, dailyCount });
       return errResponse(
@@ -184,18 +192,16 @@ export async function POST(request) {
       if (textError) return errResponse(400, textError, "VALIDATION_ERROR");
 
       const text = body.text.trim();
-      const key = `text:${text.slice(0, 500)}`;
-      if (inMemoryCache.has(key)) {
+      const key = textCacheKey(text);
+      const cached = !authUser && inMemoryCache.get(key);
+      if (cached) {
         logEvent("info", "cache.hit", { requestId, mode: "text" });
-        return Response.json(inMemoryCache.get(key));
+        return Response.json(cached);
       }
 
       logEvent("info", "analysis.start", { requestId, mode: "text", inputLength: text.length, ip });
-      const result = await runAnalysisPipeline(text, requestId);
-      inMemoryCache.set(key, result);
-      if (authUser) {
-        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
-      }
+      const result = await runAnalysisPipeline(text, requestId, null, null, authUser ? () => incrementUserDailyUsage(supabase) : null);
+      if (!authUser) inMemoryCache.set(key, result);
       return Response.json(result);
     }
 
@@ -209,10 +215,11 @@ export async function POST(request) {
       if (urlError) return errResponse(400, urlError, "VALIDATION_ERROR");
 
       const url = body.url.trim();
-      const key = `url:${url}`;
-      if (inMemoryCache.has(key)) {
+      const key = urlCacheKey(url);
+      const cached = !authUser && inMemoryCache.get(key);
+      if (cached) {
         logEvent("info", "cache.hit", { requestId, mode: "url" });
-        return Response.json(inMemoryCache.get(key));
+        return Response.json(cached);
       }
 
       logEvent("info", "analysis.start", { requestId, mode: "url", url, ip });
@@ -240,11 +247,8 @@ export async function POST(request) {
         return errResponse(422, "Could not extract enough readable article text from that URL.", "URL_EXTRACTION_TOO_SHORT");
       }
 
-      const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle);
-      inMemoryCache.set(key, result);
-      if (authUser) {
-        await incrementUserDailyUsage(supabase, authUser.id).catch(() => {});
-      }
+      const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle, authUser ? () => incrementUserDailyUsage(supabase) : null);
+      if (!authUser) inMemoryCache.set(key, result);
       return Response.json(result);
     }
 
@@ -257,7 +261,7 @@ export async function POST(request) {
       errorCode,
       message: String(error?.message || error),
     });
-    reportToSentry(error, errorCode);
+    if (errorCode !== "DAILY_LIMIT_REACHED") reportToSentry(error, errorCode);
     if (error?.status && error?.code) {
       return errResponse(error.status, error.message, error.code);
     }

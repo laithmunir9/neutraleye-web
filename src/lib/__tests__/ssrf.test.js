@@ -1,4 +1,4 @@
-import { assertUrlIsSafe, isBlockedIp } from "@/lib/ssrf";
+import { assertUrlIsSafe, isBlockedIp, resolveSafeAddress } from "@/lib/ssrf";
 
 describe("isBlockedIp", () => {
   test.each([
@@ -17,6 +17,10 @@ describe("isBlockedIp", () => {
     ["fc00::1", true],
     ["fd12:3456::1", true],
     ["::ffff:127.0.0.1", true],
+    ["::ffff:7f00:1", true],
+    ["::ffff:a00:5", true],
+    ["::ffff:c0a8:101", true],
+    ["::ffff:808:808", false],
     // public addresses
     ["1.1.1.1", false],
     ["8.8.8.8", false],
@@ -31,6 +35,7 @@ describe("isBlockedIp", () => {
 describe("assertUrlIsSafe", () => {
   test("allows a normal public https URL", async () => {
     await expect(assertUrlIsSafe("https://1.1.1.1/")).resolves.toBeUndefined();
+    await expect(resolveSafeAddress("https://1.1.1.1/")).resolves.toEqual({ address: "1.1.1.1", family: 4 });
   });
 
   test("rejects loopback IP literals", async () => {
@@ -57,5 +62,6 @@ describe("assertUrlIsSafe", () => {
 
   test("rejects bracketed IPv6 loopback literal", async () => {
     await expect(assertUrlIsSafe("http://[::1]/")).rejects.toMatchObject({ code: "URL_BLOCKED" });
+    await expect(assertUrlIsSafe("http://[::ffff:7f00:1]/")).rejects.toMatchObject({ code: "URL_BLOCKED" });
   });
 });

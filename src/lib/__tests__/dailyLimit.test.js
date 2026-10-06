@@ -4,22 +4,15 @@
 jest.mock("@upstash/redis", () => ({ Redis: class {} }));
 jest.mock("@upstash/ratelimit", () => ({ Ratelimit: class {} }));
 
-// Minimal chainable stand-in for the Supabase client. Every builder method
-// returns the builder; maybeSingle() resolves to { data }; update()/insert()
-// record their payloads. The builder is thenable so `await ...eq().eq()` and
-// `await ...insert()` resolve like a real query.
-function makeSupabaseMock({ existing }) {
-  const calls = { updates: [], inserts: [] };
+// Minimal chainable stand-in for the read-only usage query.
+function makeSupabaseMock({ existing, error = null }) {
   const builder = {
     from: () => builder,
     select: () => builder,
     eq: () => builder,
-    maybeSingle: async () => ({ data: existing ?? null }),
-    update: (payload) => { calls.updates.push(payload); return builder; },
-    insert: (payload) => { calls.inserts.push(payload); return builder; },
-    then: (resolve) => resolve({ data: null, error: null }),
+    maybeSingle: async () => ({ data: existing ?? null, error }),
   };
-  return { supabase: builder, calls };
+  return builder;
 }
 
 describe("checkIpDailyLimit", () => {
@@ -46,34 +39,46 @@ describe("getUserDailyCount", () => {
 
   test("returns the stored count when a row exists", async () => {
     const { getUserDailyCount } = require("@/lib/dailyLimit");
-    const { supabase } = makeSupabaseMock({ existing: { count: 5 } });
+    const supabase = makeSupabaseMock({ existing: { count: 5 } });
     expect(await getUserDailyCount(supabase, "u1")).toBe(5);
   });
 
   test("returns 0 when no row exists", async () => {
     const { getUserDailyCount } = require("@/lib/dailyLimit");
-    const { supabase } = makeSupabaseMock({ existing: null });
+    const supabase = makeSupabaseMock({ existing: null });
     expect(await getUserDailyCount(supabase, "u1")).toBe(0);
+  });
+
+  test("fails closed when the usage query fails", async () => {
+    const { getUserDailyCount } = require("@/lib/dailyLimit");
+    const error = new Error("database unavailable");
+    await expect(getUserDailyCount(makeSupabaseMock({ existing: null, error }), "u1")).rejects.toThrow(error);
   });
 });
 
 describe("incrementUserDailyUsage", () => {
-  beforeEach(() => jest.resetModules());
-
-  test("increments an existing row by one", async () => {
-    const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
-    const { supabase, calls } = makeSupabaseMock({ existing: { count: 4 } });
-    await incrementUserDailyUsage(supabase, "u1");
-    expect(calls.updates).toEqual([{ count: 5 }]);
-    expect(calls.inserts).toHaveLength(0);
+  beforeEach(() => {
+    jest.resetModules();
+    process.env.DAILY_ANALYSIS_LIMIT = "10";
   });
 
-  test("inserts a new row with count 1 when none exists", async () => {
+  test("uses the atomic account-scoped RPC", async () => {
     const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
-    const { supabase, calls } = makeSupabaseMock({ existing: null });
-    await incrementUserDailyUsage(supabase, "u1");
-    expect(calls.inserts).toHaveLength(1);
-    expect(calls.inserts[0]).toMatchObject({ user_id: "u1", count: 1 });
-    expect(calls.updates).toHaveLength(0);
+    const supabase = { rpc: jest.fn().mockResolvedValue({ data: 5, error: null }) };
+    expect(await incrementUserDailyUsage(supabase)).toBe(5);
+    expect(supabase.rpc).toHaveBeenCalledWith("increment_daily_usage", { p_limit: 10 });
+  });
+
+  test("surfaces accounting failures", async () => {
+    const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
+    const error = new Error("RPC unavailable");
+    const supabase = { rpc: jest.fn().mockResolvedValue({ data: null, error }) };
+    await expect(incrementUserDailyUsage(supabase)).rejects.toMatchObject({ code: "DAILY_USAGE_ERROR", status: 503 });
+  });
+
+  test("maps an atomic reservation refusal to the daily limit response", async () => {
+    const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
+    const supabase = { rpc: jest.fn().mockResolvedValue({ data: null, error: { code: "P4290" } }) };
+    await expect(incrementUserDailyUsage(supabase)).rejects.toMatchObject({ code: "DAILY_LIMIT_REACHED", status: 429 });
   });
 });

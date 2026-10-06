@@ -21,26 +21,26 @@ export async function checkIpDailyLimit(ip, fallbackStore) {
 // Current calendar-day (UTC) usage count for a signed-in user.
 export async function getUserDailyCount(supabase, userId) {
   const today = new Date().toISOString().slice(0, 10);
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("daily_usage")
     .select("count")
     .eq("user_id", userId)
     .eq("usage_date", today)
     .maybeSingle();
+  if (error) throw error;
   return data?.count ?? 0;
 }
 
-export async function incrementUserDailyUsage(supabase, userId) {
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: existing } = await supabase
-    .from("daily_usage")
-    .select("count")
-    .eq("user_id", userId)
-    .eq("usage_date", today)
-    .maybeSingle();
-  if (existing) {
-    await supabase.from("daily_usage").update({ count: existing.count + 1 }).eq("user_id", userId).eq("usage_date", today);
-  } else {
-    await supabase.from("daily_usage").insert({ user_id: userId, usage_date: today, count: 1 });
+export async function incrementUserDailyUsage(supabase) {
+  const { data, error } = await supabase.rpc("increment_daily_usage", { p_limit: DAILY_ANALYSIS_LIMIT });
+  if (error) {
+    const limitReached = error.code === "P4290";
+    const failure = new Error(limitReached
+      ? `You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`
+      : "Usage is temporarily unavailable.", { cause: error });
+    failure.code = limitReached ? "DAILY_LIMIT_REACHED" : "DAILY_USAGE_ERROR";
+    failure.status = limitReached ? 429 : 503;
+    throw failure;
   }
+  return data;
 }

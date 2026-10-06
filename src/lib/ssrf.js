@@ -6,12 +6,8 @@ import { isIP } from "node:net";
 // extraction) to block requests to loopback, link-local, private, and
 // cloud-metadata addresses.
 //
-// Note: this re-checks on every redirect hop, but does not pin the resolved
-// IP for the actual connection — a DNS-rebinding attacker who can change a
-// hostname's resolution between this check and the fetch itself could still
-// bypass it. That requires attacker-controlled DNS with a very short TTL and
-// precise timing; closing it fully would require a custom fetch dispatcher
-// that connects directly to the validated IP.
+// The caller uses the returned address for the actual connection, so DNS
+// cannot change the destination between validation and the request.
 
 export const MAX_REDIRECTS = 5;
 
@@ -41,8 +37,15 @@ function isBlockedIpv6(ip) {
   if (normalized === "::1" || normalized === "::") return true; // loopback / unspecified
   if (/^fe[89ab][0-9a-f]:/.test(normalized)) return true; // link-local fe80::/10
   if (/^f[cd][0-9a-f]{2}:/.test(normalized)) return true; // unique local fc00::/7
-  const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (mapped) return isBlockedIpv4(mapped[1]);
+  const mappedDotted = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mappedDotted) return isBlockedIpv4(mappedDotted[1]);
+  // WHATWG URL canonicalizes IPv4-mapped literals to hexadecimal groups.
+  const mappedHex = normalized.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (mappedHex) {
+    const high = parseInt(mappedHex[1], 16);
+    const low = parseInt(mappedHex[2], 16);
+    return isBlockedIpv4(`${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`);
+  }
   return false;
 }
 
@@ -61,7 +64,7 @@ function blockedError() {
 
 // Throws (code: "URL_BLOCKED") if the URL's protocol isn't http/https, or if
 // the hostname resolves to (or is) a blocked IP address.
-export async function assertUrlIsSafe(rawUrl) {
+export async function resolveSafeAddress(rawUrl) {
   const parsed = new URL(rawUrl);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw blockedError();
@@ -71,16 +74,21 @@ export async function assertUrlIsSafe(rawUrl) {
 
   let addresses;
   if (isIP(hostname)) {
-    addresses = [hostname];
+    addresses = [{ address: hostname, family: isIP(hostname) }];
   } else {
     try {
-      addresses = (await dns.promises.lookup(hostname, { all: true, verbatim: true })).map((r) => r.address);
+      addresses = await dns.promises.lookup(hostname, { all: true, verbatim: true });
     } catch {
       throw blockedError();
     }
   }
 
-  if (!addresses.length || addresses.some(isBlockedIp)) {
+  if (!addresses.length || addresses.some(({ address }) => isBlockedIp(address))) {
     throw blockedError();
   }
+  return addresses[0];
+}
+
+export async function assertUrlIsSafe(rawUrl) {
+  await resolveSafeAddress(rawUrl);
 }

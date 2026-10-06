@@ -7,7 +7,7 @@ export const metadata = {
   description: "How the NeutralEye browser extension handles article and browser data."
 };
 
-const LAST_UPDATED = "June 25, 2026";
+const LAST_UPDATED = "October 5, 2026";
 
 export default function ExtensionPrivacyPage() {
   return (
@@ -140,7 +140,9 @@ export default function ExtensionPrivacyPage() {
               <li>The URL and title of analyzed articles, stored as part of the analysis record.</li>
               <li>Daily usage count for rate limiting.</li>
             </ul>
-            <p>If you use the extension without signing in, no user data is stored on our servers. The analysis request is processed, the result is returned to your browser, and no record is retained.</p>
+            <p>
+              If you use the extension without signing in, no account-linked analysis is saved. The service may keep a result in server memory for up to 10 minutes to respond to repeated requests. An IP-based counter helps enforce usage limits, and operational logs may contain request metadata.
+            </p>
           </article>
 
           <article>
@@ -149,7 +151,7 @@ export default function ExtensionPrivacyPage() {
               <li><strong>Locally stored data</strong> remains in your browser until you sign out, clear browser storage, or uninstall the extension.</li>
               <li><strong>Account data and saved analyses</strong> are retained for as long as your NeutralEye account is active. When you delete your account, all associated data (email, saved analyses, usage records) is permanently deleted from our servers.</li>
               <li><strong>Server-side operational records</strong> (error logs, security logs) are retained only as long as reasonably necessary for security, debugging, and legal compliance, and are then deleted.</li>
-              <li><strong>Anonymous analysis requests</strong> (from users who are not signed in) are not stored on our servers after the response is returned.</li>
+              <li><strong>Anonymous analysis requests</strong> are not saved to an account. Temporary result caches expire within 10 minutes; usage counters and operational logs may be retained for the purposes described above.</li>
             </ul>
           </article>
 

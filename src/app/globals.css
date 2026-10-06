@@ -3,6 +3,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* These selectors affect the document root, so they belong in the global
+   stylesheet rather than a CSS module. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+html:has([data-newsprint]) {
+  background: var(--fc-surface);
+}
+
+html:has([data-newsprint]) body {
+  background: transparent;
+}
+
 :root {
   --bg: #ffffff;
   --surface: rgb(255 255 255 / 0.94);
