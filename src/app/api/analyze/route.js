@@ -77,7 +77,7 @@ function validateUrlInput(value) {
 
 // ── Analysis pipeline ──────────────────────────────────────────────────────
 
-async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle = null) {
+async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle = null, reserveUsage = null) {
   const verdict = await detectIfArticle(getOpenAI(), text, requestId);
   if (verdict !== "article") {
     const error = new Error("Submitted content does not look like a readable article.");
@@ -85,6 +85,7 @@ async function runAnalysisPipeline(text, requestId, sourceUrl = null, pageTitle 
     error.code = "ARTICLE_VALIDATION_FAILED";
     throw error;
   }
+  if (reserveUsage) await reserveUsage();
   const aiResponse = await generateBiasAnalysis(getOpenAI(), text, requestId, sourceUrl);
   const parsed = parseAiResponse(aiResponse);
   const normalized = normalizeAiResult(parsed);
@@ -199,16 +200,8 @@ export async function POST(request) {
       }
 
       logEvent("info", "analysis.start", { requestId, mode: "text", inputLength: text.length, ip });
-      const result = await runAnalysisPipeline(text, requestId);
+      const result = await runAnalysisPipeline(text, requestId, null, null, authUser ? () => incrementUserDailyUsage(supabase) : null);
       if (!authUser) inMemoryCache.set(key, result);
-      if (authUser) {
-        try {
-          await incrementUserDailyUsage(supabase);
-        } catch (error) {
-          logEvent("error", "daily_usage.increment_failed", { requestId, userId: authUser.id, message: String(error?.message || error) });
-          reportToSentry(error, "DAILY_USAGE_ERROR");
-        }
-      }
       return Response.json(result);
     }
 
@@ -254,16 +247,8 @@ export async function POST(request) {
         return errResponse(422, "Could not extract enough readable article text from that URL.", "URL_EXTRACTION_TOO_SHORT");
       }
 
-      const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle);
+      const result = await runAnalysisPipeline(extracted, requestId, url, pageTitle, authUser ? () => incrementUserDailyUsage(supabase) : null);
       if (!authUser) inMemoryCache.set(key, result);
-      if (authUser) {
-        try {
-          await incrementUserDailyUsage(supabase);
-        } catch (error) {
-          logEvent("error", "daily_usage.increment_failed", { requestId, userId: authUser.id, message: String(error?.message || error) });
-          reportToSentry(error, "DAILY_USAGE_ERROR");
-        }
-      }
       return Response.json(result);
     }
 
@@ -276,7 +261,7 @@ export async function POST(request) {
       errorCode,
       message: String(error?.message || error),
     });
-    reportToSentry(error, errorCode);
+    if (errorCode !== "DAILY_LIMIT_REACHED") reportToSentry(error, errorCode);
     if (error?.status && error?.code) {
       return errResponse(error.status, error.message, error.code);
     }

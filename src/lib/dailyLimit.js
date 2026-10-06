@@ -32,7 +32,15 @@ export async function getUserDailyCount(supabase, userId) {
 }
 
 export async function incrementUserDailyUsage(supabase) {
-  const { data, error } = await supabase.rpc("increment_daily_usage");
-  if (error) throw error;
+  const { data, error } = await supabase.rpc("increment_daily_usage", { p_limit: DAILY_ANALYSIS_LIMIT });
+  if (error) {
+    const limitReached = error.code === "P4290";
+    const failure = new Error(limitReached
+      ? `You've reached today's limit of ${DAILY_ANALYSIS_LIMIT} analyses. Your limit resets tomorrow.`
+      : "Usage is temporarily unavailable.", { cause: error });
+    failure.code = limitReached ? "DAILY_LIMIT_REACHED" : "DAILY_USAGE_ERROR";
+    failure.status = limitReached ? 429 : 503;
+    throw failure;
+  }
   return data;
 }

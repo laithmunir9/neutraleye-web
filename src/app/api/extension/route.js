@@ -299,6 +299,19 @@ export async function POST(request) {
       return Response.json(payload, { headers });
     }
 
+    if (authUser) {
+      try {
+        await incrementUserDailyUsage(authedSupabase);
+      } catch (error) {
+        if (error?.code === "DAILY_LIMIT_REACHED") {
+          return Response.json({ result: `⚠️ ${error.message}`, code: error.code, limited: true, saved: false, tokenExpired }, { headers });
+        }
+        logEvent("error", "daily_usage.reserve_failed", { requestId, userId: authUser.id, message: String(error?.cause?.message || error?.message || error) });
+        reportToSentry(error, "DAILY_USAGE_ERROR");
+        return Response.json({ error: "Usage is temporarily unavailable.", code: "DAILY_USAGE_ERROR" }, { status: 503, headers });
+      }
+    }
+
     const aiResponse = await generateBiasAnalysis(getOpenAI(), text, requestId, hasUrl ? url : null);
     let parsedJson = null;
     try { parsedJson = JSON.parse(aiResponse); } catch { parsedJson = null; }
@@ -314,10 +327,7 @@ export async function POST(request) {
     let saved = false;
     if (authUser) {
       try {
-        await Promise.all([
-          saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null),
-          incrementUserDailyUsage(authedSupabase),
-        ]);
+        await saveAnalysisToCloud(authedSupabase, authUser.id, parsedJson, hasUrl ? url : null, headline || null);
         saved = true;
       } catch (error) {
         logEvent("error", "save.analysis.nonfatal", { requestId, userId: authUser.id, message: String(error?.message || error) });

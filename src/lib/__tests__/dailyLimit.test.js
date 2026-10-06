@@ -57,19 +57,28 @@ describe("getUserDailyCount", () => {
 });
 
 describe("incrementUserDailyUsage", () => {
-  beforeEach(() => jest.resetModules());
+  beforeEach(() => {
+    jest.resetModules();
+    process.env.DAILY_ANALYSIS_LIMIT = "10";
+  });
 
   test("uses the atomic account-scoped RPC", async () => {
     const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
     const supabase = { rpc: jest.fn().mockResolvedValue({ data: 5, error: null }) };
     expect(await incrementUserDailyUsage(supabase)).toBe(5);
-    expect(supabase.rpc).toHaveBeenCalledWith("increment_daily_usage");
+    expect(supabase.rpc).toHaveBeenCalledWith("increment_daily_usage", { p_limit: 10 });
   });
 
   test("surfaces accounting failures", async () => {
     const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
     const error = new Error("RPC unavailable");
     const supabase = { rpc: jest.fn().mockResolvedValue({ data: null, error }) };
-    await expect(incrementUserDailyUsage(supabase)).rejects.toThrow(error);
+    await expect(incrementUserDailyUsage(supabase)).rejects.toMatchObject({ code: "DAILY_USAGE_ERROR", status: 503 });
+  });
+
+  test("maps an atomic reservation refusal to the daily limit response", async () => {
+    const { incrementUserDailyUsage } = require("@/lib/dailyLimit");
+    const supabase = { rpc: jest.fn().mockResolvedValue({ data: null, error: { code: "P4290" } }) };
+    await expect(incrementUserDailyUsage(supabase)).rejects.toMatchObject({ code: "DAILY_LIMIT_REACHED", status: 429 });
   });
 });
