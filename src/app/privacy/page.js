@@ -7,7 +7,7 @@ export const metadata = {
   description: "How NeutralEye handles information submitted through the website."
 };
 
-const LAST_UPDATED = "September 6, 2026";
+const LAST_UPDATED = "October 6, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -82,7 +82,8 @@ export default function PrivacyPage() {
             </p>
             <p>
               If you use NeutralEye without signing in, analysis history is stored only in your local browser and
-              remains on your device. You can clear it through your browser settings.
+              remains on your device. You can clear it through your browser settings. The analysis server may keep
+              a result in memory for up to 10 minutes to respond to repeated anonymous requests.
             </p>
           </article>
 
@@ -91,9 +92,9 @@ export default function PrivacyPage() {
             <p>
               Account data is retained for as long as your account is active. Locally saved results remain in your
               browser until you delete them or clear browser storage. Cloud-saved results are retained while your
-              account exists and deleted when you delete your account. Server-side operational records, if created,
-              are kept only as long as reasonably needed to operate, secure, debug, or comply with legal obligations
-              for the service.
+              account exists and deleted when you delete your account. Temporary anonymous result caches expire
+              within 10 minutes. IP-based usage counters and server-side operational records may be kept as long as
+              reasonably needed to operate, secure, debug, or comply with legal obligations for the service.
             </p>
           </article>
 
