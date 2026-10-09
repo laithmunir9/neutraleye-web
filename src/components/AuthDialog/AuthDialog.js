@@ -133,7 +133,11 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
     : "Saves your reads across devices. NeutralEye works without an account either way.";
   if (confirmed) {
     title = "Check your email";
-    blurb = `A confirmation link is on its way to ${email}. It works for one hour.`;
+    // Covers both outcomes without saying which happened. For an address that
+    // already has an account Supabase sends nothing (a decoy response, see
+    // classifySignUpResult), so this must give existing users a way forward
+    // without confirming to a stranger that the address is taken.
+    blurb = `If ${email} is new to NeutralEye, a confirmation link is on its way (check spam too); it works for one hour. If you already have an account with this address, no email is sent: sign in instead.`;
   } else if (isForgot && forgotSent) {
     title = "Reset link sent";
     blurb = `If an account exists for ${email}, a reset link is on its way. It works for one hour.`;

@@ -7,7 +7,7 @@ export const metadata = {
   description: "How NeutralEye handles information submitted through the website."
 };
 
-const LAST_UPDATED = "October 6, 2026";
+const LAST_UPDATED = "October 9, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
             <ul>
               <li>Provide article extraction, framing analysis, and structured output.</li>
               <li>Authenticate you and manage your account and usage limits.</li>
-              <li>Display saved results and history features in the product.</li>
+              <li>Save analysis results to your account when you are signed in.</li>
               <li>Enforce daily usage limits.</li>
               <li>Maintain, debug, secure, and improve the reliability of the service.</li>
               <li>Investigate errors, abuse, security incidents, or misuse of the service.</li>
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
               be saved to your account and synced across devices.
             </p>
             <p>
-              If you use NeutralEye without signing in, analysis history is stored only in your local browser and
+              If you use NeutralEye without signing in, the analyses you run are stored only in your local browser and
               remains on your device. You can clear it through your browser settings. The analysis server may keep
               a result in memory for up to 10 minutes to respond to repeated anonymous requests.
             </p>
