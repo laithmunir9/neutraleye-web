@@ -68,6 +68,20 @@ describe("Sign-in overlay", () => {
     expect(container.querySelector("dialog")).not.toHaveAttribute("open");
   });
 
+  test("clicking outside the panel does not close it; only the X does", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SiteShell><p>Page content</p></SiteShell>);
+
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    const dialog = container.querySelector("dialog");
+    // A click on the <dialog> element itself is a click on the backdrop.
+    await user.click(dialog);
+    expect(dialog).toHaveAttribute("open");
+
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
   test("arriving from an email link opens it with the notice, and closing clears the URL", async () => {
     window.history.replaceState(null, "", "/?auth=signin&notice=reset");
     const user = userEvent.setup();
