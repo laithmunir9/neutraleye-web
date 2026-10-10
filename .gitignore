@@ -53,3 +53,7 @@ next-env.d.ts
 
 # claude code local machine-specific settings (shared config in .claude/ stays tracked)
 .claude/settings.local.json
+
+# CLAUDE.md holds internal project notes and stays local only: this repo is public.
+# Claude Code reads it from disk; it is deliberately not committed.
+CLAUDE.md
