@@ -7,8 +7,10 @@ import styles from "./AuthDialog.module.css";
 
 /**
  * Sign in, create an account and reset a password, as a surface over whatever
- * page the reader is on rather than a page of its own. Closing it (the X, the
- * backdrop, Escape) leaves them exactly where they were.
+ * page the reader is on rather than a page of its own. It closes with the X
+ * (or Escape, for keyboard users) and leaves them exactly where they were.
+ * Clicking the backdrop deliberately does nothing: a stray click outside the
+ * panel used to throw away a half-typed email and password.
  *
  * Built on the native <dialog>, so focus trapping, Escape and the inert page
  * behind it come from the platform. The auth calls are the ones the retired
@@ -157,10 +159,6 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
           e.stopPropagation();
           onClose?.();
         }
-      }}
-      onClick={(e) => {
-        // The backdrop closes; clicks inside the panel do not.
-        if (e.target === ref.current) onClose?.();
       }}
       aria-labelledby="auth-dialog-title"
     >
