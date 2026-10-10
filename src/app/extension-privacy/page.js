@@ -7,7 +7,7 @@ export const metadata = {
   description: "How the NeutralEye browser extension handles article and browser data."
 };
 
-const LAST_UPDATED = "October 5, 2026";
+const LAST_UPDATED = "October 9, 2026";
 
 export default function ExtensionPrivacyPage() {
   return (
@@ -81,8 +81,8 @@ export default function ExtensionPrivacyPage() {
             <p>Each type of collected data is used for a specific purpose:</p>
             <ul>
               <li><strong>Article text, page URL, and page metadata</strong> are sent to NeutralEye&apos;s analysis server, which forwards the article text to an AI language model (OpenAI) to generate a bias analysis. The page URL is used to exclude the source publication from the list of recommended alternative sources.</li>
-              <li><strong>Email address and authentication tokens</strong> are used to authenticate your account, enforce daily usage limits, and save analysis results to your cloud history.</li>
-              <li><strong>Analysis results</strong> are displayed in the extension popup. If you are signed in, results are also saved to your NeutralEye account for access in your analysis history.</li>
+              <li><strong>Email address and authentication tokens</strong> are used to authenticate your account, enforce daily usage limits, and save analysis results to your account.</li>
+              <li><strong>Analysis results</strong> are displayed in the extension popup. If you are signed in, results are also saved to your NeutralEye account.</li>
             </ul>
             <p>
               All data usage is directly related to providing the bias analysis feature. No data is used for purposes

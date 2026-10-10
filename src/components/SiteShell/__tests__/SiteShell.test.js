@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -26,6 +26,7 @@ jest.mock("@/lib/supabase/AuthProvider", () => ({
 jest.mock("@/lib/supabase/client", () => ({ createClient: jest.fn() }));
 
 import SiteShell from "../SiteShell";
+import { createClient } from "@/lib/supabase/client";
 
 // jsdom does not implement modal dialogs; give it the minimum the component uses.
 beforeAll(() => {
@@ -84,5 +85,28 @@ describe("Sign-in overlay", () => {
     await user.click(screen.getByRole("button", { name: "Sign in" }));
     await user.click(screen.getByRole("button", { name: "No account? Create one" }));
     expect(screen.getByRole("heading", { name: "Create an account" })).toBeVisible();
+  });
+});
+
+describe("Create account with an address that already has an account", () => {
+  test("the confirmation screen tells an existing user to sign in, since no email is sent", async () => {
+    // Supabase's decoy response for an already-confirmed address: a user with no identities, no error.
+    createClient.mockReturnValue({
+      auth: { signUp: jest.fn().mockResolvedValue({ data: { user: { id: "decoy", identities: [] } }, error: null }) },
+    });
+    const user = userEvent.setup();
+    render(<SiteShell><p>Page</p></SiteShell>);
+
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "No account? Create one" }));
+    await user.type(screen.getByLabelText("Email"), "someone@example.com");
+    await user.type(screen.getByLabelText("Password"), "a-long-password");
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Check your email" })).toBeVisible());
+    const copy = screen.getByText(/someone@example.com/).textContent;
+    expect(copy).toMatch(/If you already have an account with this address, no email is sent: sign in instead/);
+    expect(copy).toMatch(/check spam/);
+    expect(screen.getByRole("button", { name: "Back to sign in" })).toBeVisible();
   });
 });
