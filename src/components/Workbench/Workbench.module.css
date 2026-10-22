@@ -308,6 +308,21 @@
   }
 }
 
+/* On a laptop at 100% zoom the Read tab ran Privacy and Terms just off the
+   bottom of the screen. A little less air above and below the column, and a
+   slightly shorter input, bring them back into view (measured: 1440x780 and
+   up). Desktop only; phones keep their tuned layout. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .workbench {
+    padding-top: clamp(2rem, 7vh, 5.5rem);
+    padding-bottom: 1.5rem;
+  }
+
+  .textarea {
+    min-height: clamp(14rem, 33vh, 22rem);
+  }
+}
+
 /* ── Write mode ──────────────────────────────────────────────────────── */
 
 /* Only the button, centred under the prompt line. */
