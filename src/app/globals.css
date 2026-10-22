@@ -196,6 +196,26 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Browser autofill paints saved emails and passwords on a blue-grey fill that
+   ignores the background property. A full-size inset shadow covers it with the
+   field's own white, and the text keeps its ink colour. The long transition
+   stops the fill flashing in before the shadow lands. The focused version
+   keeps the inputs' focus ring, which is also a box-shadow. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--fc-heading);
+  caret-color: var(--fc-heading);
+  box-shadow: inset 0 0 0 100vmax var(--fc-bg);
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+input:-webkit-autofill:focus-visible {
+  box-shadow:
+    inset 0 0 0 100vmax var(--fc-bg),
+    0 0 0 3px rgb(var(--text-rgb) / 0.08);
+}
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   width: 0.8rem;
