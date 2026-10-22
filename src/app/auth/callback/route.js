@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
+import { AUTH_COOKIE_OPTIONS } from "@/lib/supabase/cookieName";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
@@ -15,6 +16,7 @@ export async function GET(request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
       {
+        cookieOptions: AUTH_COOKIE_OPTIONS,
         cookies: {
           getAll: () => cookieStore.getAll(),
           setAll: (cookiesToSet) => {
