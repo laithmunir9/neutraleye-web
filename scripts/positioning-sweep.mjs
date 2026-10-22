@@ -59,18 +59,12 @@ const ALLOW = [
 /* Known and deliberately not fixed. Printed every run so they stay visible,
    but they do not fail the sweep. Anything added here needs a reason and a
    matching entry in CLAUDE.md Known Issues. */
-const DEFERRED = [
-  {
-    file: "../neutraleye-extension/manifest.json",
-    reason: "Deliberate exception, kept for Chrome Web Store search discoverability. Documented in src/lib/biasLevel.js. The store listing name is the only place the old category vocabulary is allowed to survive.",
-  },
-];
+const DEFERRED = [];
 
 /* The extension is a separate repo, so for as long as this sweep walked only
    `src/` it could not have failed on the surface with the most installs. Its
-   store listing carries the banned category term in its own name, which is a
-   deliberate exception, but nothing else in that repo had ever been read by
-   this check. The files are listed rather than walked: the repo root holds
+   store listing carried the banned category term in its own name until 1.1.5,
+   and nothing else in that repo had ever been read by this check. The files are listed rather than walked: the repo root holds
    node_modules and two vendored minified libraries, and a walk would spend its
    time there. */
 const EXTENSION_ROOT = "../neutraleye-extension";
