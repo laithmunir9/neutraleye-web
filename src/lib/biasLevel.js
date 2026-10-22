@@ -1,7 +1,6 @@
 // The model's severity enum. `bias_level` is an INTERNAL identifier only: it is
 // fine in code, logs and request_meta, and must never reach user-facing copy.
-// Everything a user sees says "framing" (the one deliberate exception is the
-// Chrome Web Store listing and manifest name, kept for search discoverability).
+// Everything a user sees says "framing", including the extension's name.
 //
 // This module exists so that no code ever decides "is this a no-bias result?" by
 // matching on a rendered string. Display copy changes; the enum does not.

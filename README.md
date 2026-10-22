@@ -2,7 +2,7 @@
 
 NeutralEye helps readers examine how news articles frame a story through tone, sourcing, emphasis, and omission. Readers can submit article text or a URL, inspect quoted evidence, and compare suggested sources from other perspectives. Results distinguish news, opinion, and analysis and include a confidence score.
 
-[Use the web app](https://tryneutraleye.com) · [Install the Chrome extension](https://chromewebstore.google.com/detail/neutraleye-bias-checker/fdkachmcdaebefhpkpjapoglbiakoffe) · [Extension source](https://github.com/laithmunir9/neutraleye-extension)
+[Use the web app](https://tryneutraleye.com) · [Install the Chrome extension](https://chromewebstore.google.com/detail/neutraleye/fdkachmcdaebefhpkpjapoglbiakoffe) · [Extension source](https://github.com/laithmunir9/neutraleye-extension)
 
 ## Architecture
 
