@@ -75,7 +75,9 @@ export default function Newsprint() {
     const timeouts = new Set();
 
     function tick() {
-      if (document.hidden) return;
+      // Phones hide the newsprint, so there is nothing to mark: skip the
+      // per-phrase measuring rather than doing it every tick for no result.
+      if (document.hidden || window.innerWidth < 900) return;
       if (root.querySelectorAll("[data-on]").length >= MAX_ACTIVE) return;
       const candidates = phrases.filter((el) => !("on" in el.dataset) && isInOpenArea(el.getBoundingClientRect()));
       if (!candidates.length) return;

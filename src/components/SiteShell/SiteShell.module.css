@@ -166,3 +166,25 @@
     color: var(--fc-heading);
   }
 }
+
+/* Touch screens: an invisible hit area brings the small text controls up to
+   the 44px minimum without moving anything. */
+@media (pointer: coarse) {
+  .brand,
+  .signIn,
+  .foot a {
+    position: relative;
+  }
+
+  .brand::after,
+  .signIn::after,
+  .foot a::after {
+    content: "";
+    position: absolute;
+    inset: -10px -8px;
+  }
+
+  .foot a::after {
+    inset: -12px -8px;
+  }
+}

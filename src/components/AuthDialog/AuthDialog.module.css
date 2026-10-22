@@ -260,3 +260,22 @@
   justify-content: center;
   min-height: 2.75rem;
 }
+
+/* Touch screens: 44px targets. The X gets an invisible hit area; the stacked
+   links at the foot sit too close for that without overlapping, so each
+   becomes a full 44px row instead. */
+@media (pointer: coarse) {
+  .close::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+  }
+
+  .foot {
+    gap: 0;
+  }
+
+  .switch {
+    min-height: 44px;
+  }
+}
