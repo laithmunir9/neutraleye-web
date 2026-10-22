@@ -95,11 +95,12 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--fc-heading);
-  color: var(--fc-bg);
-  font-size: 0.85rem;
-  font-weight: 600;
+  background: none;
   cursor: pointer;
+}
+
+.avatar:focus-visible {
+  box-shadow: 0 0 0 2px var(--fc-bg), 0 0 0 4px rgb(var(--text-rgb) / 0.35);
 }
 
 .accountPlaceholder {

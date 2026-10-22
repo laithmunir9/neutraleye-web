@@ -1,13 +1,12 @@
 import ReadMode from "./ReadMode";
-import WaitlistMode from "./WaitlistMode";
+import WriteMode from "./WriteMode";
 
 /*
  * The homepage's two modes, in tab order. The first entry is the default.
  *
  * Each mode owns everything inside the slot; the tabs, the prompt line and the
- * slot's position belong to Workbench and never move. When the writing
- * companion ships, swapping WaitlistMode for the real component on the "write"
- * entry below is the whole change.
+ * slot's position belong to Workbench and never move. Write's slot is only a
+ * way in: the writing dashboard itself lives at /write.
  */
 export const MODES = [
   {
@@ -20,7 +19,7 @@ export const MODES = [
     id: "write",
     label: "Write",
     prompt: "For the drafts you write yourself.",
-    Component: WaitlistMode,
+    Component: WriteMode,
   },
 ];
 

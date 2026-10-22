@@ -167,6 +167,19 @@ body {
   min-height: 100%;
 }
 
+/* Desktop reads at 90%. At the browser's 100% the homepage felt oversized on a
+   laptop and pushed Privacy and Terms below the fold; 90% zoom was the right
+   balance (decided 22 October 2026). Nearly every size is in rem, so this
+   scales the page the way zoom does. Mouse-and-trackpad screens only: touch
+   devices keep the full size, so text inputs stay at 16px or more and iOS
+   does not zoom on focus. A percentage, so a reader's own font-size setting
+   still applies. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  html {
+    font-size: 90%;
+  }
+}
+
 html {
   /* iOS Safari otherwise inflates text after a rotation to landscape. */
   -webkit-text-size-adjust: 100%;

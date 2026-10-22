@@ -4,8 +4,11 @@ import "@testing-library/jest-dom";
 
 // ── Next.js mocks ──────────────────────────────────────────────────────────────
 
+const mockPush = jest.fn();
+
 jest.mock("next/navigation", () => ({
   usePathname: () => "/",
+  useRouter: () => ({ push: mockPush }),
 }));
 
 jest.mock("next/link", () => {
@@ -28,6 +31,24 @@ jest.mock("next/image", () => {
 });
 
 // ── App mocks ──────────────────────────────────────────────────────────────────
+
+let mockAuth = { user: null, loading: false };
+jest.mock("@/lib/supabase/AuthProvider", () => ({
+  useAuth: () => mockAuth,
+}));
+
+jest.mock("@/lib/supabase/client", () => ({ createClient: jest.fn() }));
+
+// jsdom does not implement modal dialogs; give it the minimum AuthDialog uses.
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    this.setAttribute("open", "");
+  };
+  HTMLDialogElement.prototype.close = function close() {
+    this.removeAttribute("open");
+    this.dispatchEvent(new Event("close"));
+  };
+});
 
 jest.mock("@/lib/storage", () => ({
   saveAnalysis: jest.fn(),
@@ -226,7 +247,7 @@ describe("Mode toggle", () => {
     expect(screen.getByRole("tab", { name: "Read" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tab", { name: "Write" })).toHaveAttribute("aria-selected", "false");
     expect(screen.getByPlaceholderText("Paste a link or the article text")).toBeVisible();
-    expect(screen.queryByText("It will not write for you.")).not.toBeVisible();
+    expect(screen.getByRole("button", { name: "Take me to dashboard", hidden: true })).not.toBeVisible();
   });
 
   test("selecting Write switches the slot and puts the mode in the URL", async () => {
@@ -235,7 +256,7 @@ describe("Mode toggle", () => {
 
     await user.click(screen.getByRole("tab", { name: "Write" }));
     expect(screen.getByRole("tab", { name: "Write" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("It will not write for you.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Take me to dashboard" })).toBeVisible();
     expect(window.location.search).toBe("?mode=write");
 
     await user.click(screen.getByRole("tab", { name: "Read" }));
@@ -260,7 +281,7 @@ describe("Mode toggle", () => {
     await user.paste("Draft text that should still be here.");
 
     await user.click(screen.getByRole("tab", { name: "Write" }));
-    expect(screen.getByText("It will not write for you.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Take me to dashboard" })).toBeVisible();
 
     await user.click(screen.getByRole("tab", { name: "Read" }));
     expect(screen.getByPlaceholderText("Paste a link or the article text")).toHaveValue(
@@ -274,52 +295,40 @@ describe("Mode toggle", () => {
   });
 });
 
-describe("Write mode early access", () => {
-  const realFetch = global.fetch;
-
+describe("Write mode", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAuth = { user: null, loading: false };
   });
 
-  afterEach(() => {
-    global.fetch = realFetch;
-  });
-
-  test("leads with the promise not to draft", () => {
+  test("shows the prompt line and one button, nothing else", () => {
     render(<Workbench initialMode="write" />);
-    expect(screen.getByRole("heading", { name: "It will not write for you." })).toBeVisible();
+    const panel = document.getElementById("panel-write");
+    expect(panel).toHaveTextContent("For the drafts you write yourself.");
+    expect(screen.getByRole("button", { name: "Take me to dashboard" })).toBeVisible();
+    // The sign-in dialog is mounted closed inside the panel; everything else counts.
+    const outsideDialog = (selector) => [...panel.querySelectorAll(selector)].filter((el) => !el.closest("dialog"));
+    expect(outsideDialog("input, textarea, form")).toHaveLength(0);
+    expect(outsideDialog("button")).toHaveLength(1);
   });
 
-  test("rejects a malformed address without calling the API", async () => {
-    global.fetch = jest.fn();
+  test("a signed-in reader goes straight to the dashboard", async () => {
+    mockAuth = { user: { email: "reader@example.com" }, loading: false };
     const user = userEvent.setup();
     render(<Workbench initialMode="write" />);
 
-    await user.type(screen.getByLabelText(/write is not open yet/i), "not-an-email");
-    await user.click(screen.getByRole("button", { name: "Get early access" }));
-
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter an email address");
-    expect(global.fetch).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Take me to dashboard" }));
+    expect(mockPush).toHaveBeenCalledWith("/write");
   });
 
-  test("posts the address tagged as a Write signup", async () => {
-    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ ok: true }) });
+  test("a signed-out reader gets sign-in, worded for the dashboard", async () => {
     const user = userEvent.setup();
     render(<Workbench initialMode="write" />);
 
-    await user.type(screen.getByLabelText(/write is not open yet/i), "reader@example.com");
-    await user.click(screen.getByRole("button", { name: "Get early access" }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent("We will email reader@example.com");
-    });
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/waitlist",
-      expect.objectContaining({
-        method: "POST",
-        body: JSON.stringify({ email: "reader@example.com", source: "write" }),
-      })
-    );
+    await user.click(screen.getByRole("button", { name: "Take me to dashboard" }));
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading", { name: "Sign in" })).toBeVisible();
+    expect(screen.getByText("Sign in to open your writing dashboard.")).toBeVisible();
   });
 });
 

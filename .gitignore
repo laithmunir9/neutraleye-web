@@ -57,3 +57,9 @@ next-env.d.ts
 # CLAUDE.md holds internal project notes and stays local only: this repo is public.
 # Claude Code reads it from disk; it is deliberately not committed.
 CLAUDE.md
+
+# Design mockups for features in progress: internal, and this repo is public.
+docs/write-mockups/
+
+# impeccable design-hook local config and cache
+.impeccable/

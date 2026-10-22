@@ -6,16 +6,12 @@ import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useAuth } from "@/lib/supabase/AuthProvider";
 import AuthDialog from "@/components/AuthDialog/AuthDialog";
+import Avatar from "@/components/Avatar/Avatar";
 import styles from "./SiteShell.module.css";
 
 /* The whole chrome of the site: a wordmark, an account control and two legal
    links. Everything that used to sit between them (grouped nav, demo CTA,
    four-column footer) pointed at pages that no longer exist. */
-
-function userInitial(user) {
-  const name = user?.user_metadata?.full_name || user?.email || "";
-  return name[0]?.toUpperCase() || "?";
-}
 
 function AccountControl({ onSignIn, hidden }) {
   const { user, loading, supabase } = useAuth();
@@ -35,7 +31,7 @@ function AccountControl({ onSignIn, hidden }) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button type="button" className={styles.avatar} aria-label="Account">
-          {userInitial(user)}
+          <Avatar user={user} />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>

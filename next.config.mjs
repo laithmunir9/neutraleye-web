@@ -13,11 +13,16 @@ const csp = [
   // va.vercel-scripts.com serves the Web Analytics collector. Without it the
   // <Analytics /> component mounts but its script is refused, in production as
   // well as dev, and no page views are recorded at all.
-  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${isDev ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://images.unsplash.com",
+  // accounts.google.com/gsi/* is Google's sign-in button (Google Identity
+  // Services): its script, its stylesheet, the frame it draws the button in,
+  // and the calls it makes.
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://accounts.google.com/gsi/client${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style",
+  // lh3.googleusercontent.com serves Google profile pictures for the avatar.
+  "img-src 'self' data: https://images.unsplash.com https://lh3.googleusercontent.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${supabaseUrl} ${supabaseWsUrl} https://*.ingest.us.sentry.io${isDev ? " ws://localhost:*" : ""}`,
+  `connect-src 'self' ${supabaseUrl} ${supabaseWsUrl} https://*.ingest.us.sentry.io https://accounts.google.com/gsi/${isDev ? " ws://localhost:*" : ""}`,
+  "frame-src https://accounts.google.com/gsi/",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
@@ -56,6 +61,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ]
   },
   async headers() {

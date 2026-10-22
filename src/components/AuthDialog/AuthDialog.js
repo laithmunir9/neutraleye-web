@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { classifySignUpResult, reportAuthError, safeAuthCall } from "@/lib/supabase/authErrors";
+import { navigateTo } from "@/lib/navigate";
+import GoogleSignIn from "./GoogleSignIn";
 import styles from "./AuthDialog.module.css";
 
 /**
@@ -18,12 +20,23 @@ import styles from "./AuthDialog.module.css";
  *
  * `notice` carries the states that arrive from outside: "reset" after a
  * password change, "auth_failed" when an email link could not be exchanged.
+ *
+ * `next` and `subtitle` are for callers that open it on the way somewhere,
+ * like the Write tab: `next` is where a successful sign-in or a
+ * confirmation link sends the reader (otherwise they stay on the current
+ * page), and `subtitle` replaces the sign-in and sign-up line.
+ *
+ * Google sign-in shows only when NEXT_PUBLIC_GOOGLE_CLIENT_ID is set.
  */
 const NOTICES = {
   reset: { title: "Password updated", blurb: "You can now sign in with your new password." },
 };
 
-export default function AuthDialog({ open, onClose, initialMode = "signin", notice = null }) {
+function currentPath() {
+  return `${window.location.pathname}${window.location.search}` || "/";
+}
+
+export default function AuthDialog({ open, onClose, initialMode = "signin", notice = null, next = null, subtitle = null }) {
   const ref = useRef(null);
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
@@ -87,8 +100,9 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
     const fd = new FormData(e.currentTarget);
     const emailValue = String(fd.get("email") || "");
     const supabase = createClient();
-    // The confirmation link brings the reader back to the page they signed up on.
-    const back = `${window.location.pathname}${window.location.search}` || "/";
+    // The confirmation link brings the reader back to the page they signed up
+    // on, or on to where the caller was heading.
+    const back = next || currentPath();
     const result = await safeAuthCall("signup", () =>
       supabase.auth.signUp({
         email: emailValue,
@@ -122,9 +136,29 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
     );
     setLoading(false);
     if (err) setError(reportAuthError(err, "signin"));
+    else finishSignIn();
+  }
+
+  function finishSignIn() {
+    if (next) navigateTo(next);
     else onClose?.();
   }
 
+  // Google's button hands over an ID token; Supabase checks it against the
+  // nonce and starts a session, creating the account on first use.
+  async function handleGoogleCredential(token, nonce) {
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+    const { error: err } = await safeAuthCall("google_signin", () =>
+      supabase.auth.signInWithIdToken({ provider: "google", token, nonce })
+    );
+    setLoading(false);
+    if (err) setError(reportAuthError(err, "google_signin"));
+    else finishSignIn();
+  }
+
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const isSignup = mode === "signup";
   const isForgot = mode === "forgot";
   const done = confirmed || (isForgot && forgotSent);
@@ -132,7 +166,7 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
   let title = isSignup ? "Create an account" : isForgot ? "Reset your password" : "Sign in";
   let blurb = isForgot
     ? "Enter the address you signed up with and we will send a reset link to it."
-    : "Saves your reads across devices. NeutralEye works without an account either way.";
+    : subtitle || "Saves your reads across devices. NeutralEye works without an account either way.";
   if (confirmed) {
     title = "Check your email";
     // Covers both outcomes without saying which happened. For an address that
@@ -207,6 +241,19 @@ export default function AuthDialog({ open, onClose, initialMode = "signin", noti
               {loading ? "Working" : isForgot ? "Send reset link" : isSignup ? "Create account" : "Sign in"}
             </button>
           </form>
+        )}
+
+        {open && googleClientId && !done && !isForgot && (
+          <>
+            <div className={styles.or} role="separator">
+              <span>or</span>
+            </div>
+            <GoogleSignIn
+              clientId={googleClientId}
+              onCredential={handleGoogleCredential}
+              onError={() => setError("Google sign-in could not load. Use your email and password instead.")}
+            />
+          </>
         )}
 
         {!done && (

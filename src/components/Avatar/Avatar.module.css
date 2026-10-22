@@ -1,0 +1,16 @@
+.avatar {
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Ink is fixed rather than --fc-heading so the letter stays dark on the
+   light tones in either theme. */
+.initial {
+  display: grid;
+  place-items: center;
+  color: #0d0f10;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+}

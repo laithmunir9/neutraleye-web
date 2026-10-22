@@ -1,0 +1,12 @@
+.placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  padding: 2rem 1rem;
+  color: var(--fc-muted);
+  font-size: 1.05rem;
+}
+
+.placeholder p {
+  margin: 0;
+}
