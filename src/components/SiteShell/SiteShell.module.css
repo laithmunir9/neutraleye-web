@@ -20,6 +20,28 @@
   --page-bg: var(--fc-surface);
 }
 
+/* The writing dashboard: the bar sits on the dashboard's grey ground, which is
+   the surface and border tokens mixed half and half, and there is no footer. */
+.app {
+  --page-bg: color-mix(in srgb, var(--fc-surface) 50%, var(--fc-border));
+  grid-template-rows: auto 1fr;
+}
+
+/* The toolbar's own border meets the bar here; the fade under the pinned
+   header would blur that edge. */
+.app .top::after {
+  display: none;
+}
+
+.app .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.app .body > * {
+  flex: 1;
+}
+
 /* Above any backdrop. */
 .top,
 .body,

@@ -51,9 +51,10 @@ function AccountControl({ onSignIn, hidden }) {
  * used to land on /login (email links, the auth callback, old bookmarks); see
  * src/app/login/page.js. Closing it strips those params so a refresh does not
  * reopen it. `hideAccount` is for /reset-password, which is its own auth step.
- * `backdrop` renders behind everything else (the homepage newsprint).
+ * `backdrop` renders behind everything else (the homepage newsprint). `app`
+ * is for the writing dashboard: the same bar on its grey ground, and no footer.
  */
-export default function SiteShell({ children, initialAuth = null, hideAccount = false, backdrop = null }) {
+export default function SiteShell({ children, initialAuth = null, hideAccount = false, backdrop = null, app = false }) {
   const [auth, setAuth] = useState(
     initialAuth ? { open: true, mode: initialAuth.mode, notice: initialAuth.notice } : { open: false, mode: "signin", notice: null }
   );
@@ -69,7 +70,7 @@ export default function SiteShell({ children, initialAuth = null, hideAccount = 
   }
 
   return (
-    <div className={`${styles.shell} ${backdrop ? styles.onPaper : ""}`}>
+    <div className={`${styles.shell} ${backdrop ? styles.onPaper : ""} ${app ? styles.app : ""}`}>
       {backdrop}
       <header className={styles.top}>
         <Link href="/" className={styles.brand} aria-label="NeutralEye home">
@@ -81,10 +82,12 @@ export default function SiteShell({ children, initialAuth = null, hideAccount = 
 
       <div className={styles.body}>{children}</div>
 
-      <footer className={styles.foot}>
-        <Link href="/privacy">Privacy</Link>
-        <Link href="/terms">Terms</Link>
-      </footer>
+      {app ? null : (
+        <footer className={styles.foot}>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+        </footer>
+      )}
 
       <AuthDialog open={auth.open} initialMode={auth.mode} notice={auth.notice} onClose={closeAuth} />
     </div>

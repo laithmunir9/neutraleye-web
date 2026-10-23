@@ -1,0 +1,667 @@
+/* The writing dashboard. Sizes are in rem so the desktop 90% base scales them
+   with the rest of the site; the px figures in comments are the mockup's
+   (docs/write-mockups/dashboard-writing.html). The grey ground is the surface
+   and border tokens mixed half and half (#E9EBEB). */
+
+.dashboard {
+  --ground: color-mix(in srgb, var(--fc-surface) 50%, var(--fc-border));
+  --segmented-bg: color-mix(in srgb, var(--fc-border) 65%, var(--fc-surface));
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--ground);
+}
+
+.dashboardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.dashboardBody[hidden] {
+  display: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.5rem; /* 56px */
+  padding: 0.375rem max(1.25rem, env(safe-area-inset-right)) 0.375rem max(1.25rem, env(safe-area-inset-left));
+  border-top: 1px solid var(--fc-border);
+  border-bottom: 1px solid var(--fc-border);
+  background: var(--fc-surface);
+}
+
+.toolGroup,
+.toolMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolGroup {
+  gap: 0.125rem;
+}
+
+.toolMeta {
+  gap: 0.875rem;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem; /* 36px */
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4375rem;
+  background: transparent;
+  color: var(--fc-body);
+  cursor: pointer;
+}
+
+.tool[aria-pressed="true"] {
+  background: rgb(var(--text-rgb) / 0.07);
+  color: var(--fc-heading);
+}
+
+@media (hover: hover) {
+  .tool:hover:not(:disabled) {
+    background: rgb(var(--text-rgb) / 0.06);
+    color: var(--fc-heading);
+  }
+}
+
+.tool:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.tool:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--text-rgb) / 0.3);
+}
+
+.titleInput {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13.75rem; /* 220px */
+  min-width: 0;
+  padding: 0.25rem 0.375rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--fc-heading);
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+}
+
+.titleInput:focus-visible {
+  background: var(--fc-bg);
+  box-shadow: 0 0 0 1px var(--fc-border);
+}
+
+.titleInput::placeholder {
+  color: var(--fc-muted);
+}
+
+.toolRule {
+  width: 1px;
+  height: 1.375rem;
+  margin: 0 0.375rem;
+  background: var(--fc-border);
+}
+
+.meta,
+.metaError {
+  font-size: 0.875rem; /* 14px */
+  color: var(--fc-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.metaError {
+  color: var(--error-text);
+}
+
+/* ── Rail, sheet, panel ──────────────────────────────────────────────── */
+
+.workspace {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 13.75rem minmax(0, 1fr) 21.25rem; /* 220px, sheet, 340px */
+  grid-template-areas: "rail sheet panel";
+  align-items: start;
+  gap: 1.5rem;
+  padding: 1.5rem max(1.5rem, env(safe-area-inset-right)) 1.5rem max(1.5rem, env(safe-area-inset-left));
+}
+
+.noRail {
+  grid-template-columns: minmax(0, 1fr) 21.25rem;
+  grid-template-areas: "sheet panel";
+}
+
+.noPanel {
+  grid-template-columns: 13.75rem minmax(0, 1fr);
+  grid-template-areas: "rail sheet";
+}
+
+.noRail.noPanel {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "sheet";
+}
+
+.rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.newDraft {
+  height: 2.75rem; /* 44px */
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .newDraft:hover {
+    background: var(--fc-ink-hover);
+  }
+}
+
+.newDraft:focus-visible {
+  box-shadow: 0 0 0 3px var(--ground), 0 0 0 5px rgb(var(--text-rgb) / 0.35);
+}
+
+.railLabel {
+  margin: 0.875rem 0.25rem 0.25rem;
+  color: var(--fc-muted);
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.railNote {
+  margin: 0 0.25rem;
+  color: var(--fc-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.draftList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.draftRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem; /* 10px 12px */
+  border: 1px solid transparent;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--fc-heading);
+  text-align: left;
+  cursor: pointer;
+}
+
+.draftRow[aria-current="true"] {
+  border-color: var(--fc-border);
+  background: var(--fc-bg);
+}
+
+@media (hover: hover) {
+  .draftRow:hover:not([aria-current="true"]) {
+    background: rgb(var(--text-rgb) / 0.04);
+  }
+}
+
+.draftRow:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--text-rgb) / 0.3);
+}
+
+.draftTitle {
+  overflow: hidden;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.draftRow[aria-current="true"] .draftTitle {
+  font-weight: 600;
+}
+
+.draftStatus {
+  color: var(--fc-muted);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.4;
+}
+
+/* The white sheet on the grey ground. */
+.sheet {
+  grid-area: sheet;
+  min-width: 0;
+  min-height: calc(100dvh - 12rem);
+  padding: 4rem 4.5rem; /* 64px 72px */
+  border: 1px solid var(--fc-border);
+  border-radius: 0.375rem;
+  background: var(--fc-bg);
+}
+
+.sheetNote {
+  margin: 0;
+  color: var(--fc-muted);
+  font-size: 1rem;
+}
+
+.editor {
+  max-width: 42.5rem; /* 680px */
+}
+
+/* The draft itself: Source Serif 4 at 19px, roomy lines. */
+.prose {
+  min-height: 20rem;
+  color: var(--fc-heading);
+  font-size: 1.1875rem;
+  line-height: 1.75;
+  caret-color: var(--fc-heading);
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* No ring around the whole sheet while writing: the caret shows where focus
+   is, and the site-wide focus ring would box the text in. */
+.prose:focus,
+.prose:focus-visible {
+  box-shadow: none;
+}
+
+.prose p {
+  margin: 0;
+}
+
+.prose p + p {
+  margin-top: 1.375rem; /* 22px */
+}
+
+.panel {
+  grid-area: panel;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem; /* 18px */
+  padding: 1.5rem;
+  border: 1px solid var(--fc-border);
+  border-radius: 0.625rem;
+  background: var(--fc-surface);
+}
+
+.panelLabel {
+  margin: 0;
+  color: var(--fc-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.targetBox {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--fc-border);
+  border-radius: 0.625rem;
+  background: var(--fc-bg);
+}
+
+.targetLead {
+  margin: 0 0 0.25rem;
+  color: var(--fc-muted);
+  font-size: 0.8125rem;
+}
+
+.targetRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.targetName {
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.targetNone {
+  color: var(--fc-muted);
+  font-size: 1rem;
+}
+
+.changeLink {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fc-accent);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .changeLink:hover {
+    color: var(--fc-accent-dark);
+  }
+}
+
+.kindLead {
+  margin: 0 0 0.5rem;
+  color: var(--fc-body);
+  font-size: 0.9375rem; /* 15px */
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.125rem;
+  padding: 0.25rem;
+  border-radius: 0.5625rem;
+  background: var(--segmented-bg);
+}
+
+.segment {
+  padding: 0.5625rem 0;
+  border: 0;
+  border-radius: 0.4375rem;
+  background: transparent;
+  color: var(--fc-body);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.segment[aria-pressed="true"] {
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(var(--text-rgb) / 0.08);
+}
+
+.segment:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--text-rgb) / 0.3);
+}
+
+.kindStandard {
+  margin: 0.75rem 0 0;
+  color: var(--fc-body);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.check {
+  height: 2.875rem; /* 46px */
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.panelEmpty {
+  margin: 0;
+  padding-top: 1.125rem;
+  border-top: 1px solid var(--fc-border);
+  color: var(--fc-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* ── Setup card ──────────────────────────────────────────────────────── */
+
+/* A card on the dashboard's ground, not a modal over it. */
+.setupStage {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.setup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem; /* 28px */
+  width: 100%;
+  max-width: 40rem;
+  padding: 2.5rem 2.75rem; /* 40px 44px */
+  border: 1px solid var(--fc-border);
+  border-radius: 0.75rem;
+  background: var(--fc-bg);
+  box-shadow: 0 1.375rem 3rem rgb(var(--text-rgb) / 0.08);
+}
+
+.setupHeading {
+  margin: 0;
+  font-size: 2rem; /* 32px */
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  margin: 0;
+  color: var(--fc-heading);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fieldHint {
+  margin: -0.25rem 0 0;
+  color: var(--fc-muted);
+  font-size: 0.9375rem;
+}
+
+/* 16px or more on touch screens, so iOS does not zoom in on focus. */
+.input {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.875rem; /* 46px */
+  padding: 0 0.875rem;
+  border: 1px solid var(--fc-border-input);
+  border-radius: var(--control-radius);
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  font-size: 1.0625rem; /* 17px */
+}
+
+.input::placeholder {
+  color: var(--fc-muted);
+}
+
+.input:focus-visible {
+  border-color: var(--fc-heading);
+  box-shadow: 0 0 0 3px rgb(var(--text-rgb) / 0.08);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.4375rem 0.875rem;
+  border: 1px solid var(--fc-border);
+  border-radius: 999px;
+  background: var(--fc-bg);
+  color: var(--fc-body);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--fc-accent);
+  background: var(--fc-tint);
+  color: var(--fc-accent);
+}
+
+.chip:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--text-rgb) / 0.3);
+}
+
+.setupError {
+  margin: 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--error-border);
+  border-radius: var(--control-radius);
+  background: var(--error-bg);
+  color: var(--error-text);
+  font-size: 0.9rem;
+}
+
+.setupFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.375rem;
+  border-top: 1px solid var(--fc-border);
+}
+
+.setupNote {
+  flex: 1 1 16rem;
+  margin: 0;
+  color: var(--fc-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.setupActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cancel {
+  padding: 0.3rem 0;
+  border: 0;
+  background: none;
+  color: var(--fc-body);
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-decoration-color: var(--fc-border-input);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+.start {
+  padding: 0.75rem 1.4rem;
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.start:disabled {
+  background: var(--fc-ink-hover);
+  cursor: progress;
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────── */
+
+/* The rail and panel stack under the sheet. */
+@media (max-width: 1100px) {
+  .workspace,
+  .noRail,
+  .noPanel,
+  .noRail.noPanel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "sheet" "rail" "panel";
+  }
+
+  .sheet {
+    min-height: 60vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .workspace {
+    gap: 1rem;
+    padding: 1rem max(0.75rem, env(safe-area-inset-right)) 1.5rem max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .sheet {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .titleInput {
+    flex: 1 1 10rem;
+    font-size: 1rem;
+  }
+
+  .toolMeta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .setup {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .setupHeading {
+    font-size: 1.6rem;
+  }
+}
+
+/* Touch screens: 44px targets for the toolbar's icon buttons. */
+@media (pointer: coarse) {
+  .tool {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
