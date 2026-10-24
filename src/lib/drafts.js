@@ -116,6 +116,10 @@ export async function updateDraft(supabase, id, patch) {
   return supabase.from("drafts").update(patch).eq("id", id).select("updated_at").single();
 }
 
+export async function deleteDraft(supabase, id) {
+  return supabase.from("drafts").delete().eq("id", id);
+}
+
 /** Runs "Check framing" on a saved draft. Returns { data } or { error: message }. */
 export async function requestReview(draftId) {
   let response;

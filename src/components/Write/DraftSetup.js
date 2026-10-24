@@ -8,16 +8,18 @@ import styles from "./Write.module.css";
 /*
  * What a draft is: its title, its kind, who it is written toward and its
  * topic. Shown as a card on the dashboard itself, for a new draft and again
- * from "Change" for the open one. `onCancel` is absent on a first visit, when
- * there is nothing to go back to.
+ * from "Change" for the open one, where the draft can also be deleted, after
+ * a confirmation. `onCancel` is absent on a first visit, when there is
+ * nothing to go back to.
  */
-export default function DraftSetup({ mode, initial, onSubmit, onCancel }) {
+export default function DraftSetup({ mode, initial, onSubmit, onCancel, onDelete }) {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [kind, setKind] = useState(initial?.kind ?? "essay");
   const [target, setTarget] = useState(initial?.target ?? "");
   const [topic, setTopic] = useState(initial?.topic ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [confirming, setConfirming] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -27,6 +29,17 @@ export default function DraftSetup({ mode, initial, onSubmit, onCancel }) {
     if (err) {
       setError("That did not save. Check your connection and try again.");
       setBusy(false);
+    }
+  }
+
+  async function handleDelete() {
+    setBusy(true);
+    setError("");
+    const { error: err } = await onDelete();
+    if (err) {
+      setError("That did not delete. Check your connection and try again.");
+      setBusy(false);
+      setConfirming(false);
     }
   }
 
@@ -123,6 +136,30 @@ export default function DraftSetup({ mode, initial, onSubmit, onCancel }) {
             </button>
           </div>
         </div>
+
+        {onDelete ? (
+          <div className={styles.setupDelete}>
+            {confirming ? (
+              <>
+                <p className={styles.deleteQuestion} role="alert">
+                  Delete this draft for good? This cannot be undone.
+                </p>
+                <div className={styles.setupActions}>
+                  <button type="button" className={styles.cancel} onClick={() => setConfirming(false)} disabled={busy}>
+                    Keep it
+                  </button>
+                  <button type="button" className={styles.deleteConfirm} onClick={handleDelete} disabled={busy}>
+                    {busy ? "Deleting" : "Delete draft"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button type="button" className={styles.deleteLink} onClick={() => setConfirming(true)} disabled={busy}>
+                Delete this draft
+              </button>
+            )}
+          </div>
+        ) : null}
       </form>
     </div>
   );

@@ -6,6 +6,7 @@ import "@testing-library/jest-dom";
 
 const mockCalls = [];
 let mockRows = {};
+let mockDeleteError = null;
 
 function mockBuilder() {
   const op = { filters: {} };
@@ -13,7 +14,15 @@ function mockBuilder() {
     insert(values) { op.kind = "insert"; op.values = values; return chain; },
     update(values) { op.kind = "update"; op.values = values; return chain; },
     select(columns) { if (!op.kind) op.kind = "select"; op.columns = columns; return chain; },
-    eq(column, value) { op.filters[column] = value; return chain; },
+    delete() { op.kind = "delete"; return chain; },
+    eq(column, value) {
+      op.filters[column] = value;
+      if (op.kind === "delete") {
+        mockCalls.push(op);
+        return Promise.resolve({ error: mockDeleteError });
+      }
+      return chain;
+    },
     single() {
       mockCalls.push(op);
       if (op.kind === "insert") {
@@ -39,6 +48,7 @@ const DRAFTS = [
 
 beforeEach(() => {
   mockCalls.length = 0;
+  mockDeleteError = null;
   mockRows = { a: null, b: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Saved words." }] }] } };
 });
 
@@ -202,6 +212,58 @@ describe("with drafts", () => {
     await waitFor(() => expect(screen.queryByRole("heading", { name: "What are you setting out to write?" })).not.toBeInTheDocument());
     expect(mockCalls.find((c) => c.kind === "update")).toMatchObject({ values: { target: "An Atlantic feature", kind: "opinion" }, filters: { id: "b" } });
     expect(within(screen.getByRole("complementary", { name: "Framing" })).getByText("An Atlantic feature")).toBeVisible();
+  });
+
+  describe("deleting", () => {
+    test("asks first, then removes the draft and opens the next newest", async () => {
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={DRAFTS} />);
+      await user.click(screen.getByRole("button", { name: "Change" }));
+      await user.click(screen.getByRole("button", { name: "Delete this draft" }));
+      expect(screen.getByRole("alert")).toHaveTextContent("Delete this draft for good? This cannot be undone.");
+
+      await user.click(screen.getByRole("button", { name: "Keep it" }));
+      expect(mockCalls.filter((c) => c.kind === "delete")).toHaveLength(0);
+
+      await user.click(screen.getByRole("button", { name: "Delete this draft" }));
+      await user.click(screen.getByRole("button", { name: "Delete draft" }));
+
+      await waitFor(() => expect(screen.getByLabelText("Draft title")).toHaveValue("Transit fare essay"));
+      expect(mockCalls.find((c) => c.kind === "delete")).toMatchObject({ filters: { id: "b" } });
+      const rail = screen.getByRole("complementary", { name: "Drafts" });
+      expect(within(rail).queryByText("Library hours op-ed")).not.toBeInTheDocument();
+    });
+
+    test("deleting the last draft opens the setup card for a new one", async () => {
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={[DRAFTS[0]]} />);
+      await user.click(screen.getByRole("button", { name: "Change" }));
+      await user.click(screen.getByRole("button", { name: "Delete this draft" }));
+      await user.click(screen.getByRole("button", { name: "Delete draft" }));
+
+      await waitFor(() => expect(screen.getByRole("button", { name: "Start writing" })).toBeVisible());
+      expect(screen.queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Delete this draft" })).not.toBeInTheDocument();
+    });
+
+    test("a failed delete keeps the draft and says so", async () => {
+      mockDeleteError = { code: "500" };
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={DRAFTS} />);
+      await user.click(screen.getByRole("button", { name: "Change" }));
+      await user.click(screen.getByRole("button", { name: "Delete this draft" }));
+      await user.click(screen.getByRole("button", { name: "Delete draft" }));
+
+      expect(await screen.findByText("That did not delete. Check your connection and try again.")).toBeVisible();
+      expect(screen.getByLabelText("Title")).toHaveValue("Library hours op-ed");
+    });
+
+    test("is not offered when starting a new draft", async () => {
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={DRAFTS} />);
+      await user.click(screen.getByRole("button", { name: "New draft" }));
+      expect(screen.queryByRole("button", { name: "Delete this draft" })).not.toBeInTheDocument();
+    });
   });
 
   test("New draft can be cancelled back to the open draft", async () => {

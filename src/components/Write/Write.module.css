@@ -799,6 +799,58 @@
   cursor: pointer;
 }
 
+.setupDelete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-top: -0.5rem;
+}
+
+.deleteLink {
+  padding: 0.3rem 0;
+  border: 0;
+  background: none;
+  color: var(--fc-muted);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-decoration-color: var(--fc-border-input);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .deleteLink:hover {
+    color: var(--error-text);
+  }
+}
+
+.deleteQuestion {
+  flex: 1 1 14rem;
+  margin: 0;
+  color: var(--error-text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.deleteConfirm {
+  padding: 0.75rem 1.4rem;
+  border: 0;
+  border-radius: var(--control-radius);
+  background: var(--error-text);
+  color: var(--fc-bg);
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.deleteConfirm:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
 .start {
   padding: 0.75rem 1.4rem;
   border: 0;
@@ -867,5 +919,10 @@
   .tool {
     width: 2.75rem;
     height: 2.75rem;
+  }
+
+  .cancel,
+  .deleteLink {
+    min-height: 2.75rem;
   }
 }

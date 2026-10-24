@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/AuthProvider";
-import { createDraft, reportDraftError, updateDraft } from "@/lib/drafts";
+import { createDraft, deleteDraft, reportDraftError, updateDraft } from "@/lib/drafts";
 import DraftsRail from "./DraftsRail";
 import DraftSetup from "./DraftSetup";
 import Workspace from "./Workspace";
@@ -80,6 +80,23 @@ export default function WriteDashboard({ initialDrafts, loadError = false }) {
     return {};
   }
 
+  // Opens the newest remaining draft, or the setup card when none are left.
+  async function handleDelete() {
+    const id = current.id;
+    const { error } = await deleteDraft(supabase, id);
+    if (error) {
+      reportDraftError(error, "delete");
+      return { error };
+    }
+    cache.delete(id);
+    const rest = drafts.filter((draft) => draft.id !== id);
+    setDrafts(rest);
+    setCurrentId(rest[0]?.id ?? null);
+    setJustCreated(null);
+    setSetup(rest.length ? null : "new");
+    return {};
+  }
+
   const rail = (
     <DraftsRail
       drafts={drafts}
@@ -102,6 +119,7 @@ export default function WriteDashboard({ initialDrafts, loadError = false }) {
           initial={setup === "edit" ? current : null}
           onSubmit={handleSetupSubmit}
           onCancel={drafts.length ? () => setSetup(null) : undefined}
+          onDelete={setup === "edit" ? handleDelete : undefined}
         />
       ) : null}
 
