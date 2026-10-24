@@ -50,10 +50,6 @@ export async function POST(request) {
     return errResponse(503, "Checking is temporarily unavailable.", "AI_DISABLED");
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return errResponse(401, "Sign in to check a draft.", "UNAUTHENTICATED");
-
   const retryAfter = await checkRedisRateLimit(ip, {
     prefix: "ne:web",
     max: RATE_LIMIT_MAX,
@@ -67,6 +63,12 @@ export async function POST(request) {
       { status: 429, headers: { "Retry-After": String(retryAfter) } }
     );
   }
+
+  // After the rate limit, so a flood of signed-out requests is turned away
+  // without an auth call for each one.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return errResponse(401, "Sign in to check a draft.", "UNAUTHENTICATED");
 
   let body;
   try {

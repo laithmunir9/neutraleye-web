@@ -45,10 +45,11 @@ import { POST } from "../route";
 const DRAFT_ID = "6f1c2a3b-1111-4222-8333-944445555666";
 const TEXT = Array.from({ length: 6 }, () => "The council's plan is a short-sighted raid on the library.").join(" ");
 
-function request(body) {
+let mockIpCounter = 0;
+function request(body, ip = `10.0.${Math.floor(mockIpCounter / 250)}.${mockIpCounter++ % 250}`) {
   return new Request("http://localhost/api/write/review", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-real-ip": `10.0.0.${Math.floor(Math.random() * 250)}` },
+    headers: { "Content-Type": "application/json", "x-real-ip": ip },
     body: JSON.stringify(body),
   });
 }
@@ -76,6 +77,13 @@ describe("POST /api/write/review auth", () => {
     expect((await response.json()).code).toBe("UNAUTHENTICATED");
     expect(mockCreate).not.toHaveBeenCalled();
     expect(mockUpdates).toHaveLength(0);
+  });
+
+  test("signed-out requests are rate limited too, per IP", async () => {
+    mockUser = null;
+    const statuses = [];
+    for (let i = 0; i < 6; i += 1) statuses.push((await POST(request({ draftId: DRAFT_ID }, "192.0.2.7"))).status);
+    expect(statuses).toEqual([401, 401, 401, 401, 401, 429]);
   });
 
   test("another user's draft reads as not found, and nothing is checked or saved", async () => {
