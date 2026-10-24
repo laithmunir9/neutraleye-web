@@ -1,4 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
+import { isIP } from "node:net";
+import { isCloudflareIp } from "./cloudflareIp";
 
 // Shared API-route helpers: structured logging, client IP, Sentry reporting.
 
@@ -11,8 +13,15 @@ export function logEvent(level, event, meta = {}) {
 
 export function getClientIp(request) {
   // Vercel sets x-real-ip to the true connecting IP; a client cannot forge it.
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp && realIp.trim()) return realIp.trim();
+  // Behind Cloudflare that is a Cloudflare server, a different one per
+  // request, which made every IP limit useless; then the visitor's address is
+  // in cf-connecting-ip, trusted only when the connection is from Cloudflare.
+  const realIp = String(request.headers.get("x-real-ip") || "").trim();
+  if (realIp) {
+    const visitorIp = String(request.headers.get("cf-connecting-ip") || "").trim();
+    if (visitorIp && isIP(visitorIp) && isCloudflareIp(realIp)) return visitorIp;
+    return realIp;
+  }
   // Fall back to the RIGHTMOST x-forwarded-for entry — the hop appended by the
   // trusted proxy. The leftmost entry is client-controlled and spoofable, so
   // using it would let anyone reset their own rate-limit / daily-cap bucket.

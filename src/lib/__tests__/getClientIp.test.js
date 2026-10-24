@@ -31,6 +31,30 @@ describe("getClientIp", () => {
     expect(getClientIp(req({ "x-forwarded-for": "203.0.113.5" }))).toBe("203.0.113.5");
   });
 
+  describe("behind Cloudflare", () => {
+    test("uses cf-connecting-ip when the connection comes from Cloudflare", () => {
+      // The three addresses one visitor arrived from in production, 24 Oct 2026.
+      for (const edge of ["162.158.193.201", "172.71.247.144", "172.71.142.52", "2a06:98c0:3600::103"]) {
+        expect(getClientIp(req({ "x-real-ip": edge, "cf-connecting-ip": "203.0.113.5" }))).toBe("203.0.113.5");
+      }
+    });
+
+    test("ignores cf-connecting-ip from anyone connecting to Vercel directly", () => {
+      const r = req({ "x-real-ip": "198.51.100.9", "cf-connecting-ip": "203.0.113.5" });
+      expect(getClientIp(r)).toBe("198.51.100.9");
+    });
+
+    test("ignores a cf-connecting-ip that is not an address", () => {
+      const r = req({ "x-real-ip": "162.158.193.201", "cf-connecting-ip": "anything, 1.2.3.4" });
+      expect(getClientIp(r)).toBe("162.158.193.201");
+    });
+
+    test("an IPv6 visitor through Cloudflare is counted by their own address", () => {
+      const r = req({ "x-real-ip": "172.71.142.52", "cf-connecting-ip": "2001:db8::1" });
+      expect(getClientIp(r)).toBe("2001:db8::1");
+    });
+  });
+
   test("returns 'unknown' when no forwarding headers are present", () => {
     expect(getClientIp(req({}))).toBe("unknown");
   });
