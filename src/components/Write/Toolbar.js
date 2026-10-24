@@ -46,10 +46,13 @@ function ToolButton({ label, active, disabled, onClick, children }) {
 /*
  * The row under the top bar: drafts toggle, the draft's title, undo and redo,
  * bold, italic and underline, the three alignments, then the save status,
- * the word count and the framing panel toggle.
+ * the word count and the framing panel toggle. During a review (`checkedAs`
+ * is the kind's label) the draft is read-only: the editing buttons dim and
+ * the status reads "Checked as Opinion".
  */
 export default function Toolbar({
   editor,
+  checkedAs,
   title,
   onTitleChange,
   onTitleBlur,
@@ -76,7 +79,7 @@ export default function Toolbar({
           : EMPTY_STATE,
     }) || EMPTY_STATE;
 
-  const off = !editor;
+  const off = !editor || Boolean(checkedAs);
   const run = (fn) => () => fn(editor.chain().focus()).run();
 
   return (
@@ -94,6 +97,7 @@ export default function Toolbar({
           value={title}
           placeholder="Untitled"
           autoComplete="off"
+          readOnly={Boolean(checkedAs)}
           onChange={(event) => onTitleChange(event.target.value)}
           onBlur={onTitleBlur}
         />
@@ -105,30 +109,30 @@ export default function Toolbar({
           <RedoIcon />
         </ToolButton>
         <span className={styles.toolRule} aria-hidden="true" />
-        <ToolButton label="Bold" active={state.bold} disabled={off} onClick={run((c) => c.toggleBold())}>
+        <ToolButton label="Bold" active={!off && state.bold} disabled={off} onClick={run((c) => c.toggleBold())}>
           <BoldIcon />
         </ToolButton>
-        <ToolButton label="Italic" active={state.italic} disabled={off} onClick={run((c) => c.toggleItalic())}>
+        <ToolButton label="Italic" active={!off && state.italic} disabled={off} onClick={run((c) => c.toggleItalic())}>
           <ItalicIcon />
         </ToolButton>
-        <ToolButton label="Underline" active={state.underline} disabled={off} onClick={run((c) => c.toggleUnderline())}>
+        <ToolButton label="Underline" active={!off && state.underline} disabled={off} onClick={run((c) => c.toggleUnderline())}>
           <UnderlineIcon />
         </ToolButton>
         <span className={styles.toolRule} aria-hidden="true" />
-        <ToolButton label="Align left" active={state.align === "left"} disabled={off} onClick={run((c) => c.setTextAlign("left"))}>
+        <ToolButton label="Align left" active={!off && state.align === "left"} disabled={off} onClick={run((c) => c.setTextAlign("left"))}>
           <AlignLeftIcon />
         </ToolButton>
-        <ToolButton label="Align center" active={state.align === "center"} disabled={off} onClick={run((c) => c.setTextAlign("center"))}>
+        <ToolButton label="Align center" active={!off && state.align === "center"} disabled={off} onClick={run((c) => c.setTextAlign("center"))}>
           <AlignCenterIcon />
         </ToolButton>
-        <ToolButton label="Align right" active={state.align === "right"} disabled={off} onClick={run((c) => c.setTextAlign("right"))}>
+        <ToolButton label="Align right" active={!off && state.align === "right"} disabled={off} onClick={run((c) => c.setTextAlign("right"))}>
           <AlignRightIcon />
         </ToolButton>
       </div>
 
       <div className={styles.toolMeta}>
-        <span className={saveStatus === "error" ? styles.metaError : styles.meta} role="status">
-          {SAVE_LABELS[saveStatus]}
+        <span className={saveStatus === "error" && !checkedAs ? styles.metaError : styles.meta} role="status">
+          {checkedAs ? `Checked as ${checkedAs}` : SAVE_LABELS[saveStatus]}
         </span>
         <span className={styles.meta}>
           {wordCount} {wordCount === 1 ? "word" : "words"}

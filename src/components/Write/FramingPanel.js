@@ -6,10 +6,9 @@ import styles from "./Write.module.css";
 
 /*
  * The right panel while writing: what the draft is held to, the kind of piece
- * and the standard that comes with it, and the check. The check is wired up in
- * part 3; until then the button is shown but disabled.
+ * and the standard that comes with it, and the check.
  */
-export default function FramingPanel({ target, kind, onKindChange, onChangeTarget }) {
+export default function FramingPanel({ target, kind, onKindChange, onChangeTarget, onCheck, checking, checkError }) {
   return (
     <aside className={styles.panel} aria-label="Framing">
       <h2 className={styles.panelLabel}>Framing</h2>
@@ -32,9 +31,15 @@ export default function FramingPanel({ target, kind, onKindChange, onChangeTarge
         <p className={styles.kindStandard}>{kindOf(kind).standard}</p>
       </div>
 
-      <button type="button" className={styles.check} disabled title="Coming in the next step">
-        Check framing
+      <button type="button" className={styles.check} disabled={checking || !onCheck} onClick={onCheck}>
+        {checking ? "Checking" : "Check framing"}
       </button>
+
+      {checkError ? (
+        <p className={styles.checkError} role="alert">
+          {checkError}
+        </p>
+      ) : null}
 
       <p className={styles.panelEmpty}>
         Check framing to see where your draft takes a side, which claims need a source, and what a reader may notice

@@ -450,6 +450,210 @@
   line-height: 1.55;
 }
 
+.checkError {
+  margin: -0.375rem 0 0;
+  color: var(--error-text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+/* ── Review ──────────────────────────────────────────────────────────── */
+
+/* The annotation from QuoteEvidence: a tint and a rule along the baseline,
+   painted as backgrounds so a mark survives a line wrap. The chosen finding's
+   mark is stronger. */
+.reviewMark {
+  background-image:
+    linear-gradient(rgb(var(--brand-rgb) / 0.45), rgb(var(--brand-rgb) / 0.45)),
+    linear-gradient(rgb(var(--brand-rgb) / 0.11), rgb(var(--brand-rgb) / 0.11));
+  background-size: 100% 2px, 100% 100%;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  padding: 0.0625rem 0 0.125rem;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  scroll-margin: 6rem 0;
+  transition: background-image 0.2s ease;
+}
+
+.reviewMarkActive {
+  background-image:
+    linear-gradient(rgb(var(--brand-rgb)), rgb(var(--brand-rgb))),
+    linear-gradient(rgb(var(--brand-rgb) / 0.26), rgb(var(--brand-rgb) / 0.26));
+}
+
+.reviewNumber {
+  margin-left: 0.0625rem;
+  color: var(--fc-accent);
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  line-height: 0;
+  user-select: none;
+}
+
+.prose[contenteditable="false"] {
+  caret-color: transparent;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.editDraft {
+  height: 2.125rem; /* 34px */
+  padding: 0 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--fc-border) 60%, var(--fc-muted));
+  border-radius: var(--control-radius);
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .editDraft:hover {
+    border-color: var(--fc-heading);
+  }
+}
+
+.editDraft:focus-visible,
+.finding:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--text-rgb) / 0.3);
+}
+
+.reviewSummary {
+  margin: 0 0 0.375rem;
+  color: var(--fc-heading);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.findings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finding {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1rem; /* 14px 16px */
+  border: 1px solid var(--fc-border);
+  border-radius: 0.625rem;
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  text-align: left;
+  cursor: pointer;
+}
+
+.finding[aria-pressed="true"] {
+  border-color: var(--fc-accent);
+  box-shadow: 0 0.375rem 1.125rem rgb(var(--text-rgb) / 0.06);
+}
+
+@media (hover: hover) {
+  .finding:hover:not([aria-pressed="true"]) {
+    border-color: color-mix(in srgb, var(--fc-border) 50%, var(--fc-accent));
+  }
+}
+
+.findingHead {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.5rem;
+}
+
+.findingNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.375rem; /* 22px */
+  height: 1.375rem;
+  border-radius: 50%;
+  background: var(--fc-heading);
+  color: var(--fc-bg);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.findingLabel {
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: var(--fc-tint);
+  color: var(--fc-accent);
+  font-size: 0.8125rem; /* 13px */
+}
+
+.findingQuote {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--fc-body);
+  font-size: 0.9375rem;
+  font-style: italic;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+}
+
+.findingQuestion {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.panelNote {
+  margin: 0;
+  color: var(--fc-body);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.targetSection {
+  margin-top: 0.5rem;
+  padding-top: 1.125rem;
+  border-top: 1px solid var(--fc-border);
+}
+
+.targetSection .panelLabel {
+  margin-bottom: 0.25rem;
+}
+
+.targetSectionName {
+  margin: 0 0 0.75rem;
+  color: var(--fc-muted);
+  font-size: 0.9375rem;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.note {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--fc-border);
+  border-radius: 0.625rem;
+  background: var(--fc-bg);
+  color: var(--fc-heading);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviewMark {
+    transition: none;
+  }
+}
+
 /* ── Setup card ──────────────────────────────────────────────────────── */
 
 /* A card on the dashboard's ground, not a modal over it. */

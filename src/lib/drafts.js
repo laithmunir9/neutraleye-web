@@ -51,7 +51,15 @@ export function countWords(text) {
   return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
-// Part 3 decides what a review holds; for now a note is one finding.
+// What the writer sees for each finding label the review returns.
+export const FINDING_LABEL_TEXT = {
+  loaded_wording: "Loaded wording",
+  needs_source: "Needs a source",
+  one_sided: "One-sided",
+  missing_context: "Missing context",
+};
+
+// A note in the status line is one finding; target notes are not counted.
 export function notesCount(review) {
   return Array.isArray(review?.findings) ? review.findings.length : 0;
 }
@@ -106,4 +114,23 @@ export async function loadDraftContent(supabase, id) {
 /** Saves `patch` and returns the row's new updated_at, for the rail's order. */
 export async function updateDraft(supabase, id, patch) {
   return supabase.from("drafts").update(patch).eq("id", id).select("updated_at").single();
+}
+
+/** Runs "Check framing" on a saved draft. Returns { data } or { error: message }. */
+export async function requestReview(draftId) {
+  let response;
+  try {
+    response = await fetch("/api/write/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-client": "web" },
+      body: JSON.stringify({ draftId }),
+    });
+  } catch {
+    return { error: "The check could not reach NeutralEye. Check your connection and try again." };
+  }
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.review) {
+    return { error: data?.error || "The check could not be finished. Try again." };
+  }
+  return { data };
 }

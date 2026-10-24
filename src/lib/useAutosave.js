@@ -11,6 +11,7 @@ export const AUTOSAVE_DELAY_MS = 1500;
  * overlap: changes made while one is in flight go out right after it.
  *
  * `save(patch)` returns { error }. Status is "saved", "saving" or "error".
+ * `flush()` resolves true once everything is saved, false if it is not.
  * While anything is unsaved the page asks before closing, and saves on the
  * way out.
  */
@@ -32,7 +33,7 @@ export function useAutosave(save, delay = AUTOSAVE_DELAY_MS) {
     // after it, unless a debounce is already waiting on them.
     for (;;) {
       if (inFlight.current) await inFlight.current;
-      if (!pending.current) return;
+      if (!pending.current) return true;
 
       const patch = pending.current;
       pending.current = null;
@@ -52,7 +53,7 @@ export function useAutosave(save, delay = AUTOSAVE_DELAY_MS) {
           return true;
         });
       const saved = await inFlight.current;
-      if (!saved || timer.current) return;
+      if (!saved || timer.current) return false;
     }
   }, []);
 

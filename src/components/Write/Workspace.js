@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { countWords, loadDraftContent, reportDraftError, updateDraft } from "@/lib/drafts";
+import { countWords, kindOf, loadDraftContent, reportDraftError, requestReview, updateDraft } from "@/lib/drafts";
 import { useAutosave } from "@/lib/useAutosave";
 import { draftExtensions } from "./editorExtensions";
+import { createReviewMarks, findingRanges, reviewMarksKey } from "./reviewMarks";
 import Toolbar from "./Toolbar";
 import FramingPanel from "./FramingPanel";
+import ReviewPanel from "./ReviewPanel";
 import styles from "./Write.module.css";
 
 /*
@@ -64,12 +66,19 @@ export default function Workspace({
   );
   const autosave = useAutosave(save);
 
+  // The review on screen (null while editing), the finding chosen in the
+  // panel, and the check in progress.
+  const [review, setReview] = useState(null);
+  const [active, setActive] = useState(null);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState(null);
+
   const ready = Boolean(loaded);
   const editor = useEditor(
     {
       extensions: draftExtensions,
       content: loaded?.content ?? null,
-      editable: ready,
+      editable: ready && !review && !checking,
       autofocus: ready && autofocus ? "end" : false,
       immediatelyRender: false,
       editorProps: {
@@ -103,10 +112,64 @@ export default function Workspace({
     autosave.flush();
   }
 
+  // Saves, then checks the saved draft. The sheet is locked from the moment
+  // the check starts, so the review always matches what is on screen.
+  async function handleCheck() {
+    if (!editor || checking) return;
+    setChecking(true);
+    setCheckError(null);
+    editor.setEditable(false, false);
+
+    const saved = await autosave.flush();
+    const { data, error } = saved
+      ? await requestReview(draft.id)
+      : { error: "Your latest changes are not saved yet, so the check did not run. Try again in a moment." };
+    setChecking(false);
+    if (editor.isDestroyed) return;
+
+    if (error) {
+      setCheckError(error);
+      editor.setEditable(true, false);
+      return;
+    }
+
+    onDraftChange(draft.id, {
+      last_review: data.review,
+      ...(data.last_reviewed_at ? { last_reviewed_at: data.last_reviewed_at } : {}),
+    });
+    if (data.updated_at) onSaved(draft.id, data.updated_at);
+
+    const ranges = findingRanges(editor.state.doc, data.review.findings);
+    editor.registerPlugin(
+      createReviewMarks(ranges, { mark: styles.reviewMark, active: styles.reviewMarkActive, number: styles.reviewNumber })
+    );
+    setActive(null);
+    setReview(data.review);
+  }
+
+  function handleSelectFinding(number) {
+    setActive(number);
+    editor.view.dispatch(editor.state.tr.setMeta(reviewMarksKey, { active: number }));
+    const mark = editor.view.dom.querySelector(`[data-finding="${number}"]`);
+    if (mark) {
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      mark.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    }
+  }
+
+  function handleEdit() {
+    editor.unregisterPlugin(reviewMarksKey);
+    editor.setEditable(true, false);
+    setReview(null);
+    setActive(null);
+    editor.commands.focus();
+  }
+
   return (
     <>
       <Toolbar
         editor={ready ? editor : null}
+        checkedAs={review ? kindOf(review.kind).label : null}
         title={draft.title}
         onTitleChange={handleTitleChange}
         onTitleBlur={() => autosave.flush()}
@@ -130,7 +193,9 @@ export default function Workspace({
             <p className={styles.sheetNote}>Opening your draft</p>
           )}
         </main>
-        {panelOpen ? (
+        {panelOpen && review ? (
+          <ReviewPanel review={review} active={active} onSelect={handleSelectFinding} onEdit={handleEdit} />
+        ) : panelOpen ? (
           <FramingPanel
             target={draft.target}
             kind={draft.kind}
@@ -139,6 +204,9 @@ export default function Workspace({
               autosave.flush();
               onChangeTarget();
             }}
+            onCheck={ready && !loadFailed ? handleCheck : null}
+            checking={checking}
+            checkError={checkError}
           />
         ) : null}
       </div>

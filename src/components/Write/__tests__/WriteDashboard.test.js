@@ -91,7 +91,7 @@ describe("with drafts", () => {
     await waitFor(() => expect(mockCalls.find((c) => c.kind === "select")).toMatchObject({ columns: "content", filters: { id: "b" } }));
   });
 
-  test("the panel shows the target and the kind's standard, and the check waits for part 3", () => {
+  test("the panel shows the target and the kind's standard, and the check opens once the draft has loaded", async () => {
     render(<WriteDashboard initialDrafts={DRAFTS} />);
     const panel = screen.getByRole("complementary", { name: "Framing" });
     expect(within(panel).getByText("The Economist, news analysis")).toBeVisible();
@@ -99,8 +99,83 @@ describe("with drafts", () => {
     expect(within(panel).getByText(/^Opinion: taking a side is the point/)).toBeVisible();
     const check = within(panel).getByRole("button", { name: "Check framing" });
     expect(check).toBeDisabled();
-    expect(check).toHaveAttribute("title", "Coming in the next step");
+    await waitFor(() => expect(check).toBeEnabled());
     expect(within(panel).getByText(/It will not rewrite anything. The fixing stays with you./)).toBeVisible();
+  });
+
+  describe("Check framing", () => {
+    const REVIEW = {
+      summary: "Arguing is what an opinion piece does.",
+      findings: [{ quote: "Saved words", label: "needs_source", question: "What shows this?" }],
+      target_notes: [{ note: "Pieces like this open with the news. Is that the choice you want?" }],
+      kind: "opinion",
+      target: "The Economist, news analysis",
+    };
+
+    beforeEach(() => {
+      Element.prototype.scrollIntoView = jest.fn();
+      // Edit draft refocuses the editor, and ProseMirror then measures the
+      // caret to scroll to it; jsdom has no layout, so give it empty boxes.
+      const box = { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+      Range.prototype.getClientRects = () => [];
+      Range.prototype.getBoundingClientRect = () => box;
+      Element.prototype.getClientRects = () => [];
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ review: REVIEW, last_reviewed_at: new Date().toISOString(), updated_at: "2026-10-23T12:00:00Z" }),
+      });
+    });
+
+    afterEach(() => {
+      delete global.fetch;
+    });
+
+    test("shows the review read-only, marks the passage, and Edit draft goes back", async () => {
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={DRAFTS} />);
+      const check = screen.getByRole("button", { name: "Check framing" });
+      await waitFor(() => expect(check).toBeEnabled());
+      await user.click(check);
+
+      await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Checked as Opinion"));
+      expect(global.fetch).toHaveBeenCalledWith("/api/write/review", expect.objectContaining({ method: "POST", body: JSON.stringify({ draftId: "b" }) }));
+      expect(screen.getByRole("button", { name: "Bold" })).toBeDisabled();
+      expect(screen.getByRole("textbox", { name: "Draft" })).toHaveAttribute("contenteditable", "false");
+
+      const panel = screen.getByRole("complementary", { name: "Framing" });
+      expect(within(panel).getByText(REVIEW.summary)).toBeVisible();
+      const card = within(panel).getByRole("button", { name: /Needs a source/ });
+      expect(card).toHaveTextContent("“Saved words”");
+      expect(card).toHaveTextContent("What shows this?");
+      expect(within(panel).getByRole("heading", { name: "Against your target" })).toBeVisible();
+      expect(within(panel).getByText(REVIEW.target_notes[0].note)).toBeVisible();
+      expect(screen.getByText("Opinion · Checked today · 1 note")).toBeVisible();
+
+      const mark = document.querySelector('[data-finding="1"]');
+      expect(mark).toHaveTextContent("Saved words");
+      await user.click(card);
+      expect(card).toHaveAttribute("aria-pressed", "true");
+      expect(mark.scrollIntoView).toHaveBeenCalled();
+
+      await user.click(within(panel).getByRole("button", { name: "Edit draft" }));
+      expect(screen.getByRole("status")).toHaveTextContent("Saved");
+      expect(document.querySelector("[data-finding]")).toBeNull();
+      expect(screen.getByRole("textbox", { name: "Draft" })).toHaveAttribute("contenteditable", "true");
+      expect(screen.getByRole("button", { name: "Check framing" })).toBeVisible();
+    });
+
+    test("an error stays in the panel and the draft stays editable", async () => {
+      global.fetch.mockResolvedValue({ ok: false, json: async () => ({ error: "You've reached today's limit of 10 checks. Your limit resets tomorrow." }) });
+      const user = userEvent.setup();
+      render(<WriteDashboard initialDrafts={DRAFTS} />);
+      const check = screen.getByRole("button", { name: "Check framing" });
+      await waitFor(() => expect(check).toBeEnabled());
+      await user.click(check);
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("today's limit of 10 checks");
+      expect(screen.getByRole("textbox", { name: "Draft" })).toHaveAttribute("contenteditable", "true");
+      expect(screen.getByRole("button", { name: "Check framing" })).toBeEnabled();
+    });
   });
 
   test("changing the kind saves it and updates the standard and the rail", async () => {
