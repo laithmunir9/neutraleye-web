@@ -147,14 +147,24 @@ export default function Workspace({
     setReview(data.review);
   }
 
-  function handleSelectFinding(number) {
-    setActive(number);
-    editor.view.dispatch(editor.state.tr.setMeta(reviewMarksKey, { active: number }));
-    const mark = editor.view.dom.querySelector(`[data-finding="${number}"]`);
+  // From the panel's index: show that note and bring its passage into view.
+  // From the sheet: the passage is already in view. Choosing the open note
+  // again closes it.
+  function handleSelectFinding(number, { fromSheet = false } = {}) {
+    const next = number === active ? null : number;
+    setActive(next);
+    editor.view.dispatch(editor.state.tr.setMeta(reviewMarksKey, { active: next }));
+    const mark = next && !fromSheet && editor.view.dom.querySelector(`[data-finding="${next}"]`);
     if (mark) {
       const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       mark.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
     }
+  }
+
+  function handleSheetClick(event) {
+    const target = event.target.closest?.("[data-finding], [data-finding-number]");
+    if (!target) return;
+    handleSelectFinding(Number(target.dataset.finding || target.dataset.findingNumber), { fromSheet: true });
   }
 
   function handleEdit() {
@@ -188,7 +198,11 @@ export default function Workspace({
               This draft could not be opened. Refresh the page to try again.
             </p>
           ) : ready ? (
-            <EditorContent editor={editor} className={styles.editor} />
+            <EditorContent
+              editor={editor}
+              className={`${styles.editor} ${review ? styles.reviewing : ""}`}
+              onClick={review ? handleSheetClick : undefined}
+            />
           ) : (
             <p className={styles.sheetNote}>Opening your draft</p>
           )}

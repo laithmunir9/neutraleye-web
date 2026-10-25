@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -154,18 +154,32 @@ describe("with drafts", () => {
 
       const panel = screen.getByRole("complementary", { name: "Framing" });
       expect(within(panel).getByText(REVIEW.summary)).toBeVisible();
-      const card = within(panel).getByRole("button", { name: /Needs a source/ });
-      expect(card).toHaveTextContent("“Saved words”");
-      expect(card).toHaveTextContent("What shows this?");
+      expect(within(panel).getByText(/One passage is marked on your draft/)).toBeVisible();
+      // The target notes always show; a note's question only once it is chosen.
       expect(within(panel).getByRole("heading", { name: "Against your target" })).toBeVisible();
       expect(within(panel).getByText(REVIEW.target_notes[0].note)).toBeVisible();
+      expect(within(panel).queryByText("What shows this?")).toBeNull();
       expect(screen.getByText("Opinion · Checked today · 1 note")).toBeVisible();
 
+      // From the index: the note opens and the sheet scrolls to its passage.
+      const row = within(panel).getByRole("button", { name: "Note 1: Needs a source" });
       const mark = document.querySelector('[data-finding="1"]');
       expect(mark).toHaveTextContent("Saved words");
-      await user.click(card);
-      expect(card).toHaveAttribute("aria-pressed", "true");
-      expect(mark.scrollIntoView).toHaveBeenCalled();
+      const sheetScrolls = () => Element.prototype.scrollIntoView.mock.contexts.filter((el) => el.dataset.finding).length;
+      await user.click(row);
+      expect(row).toHaveAttribute("aria-pressed", "true");
+      expect(within(panel).getByText("Saved words", { selector: "q" })).toBeVisible();
+      expect(within(panel).getByText("What shows this?")).toBeVisible();
+      expect(sheetScrolls()).toBe(1);
+
+      // Choosing it again closes it; clicking the marked passage opens it.
+      await user.click(row);
+      expect(within(panel).queryByText("What shows this?")).toBeNull();
+      // A click alone: jsdom cannot place ProseMirror's mousedown.
+      fireEvent.click(document.querySelector('[data-finding="1"]'));
+      expect(row).toHaveAttribute("aria-pressed", "true");
+      expect(within(panel).getByText("What shows this?")).toBeVisible();
+      expect(sheetScrolls()).toBe(1);
 
       await user.click(within(panel).getByRole("button", { name: "Edit draft" }));
       expect(screen.getByRole("status")).toHaveTextContent("Saved");

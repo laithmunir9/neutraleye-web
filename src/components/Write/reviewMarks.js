@@ -59,6 +59,7 @@ function numberWidget(number, className) {
     sup.className = className;
     sup.textContent = String(number);
     sup.setAttribute("aria-hidden", "true");
+    sup.dataset.findingNumber = String(number);
     return sup;
   };
 }
