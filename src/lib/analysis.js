@@ -3,7 +3,7 @@ import http from "node:http";
 import https from "node:https";
 import { logEvent, reportToSentry } from "./apiLog";
 import { resolveSafeAddress, MAX_REDIRECTS } from "./ssrf";
-import { isNoBiasLevel, isNonDirectional, NO_BIAS_RESULT_TEXT } from "./biasLevel";
+import { isNoBiasLevel, isNonDirectional, NO_BIAS_RESULT_TEXT, OPINION_NO_BIAS_RESULT_TEXT, REASON_LABELS } from "./biasLevel";
 
 // Shared analysis pipeline used by both /api/analyze and /api/extension.
 // This is the single home of the article-detection and bias-analysis prompts —
@@ -492,7 +492,7 @@ export function buildHumanResult(json) {
   const recs = Array.isArray(json.recommendations) ? json.recommendations : [];
 
   if (isNoBiasLevel(biasLevel)) {
-    return NO_BIAS_RESULT_TEXT;
+    return contentTypeFromAiJson(json) === "opinion" ? OPINION_NO_BIAS_RESULT_TEXT : NO_BIAS_RESULT_TEXT;
   }
 
   const parts = [];
@@ -501,10 +501,21 @@ export function buildHumanResult(json) {
   parts.push(`**Framing**\n${levelLabel}${directionText}.`);
 
   if (summary) parts.push(`**Summary**\n${summary}`);
-  if (explanation && explanation !== summary) parts.push(explanation);
+  // The rationale only stands in for a missing summary: the popup is small,
+  // and the two mostly say the same thing.
+  if (explanation && !summary) parts.push(explanation);
 
   if (phrases.length) {
-    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}": ${String(p.note || p.why || "").trim()}`).join("\n");
+    // "Label: note" when the model wrote a note. The popup splits it into its
+    // label and sentence; a popup that predates notes shows the line as it is.
+    // Without a note, the bare category, which every popup maps itself.
+    const exLines = phrases.map((p) => {
+      const why = String(p.why || "").trim();
+      const note = String(p.note || "").trim();
+      const label = REASON_LABELS[why.toLowerCase()];
+      const reason = note ? (label ? `${label}: ${note}` : note) : why;
+      return `- "${String(p.quote || "").trim()}": ${reason}`;
+    }).join("\n");
     parts.push(`**Examples**\n${exLines}`);
   }
 

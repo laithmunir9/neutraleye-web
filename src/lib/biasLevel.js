@@ -15,6 +15,17 @@ export const NO_BIAS_LABEL = "No significant framing detected";
 export const OPINION_NO_BIAS_LABEL = "Opinion: argues its side openly";
 export const NO_BIAS_RESULT_TEXT =
   "✅ No significant framing detected. Please feel free to continue reading.";
+// The extension's text for that opinion case: the finding line, then why.
+export const OPINION_NO_BIAS_RESULT_TEXT =
+  `${OPINION_NO_BIAS_LABEL}.\n\nTaking a side is what opinion writing does, so the stance itself is not flagged. Nothing in it misrepresented facts or stated a contested claim as settled strongly enough to flag.`;
+
+// What a reader sees for each passage category the model returns ("why").
+export const REASON_LABELS = {
+  language: "Loaded wording",
+  framing: "Framing",
+  source: "Source imbalance",
+  attribution: "Attribution gaps",
+};
 
 // Pre-rename rows saved before the framing vocabulary landed. Recognized only so
 // existing history keeps rendering correctly; they age out and no further

@@ -1,5 +1,5 @@
 import { buildHumanResult, contentTypeFromAiJson } from "./analysis";
-import { isNoBiasLevel, isNonDirectional, textLooksNoBias, NO_BIAS_LABEL, NO_BIAS_RESULT_TEXT } from "./biasLevel";
+import { isNoBiasLevel, isNonDirectional, textLooksNoBias, NO_BIAS_LABEL, NO_BIAS_RESULT_TEXT, REASON_LABELS } from "./biasLevel";
 
 // AI-response → website result-shape normalization, shared home so it can be
 // unit-tested (Next.js route files may only export HTTP handlers).
@@ -61,10 +61,7 @@ function titleCase(value) {
 
 export function driverLabelFromReason(reason) {
   const n = String(reason || "").trim().toLowerCase();
-  if (n === "language") return "Loaded wording";
-  if (n === "framing") return "Framing";
-  if (n === "source") return "Source imbalance";
-  if (n === "attribution") return "Attribution gaps";
+  if (REASON_LABELS[n]) return REASON_LABELS[n];
   // AI sometimes returns descriptive labels (e.g. "LOADED PHRASING") — title-case them
   const raw = String(reason || "").trim();
   if (raw) return raw.split(/[\s_-]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");

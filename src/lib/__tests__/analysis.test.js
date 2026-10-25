@@ -59,12 +59,32 @@ describe("buildHumanResult", () => {
     expect(result).not.toContain("unknown");
   });
 
-  it("includes explanation only when it differs from summary", () => {
-    const same = buildHumanResult({ bias_level: "slight", summary: "Same text", explanation: "Same text" });
-    expect(same.match(/Same text/g)).toHaveLength(1);
+  it("includes the explanation only in place of a missing summary", () => {
+    const both = buildHumanResult({ bias_level: "slight", summary: "Summary text", explanation: "Different rationale" });
+    expect(both).toContain("Summary text");
+    expect(both).not.toContain("Different rationale");
 
-    const different = buildHumanResult({ bias_level: "slight", summary: "Summary text", explanation: "Different rationale" });
-    expect(different).toContain("Different rationale");
+    const noSummary = buildHumanResult({ bias_level: "slight", explanation: "Different rationale" });
+    expect(noSummary).toContain("Different rationale");
+  });
+
+  it("an opinion piece with nothing flagged leads with the opinion finding", () => {
+    const result = buildHumanResult({ bias_level: "none", content_type: "opinion", summary: "x" });
+    expect(result.split("\n\n")[0]).toBe("Opinion: argues its side openly.");
+    expect(result).toContain("so the stance itself is not flagged");
+    expect(result).not.toContain("No significant framing");
+  });
+
+  it("renders a passage's note after its label", () => {
+    const result = buildHumanResult({
+      bias_level: "heavy",
+      biased_phrases: [
+        { quote: "the reckless plan", why: "language", note: "'Reckless' judges the plan before the evidence." },
+        { quote: "officials said little", why: "something new", note: "Only one side is asked." },
+      ],
+    });
+    expect(result).toContain(`- "the reckless plan": Loaded wording: 'Reckless' judges the plan before the evidence.`);
+    expect(result).toContain(`- "officials said little": Only one side is asked.`);
   });
 
   it("renders biased_phrases as quote/why lines", () => {
