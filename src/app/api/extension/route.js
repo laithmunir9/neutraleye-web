@@ -102,7 +102,7 @@ async function saveAnalysisToCloud(supabase, userId, parsedJson, inputUrl, headl
     score: parsedJson.analysis_confidence ?? 0,
     summary: parsedJson.summary || "",
     drivers,
-    examples: (parsedJson.biased_phrases || []).map((p) => ({ quote: p.quote, why: p.why })),
+    examples: (parsedJson.biased_phrases || []).map((p) => ({ quote: p.quote, why: p.why, ...(p.note ? { note: p.note } : {}) })),
     sources: parsedJson.suggested_sources || [],
     recommendations: parsedJson.recommendations || [],
     request_meta: { source: "extension", ...analysisMetaFields(parsedJson) },

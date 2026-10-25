@@ -116,7 +116,13 @@ export function normalizeAiResult(parsed) {
         const quote = String(item?.quote || "").trim();
         const why = String(item?.why || "").trim().toLowerCase();
         if (!quote) return null;
-        return { quote, label: driverLabelFromReason(why), explanation: explanationFromReason(why), highlights: [] };
+        // The model's own note on this passage; the generic line per category
+        // only when it sent none. Marked words must sit inside the quote.
+        const note = String(item?.note || "").trim();
+        const highlights = uniqueStrings(Array.isArray(item?.words) ? item.words : [])
+          .filter((word) => word.length < quote.length && quote.includes(word))
+          .slice(0, 3);
+        return { quote, label: driverLabelFromReason(why), explanation: note || explanationFromReason(why), highlights };
       }).filter(Boolean)
     : humanSections.examples;
   const drivers = uniqueStrings(examples.map((item) => item.label));

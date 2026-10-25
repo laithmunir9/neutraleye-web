@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { ANALYSIS_STORAGE_KEY } from "./types";
 import { saveAnalysisToSupabase } from "./supabase/analyses";
 
@@ -31,10 +32,11 @@ export function saveAnalysis(record, user = null) {
 
   if (user?.id) {
     const tagged = { ...record, requestMeta: { ...(record.requestMeta || {}), source: "website" } };
+    // Reported by Postgres code only, never the article or the result.
     saveAnalysisToSupabase(tagged, user.id).catch((err) => {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("[neutraleye] supabase save failed", err);
-      }
+      Sentry.captureException(new Error("Analysis save failed"), {
+        tags: { area: "read", code: err?.code || "unknown" },
+      });
     });
   }
 

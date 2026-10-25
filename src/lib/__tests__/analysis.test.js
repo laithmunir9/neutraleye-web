@@ -135,16 +135,17 @@ describe("reader wording backstop", () => {
       summary: "The article is biased.",
       explanation: "Shows bias through omission.",
       recommendations: ["Compare with unbiased coverage."],
-      biased_phrases: [{ quote: "a biased council stacked the vote", why: "language" }],
+      biased_phrases: [{ quote: "a biased council stacked the vote", why: "language", note: "Calling the council biased decides the question." }],
     };
     const counts = scrubReaderFields(json);
+    expect(json.biased_phrases[0].note).toBe("Calling the council one-sided decides the question.");
     expect(json.summary).toBe("The article is one-sided.");
     expect(json.explanation).toBe("Shows framing through omission.");
     expect(json.recommendations).toEqual(["Compare with even-handed coverage."]);
     expect(json.direction).toBe("non-directional framing");
     expect(json.biased_phrases[0].quote).toBe("a biased council stacked the vote");
     expect(json.bias_level).toBe("moderate");
-    expect(counts.replaced).toBe(4);
+    expect(counts.replaced).toBe(5);
   });
 });
 

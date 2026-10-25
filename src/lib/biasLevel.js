@@ -9,6 +9,10 @@ export const NO_BIAS = "none";
 
 // Single source of truth for the copy. Renderers read these; matchers do not.
 export const NO_BIAS_LABEL = "No significant framing detected";
+// The same "none" result for an opinion piece, on the website. Taking a side
+// is what opinion writing does, so "no framing" there reads as wrong; the
+// analysis held it to the opinion standard instead. Still keyed off the enum.
+export const OPINION_NO_BIAS_LABEL = "Opinion: argues its side openly";
 export const NO_BIAS_RESULT_TEXT =
   "✅ No significant framing detected. Please feel free to continue reading.";
 

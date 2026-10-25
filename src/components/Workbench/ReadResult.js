@@ -1,16 +1,27 @@
 import QuoteEvidence from "@/components/QuoteEvidence/QuoteEvidence";
-import { isNoBiasRecord, NO_BIAS_LABEL } from "@/lib/biasLevel";
+import { isNoBiasRecord, NO_BIAS_LABEL, OPINION_NO_BIAS_LABEL } from "@/lib/biasLevel";
 import styles from "./Workbench.module.css";
 
 /* Moved from the retired /analyze page. The copy and the no-framing handling are
    unchanged; only the layout moved into the single homepage column. */
 
 const NEUTRAL_SUMMARY_TEMPLATE =
-  "This read stayed below the threshold for a meaningful framing flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to mark the article as slanted.";
+  "This read stayed below the threshold for a meaningful framing flag. The review did not find a consistent pattern of loaded wording, one-sided framing, source imbalance, or missing attribution strong enough to flag.";
 const NEUTRAL_NOTE_ITEMS = [
   "No strong directional pattern repeated across wording, framing, and attribution.",
   "Visible signals stayed below the threshold required for a meaningful framing flag.",
   "This result reflects the current text only and is not a guarantee that every relevant context is present."
+];
+// An opinion piece with nothing flagged was read against the opinion
+// standard (src/lib/analysis.js): a stance and persuasive wording are expected,
+// and only misrepresented facts, misleading omissions or contested claims
+// stated as settled count. Saying "no framing" about an argument reads as wrong.
+const OPINION_SUMMARY =
+  "This is an opinion piece, so it was read against the opinion standard: a clear stance and persuasive wording are expected. The review did not find facts misrepresented, important context left out in a misleading way, or contested claims stated as settled.";
+const OPINION_NOTE_ITEMS = [
+  "Arguing for one side is what opinion writing does, so the stance itself is not flagged.",
+  "No passage misrepresented facts or stated a contested claim as settled strongly enough to flag.",
+  NEUTRAL_NOTE_ITEMS[2]
 ];
 const CONTENT_TYPE_LABELS = {
   news: "News",
@@ -42,23 +53,29 @@ function stripPlaceholders(value) {
     .trim();
 }
 
+const isOpinionRead = (result) => isNoBiasResult(result) && result?.contentType === "opinion";
+
 function resultTitle(result) {
+  if (isOpinionRead(result)) return `${OPINION_NO_BIAS_LABEL}.`;
   if (isNoBiasResult(result)) return `${NO_BIAS_LABEL}.`;
   return stripPlaceholders(result.directionLabel || result.direction) || "Framing signal found";
 }
 
 function resultHelperText(result) {
+  if (isOpinionRead(result)) return "Taking a side is what opinion writing does.";
   if (isNoBiasResult(result)) return "Please feel free to continue reading.";
   return "Overall finding based on the article's tone, framing, sourcing, and attribution.";
 }
 
 function neutralSummaryText(result) {
+  if (isOpinionRead(result)) return OPINION_SUMMARY;
   const drivers = cleanDrivers(result);
   if (!drivers.length) return NEUTRAL_SUMMARY_TEMPLATE;
   return `This read stayed below the threshold for a meaningful framing flag. The review did not find a repeated framing signal across ${drivers.slice(0, 3).join(", ").toLowerCase()}, so the article can be read without a strong directional warning from NeutralEye.`;
 }
 
 function neutralNoteItems(result) {
+  if (isOpinionRead(result)) return OPINION_NOTE_ITEMS;
   const drivers = cleanDrivers(result);
   if (!drivers.length) return NEUTRAL_NOTE_ITEMS;
   return [

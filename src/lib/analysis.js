@@ -335,6 +335,14 @@ export function scrubReaderFields(json) {
     counts.replaced += replaced;
     if (SPECTRUM_TERMS.test(String(text || ""))) counts.spectrum += 1;
   }
+  if (Array.isArray(json.biased_phrases)) {
+    for (const phrase of json.biased_phrases) {
+      if (!phrase || typeof phrase !== "object") continue;
+      const { text, replaced } = scrubReaderText(phrase.note);
+      phrase.note = text;
+      counts.replaced += replaced;
+    }
+  }
   if (Array.isArray(json.recommendations)) {
     json.recommendations = json.recommendations.map((item) => {
       const { text, replaced } = scrubReaderText(item);
@@ -396,7 +404,7 @@ SUGGESTED_SOURCES RULES
 - If you cannot verify relevant specific articles, use an empty array for suggested_sources.${sourceDomain ? `\n- Do NOT suggest ${sourceDomain} as a source — the article being analyzed is already from that outlet.` : ""}
 
 READER-FACING WORDING
-- "summary", "explanation", "recommendations", and "direction" are shown to readers. NeutralEye describes framing; it does not label articles as biased.
+- "summary", "explanation", "recommendations", "direction", and each biased_phrases "note" are shown to readers. NeutralEye describes framing; it does not label articles as biased.
 - In those fields, never use the words "bias", "biased", "slant", "slanted", or "partisan", and never place the article or outlet on a political spectrum (no "left-leaning", "right-leaning", "liberal", "conservative" as a label for the article).
 - Describe what the writing does instead: framing, emphasis, loaded wording, one-sided sourcing, missing attribution, omission. For example, write "the journalist's framing favours one side" rather than "the article is biased".
 - The JSON key names below are fixed and must stay exactly as written, even though some contain the word "bias".
@@ -411,9 +419,9 @@ Required schema:
   "bias_level": "none" | "slight" | "moderate" | "heavy" | "uncertain",
   "direction": "toward <entity>" | "against <entity>" | "non-directional" | "unknown",
   "analysis_confidence": <number 0.00–1.00>,
-  "summary": "<one or two neutral sentences in framing terms; do not use the word bias, even to deny it. If bias_level is 'none', say plainly that the journalist's own writing does not meaningfully frame the story. If bias_level is not 'none', state plainly how the journalist's own writing frames the story and briefly why, never calling it biased.>",
+  "summary": "<one or two neutral sentences in framing terms; do not use the word bias, even to deny it. If bias_level is 'none' and content_type is 'opinion', say plainly that the piece argues its position openly, as opinion writing does, and that it does not misrepresent facts or present contested claims as settled. If bias_level is 'none' otherwise, say plainly that the journalist's own writing does not meaningfully frame the story. If bias_level is not 'none', state plainly how the journalist's own writing frames the story and briefly why, never calling it biased.>",
   "biased_phrases": [
-    { "quote": "<exact excerpt of the journalist's own writing — never a quote attributed to a person in the article>", "why": "framing|language|source|attribution" }
+    { "quote": "<exact excerpt of the journalist's own writing — never a quote attributed to a person in the article>", "why": "framing|language|source|attribution", "note": "<one plain sentence about this excerpt only: what its specific wording or choice does to the reader's picture of the story. Name the words or the choice. Never suggest replacement wording.>", "words": ["<1 to 3 of the loaded words or short phrases inside quote, each copied exactly from quote; an empty array when the issue is a choice of emphasis, sourcing or attribution rather than particular words>"] }
   ],
   "suggested_sources": [
     { "title": "Article title here", "url": "https://outlet.com/article-path", "outlet": "Outlet Name" }
@@ -424,6 +432,7 @@ Required schema:
 
 Rules:
 - If bias_level is "none", biased_phrases must be an empty array.
+- Every biased_phrases "note" must be specific to its own excerpt. Never repeat a general definition such as "loaded wording shifts perception".
 - If you cannot confidently verify a source URL exists and covers this exact topic, suggested_sources must be an empty array.
 
 TEXT_FOR_ANALYSIS:
@@ -495,7 +504,7 @@ export function buildHumanResult(json) {
   if (explanation && explanation !== summary) parts.push(explanation);
 
   if (phrases.length) {
-    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}": ${String(p.why || "").trim()}`).join("\n");
+    const exLines = phrases.map((p) => `- "${String(p.quote || "").trim()}": ${String(p.note || p.why || "").trim()}`).join("\n");
     parts.push(`**Examples**\n${exLines}`);
   }
 

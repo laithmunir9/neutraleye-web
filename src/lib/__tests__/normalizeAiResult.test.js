@@ -41,6 +41,33 @@ describe("parseAiResponse + normalizeAiResult", () => {
     expect(normalized.recommendations).toEqual(["Compare with wire-service reporting."]);
   });
 
+  test("each passage keeps the model's own note and only words found inside its quote", () => {
+    const aiResponse = JSON.stringify({
+      content_type: "news",
+      bias_level: "moderate",
+      direction: "against the council",
+      analysis_confidence: 0.8,
+      summary: "s",
+      biased_phrases: [
+        {
+          quote: "the council rammed through a punishing fee hike",
+          why: "language",
+          note: "'Rammed through' says the vote was forced, which the article does not show.",
+          words: ["rammed through", "punishing", "not in the quote", "the council rammed through a punishing fee hike"],
+        },
+        { quote: "critics were largely ignored", why: "source" },
+      ],
+    });
+
+    const [first, second] = normalizeAiResult(parseAiResponse(aiResponse)).examples;
+
+    expect(first.explanation).toBe("'Rammed through' says the vote was forced, which the article does not show.");
+    expect(first.highlights).toEqual(["rammed through", "punishing"]);
+    // No note sent: the category's general line, and the whole quote is marked.
+    expect(second.explanation).toBe("The sourcing appears one-sided or lacks meaningful counterbalance.");
+    expect(second.highlights).toEqual([]);
+  });
+
   test("bias_level 'none' normalizes to zero score and the no-bias direction label", () => {
     const aiResponse = JSON.stringify({
       content_type: "news",

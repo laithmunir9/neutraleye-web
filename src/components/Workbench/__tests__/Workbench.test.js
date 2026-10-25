@@ -172,6 +172,41 @@ describe("Read mode", () => {
     expect(screen.getByText(/no follow-up steps were generated/i)).toBeInTheDocument();
   });
 
+  test("an opinion piece with nothing flagged says it argues openly, not that it has no framing", async () => {
+    mockAnalyzeText.mockResolvedValue({
+      id: "opinion-1",
+      createdAt: "2026-10-25T12:00:00.000Z",
+      inputType: "text",
+      contentType: "opinion",
+      direction: "non-directional",
+      directionLabel: "No significant framing detected",
+      confidence: 0.9,
+      summary: "",
+      drivers: [],
+      examples: [],
+      sources: [],
+      recommendations: [],
+      requestMeta: { biasLevel: "none", contentType: "opinion" }
+    });
+
+    const user = userEvent.setup();
+    render(<AnalyzePage />);
+    const textarea = screen.getByPlaceholderText("Paste a link or the article text");
+    await user.click(textarea);
+    await user.paste([
+      "This column argues that the city should scrap its new parking fees before they take effect in March.",
+      "It sets out the case against the plan and answers the council's argument about congestion downtown.",
+      "The content is only a fixture, but it should pass the frontend quality checks before the mocked request succeeds."
+    ].join(" "));
+    await user.click(screen.getByRole("button", { name: "Analyze framing" }));
+
+    await waitFor(() => expect(screen.getAllByText("Opinion: argues its side openly.").length).toBeGreaterThan(0));
+    expect(screen.queryByText("No significant framing detected.")).not.toBeInTheDocument();
+    expect(screen.getByText("Taking a side is what opinion writing does.")).toBeInTheDocument();
+    expect(screen.getByText(/read against the opinion standard/)).toBeInTheDocument();
+    expect(screen.getByText(/so the stance itself is not flagged/)).toBeInTheDocument();
+  });
+
   test("shows a readable validation error for repetitive text input", async () => {
     const user = userEvent.setup();
     render(<AnalyzePage />);

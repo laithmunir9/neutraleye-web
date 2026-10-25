@@ -87,6 +87,22 @@ describe("generateBiasAnalysis prompt contract", () => {
     expect(directionLine).not.toMatch(/bias/i);
   });
 
+  test("asks for a specific note and the loaded words for every passage", async () => {
+    const prompt = await capturePrompt();
+    const phraseLine = prompt.split("\n").find((line) => line.includes('"quote":'));
+    expect(phraseLine).toContain('"note":');
+    expect(phraseLine).toContain('"words":');
+    expect(phraseLine).toMatch(/each copied exactly from quote/);
+    expect(phraseLine).toMatch(/Never suggest replacement wording/);
+    expect(prompt).toMatch(/must be specific to its own excerpt/);
+    expect(prompt).toMatch(/and each biased_phrases "note" are shown to readers/);
+  });
+
+  test("an opinion piece with nothing flagged is described as arguing openly", async () => {
+    const summaryLine = (await capturePrompt()).split("\n").find((line) => line.includes('"summary":'));
+    expect(summaryLine).toMatch(/content_type is 'opinion', say plainly that the piece argues its position openly/);
+  });
+
   test("asks for a real entity in direction, never the template placeholder", async () => {
     const prompt = await capturePrompt();
     expect(prompt).toMatch(/replace <entity> with the actual person, group, institution or side/);
