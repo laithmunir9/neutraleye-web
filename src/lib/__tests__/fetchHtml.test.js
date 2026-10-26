@@ -42,6 +42,18 @@ test("connects to the vetted address while retaining the original URL host", asy
   });
 });
 
+test("answers an all-addresses lookup with an array, as autoSelectFamily requires", async () => {
+  const get = mockResponse({});
+  await fetchHtml("http://example.com/article");
+  const lookup = get.mock.calls[0][1].lookup;
+  await new Promise((resolve) => {
+    lookup("example.com", { all: true }, (_error, addresses) => {
+      expect(addresses).toEqual([{ address: "1.1.1.1", family: 4 }]);
+      resolve();
+    });
+  });
+});
+
 test("rejects an oversized response before reading its body", async () => {
   mockResponse({ "content-length": String(MAX_HTML_BYTES + 1) });
   await expect(fetchHtml("http://example.com/article")).rejects.toMatchObject({

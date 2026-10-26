@@ -81,8 +81,12 @@ function fetchValidatedPage(url, address, timeoutMs) {
         "Accept-Encoding": "identity",
       },
       // Keep Host and TLS verification tied to the URL while connecting only
-      // to the address that passed the SSRF check.
-      lookup: (_hostname, _options, callback) => callback(null, address.address, address.family),
+      // to the address that passed the SSRF check. Node's autoSelectFamily
+      // (on by default) asks with { all: true } and expects an array back.
+      lookup: (_hostname, options, callback) => {
+        if (options?.all) callback(null, [{ address: address.address, family: address.family }]);
+        else callback(null, address.address, address.family);
+      },
     }, (response) => {
       const status = response.statusCode || 0;
       if (status >= 300 && status < 400 && response.headers.location) {

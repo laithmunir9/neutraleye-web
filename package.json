@@ -11,6 +11,9 @@
     "typecheck": "tsc --noEmit --incremental false",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "dependencies": {
     "@next/env": "^16.1.6",
     "@radix-ui/react-avatar": "^1.1.11",
